@@ -76,4 +76,8 @@ app.delete('/api/flights/:id', (req, res) => {
         res.json({ success: !err });
     });
 });
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Сервер запущен на порту ${PORT}`);
+});
 app.listen(3000, () => console.log('🚀 Сервер SAPAR запущен на порту 3000 (БЕЗ ТЕЛЕГРАМА)'));

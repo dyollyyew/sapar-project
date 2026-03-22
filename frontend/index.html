@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html lang="tm">
+<html lang="tk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAPAR.TM — Bilet Almak</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --tm-green: #00843D; }
-        body { font-family: sans-serif; background: #f4f7f6; margin: 0; text-align: center; }
-        .header { background: var(--tm-green); color: white; padding: 20px; font-size: 24px; font-weight: bold; }
-        .search-container { max-width: 450px; margin: 30px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        button { background: #ff5a5f; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #e0484d; }
-        .ticket-card { background: white; margin: 10px auto; padding: 15px; border-radius: 10px; border-left: 5px solid var(--tm-green); display: flex; justify-content: space-between; align-items: center; max-width: 450px; text-align: left; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; }
+        .header { background-color: #1a8a42; color: white; text-align: center; padding: 15px; font-size: 24px; font-weight: bold; }
+        .search-container { max-width: 600px; margin: 30px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; }
+        button { background-color: #ff5e62; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #ff4045; }
+        .results { max-width: 600px; margin: 20px auto; }
+        .ticket { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #1a8a42; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .price { color: #1a8a42; font-weight: bold; font-size: 18px; }
+        .buy-btn { background: #ff5e62; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -21,93 +23,65 @@
 
 <div class="search-container">
     <h3>Bilet Gözleg</h3>
-    <select id="from-city">
-        <option value="Ashgabat">Ashgabat (ASB)</option>
-        <option value="Mary">Mary (MYP)</option>
+    <select id="from">
+        <option value="Ashgabat (ASB)">Ashgabat (ASB)</option>
+        <option value="Istanbul (IST)">Istanbul (IST)</option>
+        <option value="Moscow (VKO)">Moscow (VKO)</option>
     </select>
-    <select id="to-city">
-        <option value="Istanbul">Istanbul (IST)</option>
-        <option value="Moscow">Moscow (VKO)</option>
+    <select id="to">
+        <option value="Istanbul (IST)">Istanbul (IST)</option>
+        <option value="Ashgabat (ASB)">Ashgabat (ASB)</option>
+        <option value="Moscow (VKO)">Moscow (VKO)</option>
     </select>
-    <button onclick="search()">Gözle</button>
+    <button onclick="searchTickets()">Gözle</button>
 </div>
 
-<div id="results"></div>
+<div id="results" class="results"></div>
 
 <script>
-    async function search() {
-        const from = document.getElementById('from-city').value;
-        const to = document.getElementById('to-city').value;
-        const resDiv = document.getElementById('results');
-        resDiv.innerHTML = 'Gözlenilýär...';
+    // СЮДА ВСТАВЬ ССЫЛКУ ИЗ RAILWAY (обязательно с https:// в начале и без косой черты в конце)
+    const API_URL = 'sapar-project-production.up.railway.app';
+
+    async function searchTickets() {
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
+        const resultsDiv = document.getElementById('results');
+
+        resultsDiv.innerHTML = '<p style="text-align:center;">Gözlenýär...</p>';
 
         try {
-            const response = await fetch(`http://localhost:3000/api/search?from=${from}&to=${to}`);
-            const flights = await response.json();
-            resDiv.innerHTML = '';
+            // Запрос на сервер в Railway
+            const response = await fetch(`${API_URL}/api/search?from=${from}&to=${to}`);
+            const tickets = await response.json();
 
-            if (flights.length === 0) {
-                resDiv.innerHTML = 'Bilet tapylmady.';
+            resultsDiv.innerHTML = '';
+
+            if (tickets.length === 0) {
+                resultsDiv.innerHTML = '<p style="text-align:center;">Bilet tapylmady.</p>';
                 return;
             }
 
-            flights.forEach(f => {
-                const price = Math.round(f.base_price * 1.03);
-                resDiv.innerHTML += `
-                    <div class="ticket-card">
-                        <div><b>${f.time}</b><br><small>Turkmenistan Airlines</small></div>
-                        <div style="text-align:right">
-                            <b style="color:var(--tm-green)">${price} TMT</b><br>
-                            <button onclick="buy('${f.from_city}', '${f.to_city}', '${f.time}', ${price})" style="padding:5px 10px; font-size:12px; width:auto;">Satyn al</button>
-                        </div>
-                    </div>`;
+            tickets.forEach(ticket => {
+                const div = document.createElement('div');
+                div.className = 'ticket';
+                div.innerHTML = `
+                    <div>
+                        <strong>${ticket.time}</strong><br>
+                        <small>${ticket.airline}</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="price">${ticket.price} TMT</span><br>
+                        <a href="#" class="buy-btn">Satyn al</a>
+                    </div>
+                `;
+                resultsDiv.appendChild(div);
             });
-        } catch (e) {
-            resDiv.innerHTML = '<p style="color:red">Сервер запущен? Проверь CMD!</p>';
+        } catch (error) {
+            console.error('Error:', error);
+            resultsDiv.innerHTML = '<p style="text-align:center; color:red;">Сервер не отвечает. Проверь Railway!</p>';
         }
-    }
-
-    async function buy(from, to, time, price) {
-        const fio = prompt("F.I.O:");
-        const pas = prompt("Passport №:");
-        if (!fio || !pas) return;
-
-        const res = await fetch('http://localhost:3000/api/book', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ fio, passport: pas, route: from+'-'+to, price: price+' TMT' })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            alert("Sargyt kabul edildi! Bilet ýüklenýär...");
-            generatePDF(fio, pas, from, to, time, price, data.orderId);
-        }
-    }
-
-    function generatePDF(fio, pas, from, to, time, price, id) {
-        const opt = {
-            margin: 1,
-            filename: `Sapar_Bilet_${id}.pdf`,
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        
-        const content = `
-            <div style="padding:30px; border:10px solid #00843D; font-family:sans-serif;">
-                <h1 style="text-align:center; color:#00843D;">SAPAR.TM BILET</h1>
-                <p><b>Order ID:</b> ${id}</p>
-                <p><b>Passenger:</b> ${fio}</p>
-                <p><b>Passport:</b> ${pas}</p>
-                <div style="background:#f0f0f0; padding:15px; border-radius:8px;">
-                    <h3>${from} ✈ ${to}</h3>
-                    <p>Wagty: ${time} | Senesi: 25.03.2026</p>
-                </div>
-                <h2 style="text-align:right;">Bahasy: ${price} TMT</h2>
-            </div>`;
-            
-        html2pdf().set(opt).from(content).save();
     }
 </script>
+
 </body>
 </html>
