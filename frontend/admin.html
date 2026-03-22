@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="tm">
+<head>
+    <meta charset="UTF-8">
+    <title>SAPAR Control Panel</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 30px; background: #f0f2f5; color: #333; }
+        .box { background: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h2 { color: #00843D; border-bottom: 2px solid #00843D; padding-bottom: 10px; }
+        input { padding: 10px; margin: 5px; border: 1px solid #ddd; border-radius: 6px; }
+        button { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-add { background: #00843D; color: white; }
+        .btn-del { background: #ff5a5f; color: white; padding: 5px 10px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>➕ Täze reýs goşmak (Добавить рейс)</h2>
+        <input type="text" id="from" placeholder="Nireden (ASB)">
+        <input type="text" id="to" placeholder="Nirä (IST)">
+        <input type="text" id="time" placeholder="Wagt (12:00)">
+        <input type="number" id="price" placeholder="Baha (TMT)">
+        <button class="btn-add" onclick="addFlight()">Goşmak</button>
+    </div>
+
+    <div class="box">
+        <h2>✈️ Reýsleri dolandyrmak (Рейсы)</h2>
+        <table id="flights-table">
+            <thead><tr><th>ID</th><th>Маршрут</th><th>Время</th><th>Цена</th><th>Удалить</th></tr></thead>
+            <tbody id="flights-list"></tbody>
+        </table>
+    </div>
+
+    <div class="box">
+        <h2>📋 Sargytlar (Заказы клиентов)</h2>
+        <button onclick="loadOrders()" style="background:#333; color:white;">Täzele (Обновить)</button>
+        <table id="orders-table">
+            <thead><tr><th>ID</th><th>Клиент</th><th>Рейс</th><th>Паспорт</th><th>Удалить</th></tr></thead>
+            <tbody id="orders-list"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+
+        async function addFlight() {
+            const body = {
+                from_city: document.getElementById('from').value,
+                to_city: document.getElementById('to').value,
+                time: document.getElementById('time').value,
+                base_price: document.getElementById('price').value
+            };
+            await fetch(`${API}/flights`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+            location.reload();
+        }
+
+        async function loadAll() {
+            // Загрузка рейсов
+            const fRes = await fetch(`${API}/flights/all`);
+            const flights = await fRes.json();
+            document.getElementById('flights-list').innerHTML = flights.map(f => `
+                <tr><td>${f.id}</td><td>${f.from_city} → ${f.to_city}</td><td>${f.time}</td><td>${f.base_price} TMT</td>
+                <td><button class="btn-del" onclick="deleteItem('flights', ${f.id})">X</button></td></tr>`).join('');
+
+            // Загрузка заказов
+            const oRes = await fetch(`${API}/orders`);
+            const orders = await oRes.json();
+            document.getElementById('orders-list').innerHTML = orders.map(o => `
+                <tr><td>${o.id}</td><td>${o.fio}</td><td>${o.route}</td><td>${o.passport}</td>
+                <td><button class="btn-del" onclick="deleteItem('orders', ${o.id})">X</button></td></tr>`).join('');
+        }
+
+        async function deleteItem(type, id) {
+            if(confirm('Pozmak isleýärsiňizmi? (Удалить?)')) {
+                await fetch(`${API}/${type}/${id}`, { method: 'DELETE' });
+                loadAll();
+            }
+        }
+
+        loadAll();
+    </script>
+</body>
+</html>
