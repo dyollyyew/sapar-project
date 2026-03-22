@@ -80,4 +80,29 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Сервер запущен на порту ${PORT}`);
 });
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+// Разрешаем фронтенду (Vercel) делать запросы к этому серверу
+app.use(cors());
+app.use(express.json());
+
+// Тестовый маршрут, чтобы проверить, работает ли ссылка
+app.get('/', (req, res) => {
+    res.send('Бэкенд SAPAR успешно запущен! 🚀');
+});
+
+// Твой основной маршрут для поиска билетов (пример)
+app.get('/search', (req, res) => {
+    const { from, to, date } = req.query;
+    // Здесь будет твоя логика поиска, а пока вернем пустой массив
+    res.json([]); 
+});
+
+// Railway сам назначит порт через переменную окружения
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Сервер запущен на порту ${PORT}`);
+});
 app.listen(3000, () => console.log('🚀 Сервер SAPAR запущен на порту 3000 (БЕЗ ТЕЛЕГРАМА)'));
