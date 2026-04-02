@@ -7,19 +7,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Подключение базы данных
 const dbPath = path.resolve(__dirname, 'sapar.db');
 const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) console.error('DB Error:', err.message);
+    if (err) console.error('Ошибка БД:', err.message);
     else {
-        console.log('Connected to SQLite database.');
+        console.log('База данных подключена.');
         initDB();
     }
 });
 
 function initDB() {
     db.serialize(() => {
-        // Создаем таблицу
         db.run(`CREATE TABLE IF NOT EXISTS trips (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             departure TEXT,
@@ -29,7 +27,6 @@ function initDB() {
             price INTEGER
         )`);
 
-        // Проверяем и добавляем начальные данные
         db.get("SELECT count(*) as count FROM trips", (err, row) => {
             if (row && row.count === 0) {
                 const ins = 'INSERT INTO trips (departure, arrival, time, airline, price) VALUES (?,?,?,?,?)';
@@ -37,13 +34,12 @@ function initDB() {
                 db.run(ins, ["Ashgabat (ASB)", "Istanbul (IST)", "22:15", "Turkish Airlines", 4100]);
                 db.run(ins, ["Ashgabat (ASB)", "Moscow (VKO)", "08:00", "Turkmenistan Airlines", 3200]);
                 db.run(ins, ["Istanbul (IST)", "Ashgabat (ASB)", "15:45", "Turkish Airlines", 3950]);
-                console.log('Initial data seeded.');
+                console.log('Данные добавлены в базу.');
             }
         });
     });
 }
 
-// Маршрут: Список городов
 app.get('/api/cities', (req, res) => {
     const sql = `SELECT DISTINCT departure AS city FROM trips UNION SELECT DISTINCT arrival AS city FROM trips`;
     db.all(sql, [], (err, rows) => {
@@ -52,19 +48,15 @@ app.get('/api/cities', (req, res) => {
     });
 });
 
-// Маршрут: Поиск билетов
 app.get('/api/search', (req, res) => {
     const { from, to } = req.query;
-    const sql = `SELECT * FROM trips WHERE departure = ? AND arrival = ?`;
-    db.all(sql, [from, to], (err, rows) => {
+    db.all(`SELECT * FROM trips WHERE departure = ? AND arrival = ?`, [from, to], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
     });
 });
 
-app.get('/', (req, res) => res.send('SAPAR API is running... ✅'));
+app.get('/', (req, res) => res.send('SAPAR API Online ✅'));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is live on port ${PORT}`);
-});
+app.listen(PORT, '0.0.0.0', () => console.log(`Сервер запущен на порту ${PORT}`));
