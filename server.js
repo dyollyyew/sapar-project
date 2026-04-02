@@ -77,4 +77,22 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Сервер запущен на порту ${PORT}`);
+    // Новый маршрут для получения списка городов
+app.get('/api/cities', (req, res) => {
+    // Выбираем уникальные города из колонок departure и arrival
+    const sql = `
+        SELECT DISTINCT departure AS city FROM trips 
+        UNION 
+        SELECT DISTINCT arrival AS city FROM trips
+    `;
+    
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        const cities = rows.map(row => row.city);
+        res.json(cities);
+    });
+});
 });

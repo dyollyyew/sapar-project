@@ -9,12 +9,14 @@
         .header { background-color: #1a8a42; color: white; text-align: center; padding: 15px; font-size: 24px; font-weight: bold; }
         .search-container { max-width: 600px; margin: 30px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
         select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; }
-        button { background-color: #ff5e62; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button { background-color: #ff5e62; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
         button:hover { background-color: #ff4045; }
         .results { max-width: 600px; margin: 20px auto; }
         .ticket { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #1a8a42; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .price { color: #1a8a42; font-weight: bold; font-size: 18px; }
-        .buy-btn { background: #ff5e62; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-size: 14px; }
+        .buy-btn { background: #ff5e62; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 14px; font-weight: bold; }
+        .loading { text-align: center; color: #666; font-style: italic; }
+        .error { text-align: center; color: #ff5e62; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -23,62 +25,73 @@
 
 <div class="search-container">
     <h3>Bilet Gözleg</h3>
+    <label for="from">Nireden:</label>
     <select id="from">
         <option value="Ashgabat (ASB)">Ashgabat (ASB)</option>
         <option value="Istanbul (IST)">Istanbul (IST)</option>
         <option value="Moscow (VKO)">Moscow (VKO)</option>
     </select>
+
+    <label for="to">Nirä:</label>
     <select id="to">
         <option value="Istanbul (IST)">Istanbul (IST)</option>
         <option value="Ashgabat (ASB)">Ashgabat (ASB)</option>
         <option value="Moscow (VKO)">Moscow (VKO)</option>
     </select>
+    
     <button onclick="searchTickets()">Gözle</button>
 </div>
 
 <div id="results" class="results"></div>
 
 <script>
-    // СЮДА ВСТАВЬ ССЫЛКУ ИЗ RAILWAY (обязательно с https:// в начале и без косой черты в конце)
-  const API_URL = 'https://sapar-project-production.up.railway.app';
+    // Твой адрес в Railway
+    const API_URL = 'https://sapar-project-production.up.railway.app';
 
     async function searchTickets() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
         const resultsDiv = document.getElementById('results');
 
-        resultsDiv.innerHTML = '<p style="text-align:center;">Gözlenýär...</p>';
+        // Показываем индикатор загрузки
+        resultsDiv.innerHTML = '<p class="loading">Gözlenýär, garaşyň...</p>';
 
         try {
-            // Запрос на сервер в Railway
+            // Формируем запрос к API
             const response = await fetch(`${API_URL}/api/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+            
+            if (!response.ok) throw new Error('Сервер ответил с ошибкой');
+            
             const tickets = await response.json();
 
             resultsDiv.innerHTML = '';
 
-            if (tickets.length === 0) {
-                resultsDiv.innerHTML = '<p style="text-align:center;">Bilet tapylmady.</p>';
+            // Если билетов нет
+            if (!tickets || tickets.length === 0) {
+                resultsDiv.innerHTML = '<p style="text-align:center;">Görkezilen ugur boýunça bilet tapylmady.</p>';
                 return;
             }
 
+            // Отрисовка билетов
             tickets.forEach(ticket => {
                 const div = document.createElement('div');
                 div.className = 'ticket';
                 div.innerHTML = `
                     <div>
-                        <strong>${ticket.time}</strong><br>
-                        <small>${ticket.airline}</small>
+                        <strong>${ticket.time || '--:--'}</strong><br>
+                        <small>${ticket.airline || 'Näbelli awiakompaniýa'}</small>
                     </div>
                     <div style="text-align: right;">
                         <span class="price">${ticket.price} TMT</span><br>
-                        <a href="#" class="buy-btn">Satyn al</a>
+                        <a href="#" class="buy-btn" onclick="alert('Satyn alşyňyz tassyklanyldy!')">Satyn al</a>
                     </div>
                 `;
                 resultsDiv.appendChild(div);
             });
+
         } catch (error) {
-            console.error('Error:', error);
-            resultsDiv.innerHTML = '<p style="text-align:center; color:red;">Сервер не отвечает. Проверь Railway!</p>';
+            console.error('Fetch Error:', error);
+            resultsDiv.innerHTML = '<p class="error">Сервер не отвечает. Проверьте соединение или Railway!</p>';
         }
     }
 </script>
