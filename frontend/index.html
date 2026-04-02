@@ -3,98 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM — Bilet Almak</title>
+    <title>SAPAR.TM</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; }
-        .header { background-color: #1a8a42; color: white; text-align: center; padding: 15px; font-size: 24px; font-weight: bold; }
-        .search-container { max-width: 600px; margin: 30px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-        select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; }
-        button { background-color: #ff5e62; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background-color: #ff4045; }
-        .results { max-width: 600px; margin: 20px auto; }
-        .ticket { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #1a8a42; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .price { color: #1a8a42; font-weight: bold; font-size: 18px; }
-        .buy-btn { background: #ff5e62; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 14px; font-weight: bold; }
-        .loading { text-align: center; color: #666; font-style: italic; }
-        .error { text-align: center; color: #ff5e62; font-weight: bold; }
+        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        .header { background: #1a8a42; color: white; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; }
+        .container { max-width: 500px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #ddd; font-size: 16px; }
+        button { background: #ff5e62; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .ticket { background: white; padding: 15px; margin-top: 10px; border-radius: 8px; border-left: 5px solid #1a8a42; display: flex; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .price { color: #1a8a42; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="header">SAPAR.TM</div>
 
-<div class="search-container">
-    <h3>Bilet Gözleg</h3>
-    <label for="from">Nireden:</label>
-    <select id="from">
-        <option value="Ashgabat (ASB)">Ashgabat (ASB)</option>
-        <option value="Istanbul (IST)">Istanbul (IST)</option>
-        <option value="Moscow (VKO)">Moscow (VKO)</option>
-    </select>
-
-    <label for="to">Nirä:</label>
-    <select id="to">
-        <option value="Istanbul (IST)">Istanbul (IST)</option>
-        <option value="Ashgabat (ASB)">Ashgabat (ASB)</option>
-        <option value="Moscow (VKO)">Moscow (VKO)</option>
-    </select>
+<div class="container">
+    <label>Nireden:</label>
+    <select id="from"><option>Ýüklenýär...</option></select>
     
-    <button onclick="searchTickets()">Gözle</button>
+    <label>Nirä:</label>
+    <select id="to"><option>Ýüklenýär...</option></select>
+    
+    <button onclick="search()">Bilet Gözle</button>
 </div>
 
-<div id="results" class="results"></div>
+<div id="results" style="max-width: 500px; margin: 0 auto;"></div>
 
 <script>
-    // Твой адрес в Railway
-    const API_URL = 'https://sapar-project-production.up.railway.app';
+    const API = 'https://sapar-project-production.up.railway.app';
 
-    async function searchTickets() {
+    async function loadCities() {
+        try {
+            const res = await fetch(`${API}/api/cities`);
+            const cities = await res.json();
+            const fromS = document.getElementById('from');
+            const toS = document.getElementById('to');
+            fromS.innerHTML = ''; toS.innerHTML = '';
+            cities.forEach(c => {
+                fromS.add(new Option(c, c));
+                toS.add(new Option(c, c));
+            });
+        } catch (e) { console.error("Ошибка городов", e); }
+    }
+
+    async function search() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
-        const resultsDiv = document.getElementById('results');
-
-        // Показываем индикатор загрузки
-        resultsDiv.innerHTML = '<p class="loading">Gözlenýär, garaşyň...</p>';
+        const resDiv = document.getElementById('results');
+        resDiv.innerHTML = '<p style="text-align:center;">Gözlenýär...</p>';
 
         try {
-            // Формируем запрос к API
-            const response = await fetch(`${API_URL}/api/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
-            
-            if (!response.ok) throw new Error('Сервер ответил с ошибкой');
-            
-            const tickets = await response.json();
-
-            resultsDiv.innerHTML = '';
-
-            // Если билетов нет
-            if (!tickets || tickets.length === 0) {
-                resultsDiv.innerHTML = '<p style="text-align:center;">Görkezilen ugur boýunça bilet tapylmady.</p>';
-                return;
-            }
-
-            // Отрисовка билетов
-            tickets.forEach(ticket => {
-                const div = document.createElement('div');
-                div.className = 'ticket';
-                div.innerHTML = `
-                    <div>
-                        <strong>${ticket.time || '--:--'}</strong><br>
-                        <small>${ticket.airline || 'Näbelli awiakompaniýa'}</small>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="price">${ticket.price} TMT</span><br>
-                        <a href="#" class="buy-btn" onclick="alert('Satyn alşyňyz tassyklanyldy!')">Satyn al</a>
-                    </div>
-                `;
-                resultsDiv.appendChild(div);
+            const res = await fetch(`${API}/api/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+            const data = await res.json();
+            resDiv.innerHTML = data.length ? '' : '<p style="text-align:center;">Bilet tapylmady.</p>';
+            data.forEach(t => {
+                resDiv.innerHTML += `
+                    <div class="ticket">
+                        <div><strong>${t.time}</strong><br><small>${t.airline}</small></div>
+                        <div style="text-align:right"><span class="price">${t.price} TMT</span><br>
+                        <button style="padding:5px 10px; width:auto; margin:0;" onclick="alert('Satyn alyndy!')">Al</button></div>
+                    </div>`;
             });
-
-        } catch (error) {
-            console.error('Fetch Error:', error);
-            resultsDiv.innerHTML = '<p class="error">Сервер не отвечает. Проверьте соединение или Railway!</p>';
-        }
+        } catch (e) { resDiv.innerHTML = '<p style="color:red; text-align:center;">Сервер не отвечает.</p>'; }
     }
-</script>
 
+    window.onload = loadCities;
+</script>
 </body>
 </html>

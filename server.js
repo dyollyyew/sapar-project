@@ -2,25 +2,24 @@ const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const app = express();
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Путь к файлу базы данных в корне проекта
+// Подключение базы данных
 const dbPath = path.resolve(__dirname, 'sapar.db');
-
 const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) console.error('Ошибка подключения к БД:', err.message);
+    if (err) console.error('DB Error:', err.message);
     else {
-        console.log('База данных SAPAR подключена.');
-        initializeDatabase(); // Запуск создания структуры
+        console.log('Connected to SQLite database.');
+        initDB();
     }
 });
 
-function initializeDatabase() {
+function initDB() {
     db.serialize(() => {
-        // Создаем таблицу trips
+        // Создаем таблицу
         db.run(`CREATE TABLE IF NOT EXISTS trips (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             departure TEXT,
@@ -28,71 +27,44 @@ function initializeDatabase() {
             time TEXT,
             airline TEXT,
             price INTEGER
-        )`, (err) => {
-            if (err) console.error('Ошибка создания таблицы:', err.message);
-            else {
-                console.log('Таблица trips проверена/создана.');
-                seedTrips(); // Добавляем данные
+        )`);
+
+        // Проверяем и добавляем начальные данные
+        db.get("SELECT count(*) as count FROM trips", (err, row) => {
+            if (row && row.count === 0) {
+                const ins = 'INSERT INTO trips (departure, arrival, time, airline, price) VALUES (?,?,?,?,?)';
+                db.run(ins, ["Ashgabat (ASB)", "Istanbul (IST)", "10:30", "Turkmenistan Airlines", 2450]);
+                db.run(ins, ["Ashgabat (ASB)", "Istanbul (IST)", "22:15", "Turkish Airlines", 4100]);
+                db.run(ins, ["Ashgabat (ASB)", "Moscow (VKO)", "08:00", "Turkmenistan Airlines", 3200]);
+                db.run(ins, ["Istanbul (IST)", "Ashgabat (ASB)", "15:45", "Turkish Airlines", 3950]);
+                console.log('Initial data seeded.');
             }
         });
     });
 }
 
-function seedTrips() {
-    db.get("SELECT count(*) as count FROM trips", (err, row) => {
-        if (!err && row.count === 0) {
-            console.log('База пуста. Добавляю тестовые билеты...');
-            const insert = 'INSERT INTO trips (departure, arrival, time, airline, price) VALUES (?,?,?,?,?)';
-            
-            // Важно: города должны СТРОГО совпадать с именами в index.html
-            db.run(insert, ["Ashgabat (ASB)", "Istanbul (IST)", "10:30", "Turkmenistan Airlines", 2450]);
-            db.run(insert, ["Ashgabat (ASB)", "Istanbul (IST)", "22:15", "Turkish Airlines", 4100]);
-            db.run(insert, ["Ashgabat (ASB)", "Moscow (VKO)", "08:00", "Turkmenistan Airlines", 3200]);
-            db.run(insert, ["Istanbul (IST)", "Ashgabat (ASB)", "15:45", "Turkish Airlines", 3950]);
-            
-            console.log('Данные успешно загружены!');
-        }
+// Маршрут: Список городов
+app.get('/api/cities', (req, res) => {
+    const sql = `SELECT DISTINCT departure AS city FROM trips UNION SELECT DISTINCT arrival AS city FROM trips`;
+    db.all(sql, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows.map(row => row.city));
     });
-}
+});
 
-// Маршрут для поиска
+// Маршрут: Поиск билетов
 app.get('/api/search', (req, res) => {
     const { from, to } = req.query;
-    console.log(`Поиск: ${from} -> ${to}`);
-
     const sql = `SELECT * FROM trips WHERE departure = ? AND arrival = ?`;
     db.all(sql, [from, to], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
+        if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
     });
 });
 
-app.get('/', (req, res) => {
-    res.send('SAPAR Backend готов и база данных заполнена! ✅');
-});
+app.get('/', (req, res) => res.send('SAPAR API is running... ✅'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Сервер запущен на порту ${PORT}`);
-    // Новый маршрут для получения списка городов
-app.get('/api/cities', (req, res) => {
-    // Выбираем уникальные города из колонок departure и arrival
-    const sql = `
-        SELECT DISTINCT departure AS city FROM trips 
-        UNION 
-        SELECT DISTINCT arrival AS city FROM trips
-    `;
-    
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        const cities = rows.map(row => row.city);
-        res.json(cities);
-    });
-});
+    console.log(`Server is live on port ${PORT}`);
 });
