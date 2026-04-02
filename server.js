@@ -7,10 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 // Подключение к базе
-const db = new sqlite3.Database('./sapar.db', (err) => {
-    if (err) console.error('Ошибка БД:', err.message);
-    else console.log('База данных SAPAR подключена.');
-});
+const db = new sqlite3.Database('./sapar.db');
 
 // ГЛАВНЫЙ МАРШРУТ: Поиск билетов
 app.get('/api/search', (req, res) => {
@@ -36,4 +33,9 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Сервер запущен на порту ${PORT}`);
+    const cors = require('cors');
+app.use(cors({
+    origin: '*', // Разрешает запросы с любого адреса (включая твой локальный файл)
+    methods: ['GET', 'POST']
+}));
 });

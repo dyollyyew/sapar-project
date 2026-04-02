@@ -40,7 +40,7 @@
 
 <script>
     // СЮДА ВСТАВЬ ССЫЛКУ ИЗ RAILWAY (обязательно с https:// в начале и без косой черты в конце)
-    const API_URL = 'sapar-project-production.up.railway.app';
+  const API_URL = 'https://sapar-project-production.up.railway.app';
 
     async function searchTickets() {
         const from = document.getElementById('from').value;
@@ -51,7 +51,7 @@
 
         try {
             // Запрос на сервер в Railway
-            const response = await fetch('https://sapar-project-production.up.railway.app/api/trips?from=' + fromCity + '&to=' + toCity);
+            const response = await fetch(`${API_URL}/api/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
             const tickets = await response.json();
 
             resultsDiv.innerHTML = '';
