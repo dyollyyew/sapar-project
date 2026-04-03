@@ -32,10 +32,9 @@ function initDB() {
         db.get("SELECT count(*) as count FROM trips", (err, row) => {
             if (row && row.count === 0) {
                 const ins = 'INSERT INTO trips (departure, arrival, time, airline, price, date) VALUES (?,?,?,?,?,?)';
-                // Рейсы на 5 апреля
+                // Данные на разные даты
                 db.run(ins, ["Ashgabat (ASB)", "Istanbul (IST)", "10:30", "Turkmenistan Airlines", 2450, "2026-04-05"]);
                 db.run(ins, ["Ashgabat (ASB)", "Istanbul (IST)", "22:15", "Turkish Airlines", 4100, "2026-04-05"]);
-                // Рейсы на 6 апреля
                 db.run(ins, ["Ashgabat (ASB)", "Moscow (VKO)", "08:00", "Turkmenistan Airlines", 3200, "2026-04-06"]);
                 db.run(ins, ["Istanbul (IST)", "Ashgabat (ASB)", "15:45", "Turkish Airlines", 3950, "2026-04-06"]);
                 console.log('Database seeded with dates.');
@@ -44,6 +43,7 @@ function initDB() {
     });
 }
 
+// Получение списка городов
 app.get('/api/cities', (req, res) => {
     const sql = `SELECT DISTINCT departure AS city FROM trips UNION SELECT DISTINCT arrival AS city FROM trips`;
     db.all(sql, [], (err, rows) => {
@@ -52,8 +52,9 @@ app.get('/api/cities', (req, res) => {
     });
 });
 
+// Поиск по городам И дате
 app.get('/api/search', (req, res) => {
-    const { from, to, date } = req.query; // Теперь принимаем и дату
+    const { from, to, date } = req.query;
     const sql = `SELECT * FROM trips WHERE departure = ? AND arrival = ? AND date = ?`;
     db.all(sql, [from, to, date], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });

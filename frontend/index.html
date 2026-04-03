@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAPAR.TM — Bilet</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; }
-        .header { background: #1a8a42; color: white; padding: 20px; text-align: center; font-size: 26px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .box { max-width: 450px; margin: 25px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        label { display: block; margin-top: 10px; color: #555; font-size: 14px; }
+        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+        .header { background: #1a8a42; color: white; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; }
+        .box { max-width: 450px; margin: 25px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 10px; font-size: 14px; color: #555; }
         select, input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
-        button { background: #ff5e62; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        button { background: #ff5e62; color: white; border: none; font-weight: bold; cursor: pointer; }
         button:hover { background: #ff4045; }
-        .ticket { background: white; padding: 18px; margin: 12px auto; max-width: 450px; border-radius: 10px; border-left: 6px solid #1a8a42; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .ticket { background: white; padding: 15px; margin: 12px auto; max-width: 450px; border-radius: 10px; border-left: 6px solid #1a8a42; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .price { color: #1a8a42; font-weight: bold; font-size: 18px; }
     </style>
 </head>
@@ -21,13 +21,13 @@
 <div class="header">SAPAR.TM</div>
 
 <div class="box">
-    <label>Nireden (Откуда):</label>
+    <label>Nireden:</label>
     <select id="from"><option>Ýüklenýär...</option></select>
     
-    <label>Nirä (Куда):</label>
+    <label>Nirä:</label>
     <select id="to"><option>Ýüklenýär...</option></select>
     
-    <label>Uçuş güni (Дата вылета):</label>
+    <label>Uçuş güni (Дата):</label>
     <input type="date" id="travelDate">
     
     <button onclick="search()">Bilet Gözle</button>
@@ -38,8 +38,9 @@
 <script>
     const API = 'https://sapar-project-production.up.railway.app';
 
-    // Установка сегодняшней даты по умолчанию
+    // При загрузке страницы
     window.onload = async () => {
+        // Ставим сегодняшнюю дату в календарь
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('travelDate').value = today;
         await loadCities();
@@ -55,7 +56,7 @@
                 f.add(new Option(c, c));
                 t.add(new Option(c, c));
             });
-        } catch (e) { console.error("Error loading cities", e); }
+        } catch (e) { console.error("Ошибка загрузки городов", e); }
     }
 
     async function search() {
@@ -66,25 +67,25 @@
         if(!d) { alert("Sene saýlaň!"); return; }
 
         const resDiv = document.getElementById('results');
-        resDiv.innerHTML = '<p style="text-align:center; color:#666;">Gözlenýär...</p>';
+        resDiv.innerHTML = '<p style="text-align:center;">Gözlenýär...</p>';
 
         try {
             const url = `${API}/api/search?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}&date=${d}`;
             const res = await fetch(url);
             const data = await res.json();
             
-            resDiv.innerHTML = data.length ? '' : '<p style="text-align:center; color:#999; margin-top:20px;">Bu gün üçin bilet tapylmady.</p>';
+            resDiv.innerHTML = data.length ? '' : '<p style="text-align:center; color:#999;">Bu sene üçin bilet tapylmady.</p>';
             
             data.forEach(ticket => {
                 resDiv.innerHTML += `
                 <div class="ticket">
                     <div>
-                        <strong style="font-size:18px;">${ticket.time}</strong><br>
-                        <small style="color:#777;">${ticket.airline}</small>
+                        <strong>${ticket.time}</strong><br>
+                        <small style="color:#666;">${ticket.airline}</small>
                     </div>
                     <div style="text-align:right">
                         <span class="price">${ticket.price} TMT</span><br>
-                        <button style="width:auto; padding:6px 15px; margin:5px 0 0 0;" onclick="alert('Satyn alyndy!')">Satyn al</button>
+                        <button style="width:auto; padding:5px 10px; margin-top:5px;" onclick="alert('Satyn alyndy!')">Satyn al</button>
                     </div>
                 </div>`;
             });
