@@ -2,53 +2,97 @@
 <html lang="tk">
 <head>
     <meta charset="UTF-8">
-    <title>SAPAR.TM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPAR.TM — Bilet</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; margin: 0; text-align: center; }
-        .header { background: #1a8a42; color: white; padding: 20px; font-size: 24px; }
-        .box { max-width: 400px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #ddd; }
-        button { background: #ff5e62; color: white; border: none; cursor: pointer; font-weight: bold; }
-        .ticket { background: white; padding: 15px; margin: 10px auto; max-width: 400px; border-radius: 8px; border-left: 5px solid #1a8a42; display: flex; justify-content: space-between; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; }
+        .header { background: #1a8a42; color: white; padding: 20px; text-align: center; font-size: 26px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .box { max-width: 450px; margin: 25px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 10px; color: #555; font-size: 14px; }
+        select, input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
+        button { background: #ff5e62; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        button:hover { background: #ff4045; }
+        .ticket { background: white; padding: 18px; margin: 12px auto; max-width: 450px; border-radius: 10px; border-left: 6px solid #1a8a42; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .price { color: #1a8a42; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
-    <div class="header">SAPAR.TM</div>
-    <div class="box">
-        <label>Nireden:</label> <select id="from"><option>Ýüklenýär...</option></select>
-        <label>Nirä:</label> <select id="to"><option>Ýüklenýär...</option></select>
-        <button onclick="search()">Gözle</button>
-    </div>
-    <div id="results"></div>
 
-    <script>
-        const API = 'https://sapar-project-production.up.railway.app';
+<div class="header">SAPAR.TM</div>
 
-        async function loadCities() {
-            try {
-                const res = await fetch(`${API}/api/cities`);
-                const cities = await res.json();
-                const f = document.getElementById('from'), t = document.getElementById('to');
-                f.innerHTML = ''; t.innerHTML = '';
-                cities.forEach(c => { f.add(new Option(c, c)); t.add(new Option(c, c)); });
-            } catch (e) { console.error("Ошибка:", e); }
-        }
+<div class="box">
+    <label>Nireden (Откуда):</label>
+    <select id="from"><option>Ýüklenýär...</option></select>
+    
+    <label>Nirä (Куда):</label>
+    <select id="to"><option>Ýüklenýär...</option></select>
+    
+    <label>Uçuş güni (Дата вылета):</label>
+    <input type="date" id="travelDate">
+    
+    <button onclick="search()">Bilet Gözle</button>
+</div>
 
-        async function search() {
-            const f = document.getElementById('from').value, t = document.getElementById('to').value;
-            const resDiv = document.getElementById('results');
-            resDiv.innerHTML = 'Garaşyň...';
-            const res = await fetch(`${API}/api/search?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}`);
+<div id="results"></div>
+
+<script>
+    const API = 'https://sapar-project-production.up.railway.app';
+
+    // Установка сегодняшней даты по умолчанию
+    window.onload = async () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('travelDate').value = today;
+        await loadCities();
+    };
+
+    async function loadCities() {
+        try {
+            const res = await fetch(`${API}/api/cities`);
+            const cities = await res.json();
+            const f = document.getElementById('from'), t = document.getElementById('to');
+            f.innerHTML = ''; t.innerHTML = '';
+            cities.forEach(c => {
+                f.add(new Option(c, c));
+                t.add(new Option(c, c));
+            });
+        } catch (e) { console.error("Error loading cities", e); }
+    }
+
+    async function search() {
+        const f = document.getElementById('from').value;
+        const t = document.getElementById('to').value;
+        const d = document.getElementById('travelDate').value;
+
+        if(!d) { alert("Sene saýlaň!"); return; }
+
+        const resDiv = document.getElementById('results');
+        resDiv.innerHTML = '<p style="text-align:center; color:#666;">Gözlenýär...</p>';
+
+        try {
+            const url = `${API}/api/search?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}&date=${d}`;
+            const res = await fetch(url);
             const data = await res.json();
-            resDiv.innerHTML = data.length ? '' : 'Bilet tapylmady.';
+            
+            resDiv.innerHTML = data.length ? '' : '<p style="text-align:center; color:#999; margin-top:20px;">Bu gün üçin bilet tapylmady.</p>';
+            
             data.forEach(ticket => {
-                resDiv.innerHTML += `<div class="ticket">
-                    <div><b>${ticket.time}</b><br><small>${ticket.airline}</small></div>
-                    <div style="text-align:right"><b>${ticket.price} TMT</b><br><button style="width:auto;padding:5px" onclick="alert('OK!')">Al</button></div>
+                resDiv.innerHTML += `
+                <div class="ticket">
+                    <div>
+                        <strong style="font-size:18px;">${ticket.time}</strong><br>
+                        <small style="color:#777;">${ticket.airline}</small>
+                    </div>
+                    <div style="text-align:right">
+                        <span class="price">${ticket.price} TMT</span><br>
+                        <button style="width:auto; padding:6px 15px; margin:5px 0 0 0;" onclick="alert('Satyn alyndy!')">Satyn al</button>
+                    </div>
                 </div>`;
             });
+        } catch (e) { 
+            resDiv.innerHTML = '<p style="color:red; text-align:center;">Сервер не отвечает.</p>'; 
         }
-        window.onload = loadCities;
-    </script>
+    }
+</script>
+
 </body>
 </html>
