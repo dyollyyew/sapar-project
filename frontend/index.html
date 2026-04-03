@@ -2,160 +2,128 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SAPAR.TM — Оплата МИР</title>
+    <title>SAPAR.TM — Поиск с фильтрами</title>
     <style>
-        :root { --mir-blue: #224099; --mir-green: #00a550; --accent: #ff5e62; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; }
-        .header { background: var(--mir-blue); color: white; padding: 15px 5%; display: flex; justify-content: space-between; }
-        .container { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .btn-mir { background: var(--mir-green); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
-        .mir-logo { height: 30px; margin-bottom: 15px; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        .ticket { background: white; padding: 20px; border-radius: 10px; border-left: 8px solid var(--mir-blue); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); align-items:center; justify-content:center; z-index:1000; }
+        :root { --main: #00873d; --accent: #ff5e62; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f3f5; margin: 0; }
+        .header { background: var(--main); color: white; padding: 20px; text-align: center; font-weight: 900; font-size: 26px; }
+        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+        .search-area { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        .btn-find { width: 100%; background: var(--accent); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 16px; }
+        
+        /* Стили Фильтра */
+        .filter-bar { background: #fff; padding: 15px; border-radius: 10px; margin-top: 20px; display: flex; align-items: center; gap: 20px; display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .filter-bar label { font-weight: bold; color: #555; }
+
+        .ticket-card { background: white; margin-top: 15px; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid transparent; transition: 0.3s; }
+        .ticket-card:hover { border-left-color: var(--main); transform: translateY(-2px); }
+        .airline-logo { font-weight: bold; color: #333; font-size: 18px; }
+        .time-info { color: #666; }
+        .price-tag { color: var(--main); font-size: 24px; font-weight: bold; }
+        .btn-go { background: var(--main); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div style="font-size: 24px; font-weight: bold;">SAPAR.TM <span style="font-size:12px; font-weight:normal;">| Оплата МИР</span></div>
-    <div id="user-nav"></div>
-</div>
+<div class="header">SAPAR.TM</div>
 
 <div class="container">
-    <div id="auth-box" class="card">
-        <h3>Вход в систему</h3>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="pass" placeholder="Пароль">
-        <button class="btn-mir" style="background:var(--mir-blue);" onclick="login()">ВОЙТИ</button>
-        <p style="text-align:center; font-size:13px; color:blue; cursor:pointer;" onclick="alert('Используйте тестовый email')">Регистрация</p>
-    </div>
-
-    <div id="search-box" class="card" style="display:none;">
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+    <div class="search-area">
+        <div class="grid">
             <select id="from"></select>
             <select id="to"></select>
             <input type="date" id="dateS" value="2026-04-05">
         </div>
-        <button class="btn-mir" onclick="search()">НАЙТИ БИЛЕТЫ</button>
+        <button class="btn-find" onclick="search()">GÖZLE (НАЙТИ)</button>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+        <label>Фильтр:</label>
+        <select id="filterAirline" onchange="applyFilters()" style="width: 200px;">
+            <option value="all">Все авиакомпании</option>
+        </select>
+        <select id="filterPrice" onchange="applyFilters()" style="width: 200px;">
+            <option value="cheap">Сначала дешевые</option>
+            <option value="fast">Самые ранние</option>
+        </select>
     </div>
 
     <div id="results"></div>
 </div>
 
-<div id="modal" class="modal">
-    <div class="card" style="width:400px; border-top: 5px solid var(--mir-green);">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:bold; color:var(--mir-blue);">ОПЛАТА КАРТОЙ МИР</span>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Mir-logo.svg" class="mir-logo">
-        </div>
-        
-        <label>Данные пассажира (LATIN)</label>
-        <input type="text" id="pName" placeholder="ИМЯ ФАМИЛИЯ" style="text-transform:uppercase;">
-        <input type="text" id="pDoc" placeholder="ПАСПОРТ">
-
-        <div style="background:#f0f4f8; padding:15px; border-radius:8px; margin-top:10px;">
-            <label>Номер карты МИР</label>
-            <input type="text" id="cardNum" placeholder="2000 0000 0000 0000" maxlength="19">
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="cardDate" placeholder="ММ/ГГ" maxlength="5">
-                <input type="password" id="cardCVC" placeholder="CVC" maxlength="3">
-            </div>
-        </div>
-
-        <div style="margin:15px 0; font-weight:bold; display:flex; justify-content:space-between;">
-            <span>К оплате (+5%):</span>
-            <span id="priceDisplay" style="color:var(--mir-green);">0 TMT</span>
-        </div>
-
-        <button class="btn-mir" onclick="payNow()" id="payBtn">ОПЛАТИТЬ</button>
-        <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Отмена</button>
-    </div>
-</div>
-
 <script>
     const API = 'https://sapar-project-production.up.railway.app';
-    let user = JSON.parse(localStorage.getItem('s_user'));
-    let curTk = null;
+    let allResults = [];
 
     window.onload = async () => {
-        if(user) showUI();
         const res = await fetch(`${API}/api/cities`);
         const cities = await res.json();
+        const f = document.getElementById('from'), t = document.getElementById('to');
         cities.forEach(c => {
-            document.getElementById('from').add(new Option(c, c));
-            document.getElementById('to').add(new Option(c, c));
+            f.add(new Option(c, c));
+            t.add(new Option(c, c));
         });
     };
 
-    function showUI() {
-        document.getElementById('auth-box').style.display = 'none';
-        document.getElementById('search-box').style.display = 'block';
-        document.getElementById('user-nav').innerText = user.name;
-    }
-
-    async function login() {
-        const e = document.getElementById('email').value, p = document.getElementById('pass').value;
-        const res = await fetch(`${API}/api/auth/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:e, password:p}) });
-        const data = await res.json();
-        if(data.success) { localStorage.setItem('s_user', JSON.stringify(data.user)); location.reload(); }
-    }
-
     async function search() {
-        const f = document.getElementById('from').value, t = document.getElementById('to').value, d = document.getElementById('dateS').value;
-        const res = await fetch(`${API}/api/search?from=${f}&to=${t}&date=${d}`);
-        const data = await res.json();
-        const div = document.getElementById('results'); div.innerHTML = '';
-        data.forEach(tk => {
-            const finalP = (tk.price * 1.05).toFixed(0);
-            div.innerHTML += `<div class="ticket">
-                <div><b>${tk.time}</b><br><small>${tk.airline}</small></div>
-                <div style="text-align:right"><b>${finalP} TMT</b><br>
-                <button class="btn-mir" style="padding:5px 15px; width:auto; margin-top:5px;" onclick='openPay(${JSON.stringify(tk)})'>ВЫБРАТЬ</button></div>
-            </div>`;
-        });
-    }
+        const f = document.getElementById('from').value;
+        const t = document.getElementById('to').value;
+        const d = document.getElementById('dateS').value;
 
-    function openPay(tk) {
-        curTk = tk;
-        document.getElementById('priceDisplay').innerText = (tk.price * 1.05).toFixed(2) + " TMT";
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    async function payNow() {
-        const card = document.getElementById('cardNum').value;
-        if(!card.startsWith('2')) return alert("Ошибка: Используйте карту МИР (номер начинается на 2)");
-
-        document.getElementById('payBtn').innerText = "СВЯЗЬ С БАНКОМ...";
-        document.getElementById('payBtn').disabled = true;
-
-        const nameParts = document.getElementById('pName').value.split(' ');
+        const res = await fetch(`${API}/api/search?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}&date=${d}`);
+        allResults = await res.json();
         
-        const res = await fetch(`${API}/api/pay-mir`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                trip_id: curTk.id,
-                user_id: user.id,
-                name: nameParts[0],
-                surname: nameParts[1] || '',
-                passport: document.getElementById('pDoc').value,
-                price: curTk.price,
-                email: user.email,
-                route: `${curTk.departure} -> ${curTk.arrival}`,
-                f_date: curTk.date,
-                card_number: card
-            })
-        });
+        // Заполняем список компаний в фильтре
+        const filterSelect = document.getElementById('filterAirline');
+        filterSelect.innerHTML = '<option value="all">Все авиакомпании</option>';
+        const airlines = [...new Set(allResults.map(item => item.airline))];
+        airlines.forEach(a => filterSelect.add(new Option(a, a)));
 
-        if(res.ok) {
-            alert("Оплата прошла успешно! Билет отправлен на почту.");
-            location.reload();
-        } else {
-            alert("Ошибка платежа");
-            document.getElementById('payBtn').disabled = false;
+        document.getElementById('filterBar').style.display = 'flex';
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const airline = document.getElementById('filterAirline').value;
+        const sort = document.getElementById('filterPrice').value;
+
+        let filtered = [...allResults];
+
+        if (airline !== 'all') {
+            filtered = filtered.filter(item => item.airline === airline);
         }
+
+        if (sort === 'cheap') {
+            filtered.sort((a, b) => a.price - b.price);
+        } else {
+            filtered.sort((a, b) => a.time.localeCompare(b.time));
+        }
+
+        render(filtered);
+    }
+
+    function render(data) {
+        const div = document.getElementById('results');
+        div.innerHTML = data.length ? '' : '<p style="text-align:center; margin-top:30px;">Ничего не найдено.</p>';
+
+        data.forEach(tk => {
+            const finalPrice = (tk.price * 1.05).toFixed(0);
+            div.innerHTML += `
+                <div class="ticket-card">
+                    <div>
+                        <div class="airline-logo">${tk.airline}</div>
+                        <div class="time-info">Вылет: <b>${tk.time}</b></div>
+                    </div>
+                    <div style="text-align:right">
+                        <div class="price-tag">${finalPrice} TMT</div>
+                        <button class="btn-go" onclick="window.open('${tk.official_url}', '_blank')">
+                            ОФИЦИАЛЬНЫЙ САЙТ
+                        </button>
+                    </div>
+                </div>`;
+        });
     }
 </script>
 </body>
