@@ -1,83 +1,85 @@
 <!DOCTYPE html>
-<html lang="tk">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM — Официальный поиск</title>
+    <title>SAPAR.TM — Официальный сервис</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #eef2f3; margin: 0; }
-        .nav { background: #00873d; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; }
-        .main-form { max-width: 900px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .grid { display: grid; grid-template-columns: 1.2fr 1.2fr 1fr 1fr 1fr; gap: 10px; align-items: end; }
-        label { font-size: 12px; color: #666; font-weight: bold; margin-bottom: 5px; display: block; }
-        select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-        .btn-find { background: #ff5e62; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; height: 42px; }
-        .ticket-card { background: white; max-width: 900px; margin: 10px auto; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; border-left: 8px solid #00873d; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .cabinet-section { display: none; max-width: 900px; margin: 20px auto; }
-        .active-page { display: block !important; }
+        :root { --green: #00873d; --red: #ff5e62; --gray: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; }
+        .header { background: var(--green); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
+        .search-box { max-width: 1000px; margin: 20px auto; background: white; padding: 30px; border-radius: 15px; shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .lang-btn { background: none; border: 1px solid white; color: white; cursor: pointer; margin-left: 5px; border-radius: 4px; }
+        .ticket { background: white; margin: 10px auto; padding: 20px; border-radius: 10px; border-left: 10px solid var(--green); display: flex; justify-content: space-between; max-width: 1000px; }
+        .btn-buy { background: var(--red); color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-top: 5px; }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; }
     </style>
 </head>
 <body>
 
-<div class="nav">
+<div class="header">
     <div style="font-size: 24px; font-weight: bold;">SAPAR.TM</div>
     <div>
-        <button onclick="togglePage('search')" style="background:none; color:white; border:1px solid white; padding:5px 15px; cursor:pointer; border-radius:20px; margin-right:10px;">Gözleg</button>
-        <button onclick="togglePage('cabinet')" style="background:white; color:#00873d; border:none; padding:5px 15px; cursor:pointer; border-radius:20px;">Meniň biletlerim</button>
+        <button class="lang-btn" onclick="setLang('tk')">TK</button>
+        <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
 </div>
 
-<div id="search-section" class="main-form active-page">
+<div class="search-box">
+    <h2 id="txt-title">Поиск авиабилетов</h2>
     <div class="grid">
-        <div><label>Nireden (Откуда)</label><select id="from"></select></div>
-        <div><label>Nirä (Куда)</label><select id="to"></select></div>
-        <div><label>Gidýän (Туда)</label><input type="date" id="dateStart"></div>
-        <div><label>Yza (Обратно)</label><input type="date" id="dateEnd"></div>
-        <div><label>Kim (Кто)</label>
-            <select id="pass">
-                <option>1 Ýolagçy</option>
-                <option>2 Ýolagçy</option>
-            </select>
-        </div>
+        <div><label id="lbl-from">Откуда</label><select id="from"></select></div>
+        <div><label id="lbl-to">Куда</label><select id="to"></select></div>
+        <div><label id="lbl-date">Туда</label><input type="date" id="dateStart"></div>
+        <div><label id="lbl-back">Обратно</label><input type="date" id="dateEnd"></div>
+        <div><label id="lbl-who">Кто</label><select><option>1 Ýolagçy</option></select></div>
     </div>
-    <button class="btn-find" style="width: 100%; margin-top: 15px;" onclick="search()">TAP (НАЙТИ БИЛЕТЫ)</button>
-    <div id="results" style="margin-top: 20px;"></div>
+    <button onclick="search()" class="btn-buy" style="width:100%; margin-top:20px; font-size:18px;" id="btn-find">НАЙТИ</button>
 </div>
 
-<div id="cabinet-section" class="main-form cabinet-section">
-    <h3>Biletiňi tapmak</h3>
-    <input type="text" id="myPass" placeholder="Pasport belgiňizi giriziň (I-AS 123456)">
-    <button onclick="loadMy()" style="background:#00873d; color:white; border:none; padding:10px; margin-top:10px; cursor:pointer; width:100%;">GÖRKEZ</button>
-    <div id="myResults" style="margin-top:20px;"></div>
-</div>
+<div id="results"></div>
 
-<div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:1000;">
-    <div style="background:white; padding:25px; border-radius:12px; width:320px;">
-        <h3>Bronlamak</h3>
-        <input type="hidden" id="tId">
-        <input type="text" id="pName" placeholder="Adyňyz we Familiýaňyz" style="margin-bottom:10px;">
-        <input type="text" id="pDoc" placeholder="Pasport belgiňiz" style="margin-bottom:10px;">
-        <button class="btn-find" style="width:100%;" onclick="bookNow()">TASSYKLAMAK</button>
-        <button onclick="closeModal()" style="width:100%; background:none; border:none; color:gray; cursor:pointer; margin-top:10px;">Yza</button>
+<div id="modal" class="modal">
+    <div style="background:white; padding:30px; border-radius:15px; width:400px;">
+        <h3 id="txt-book">Данные пассажира (LATIN)</h3>
+        <input type="text" id="pName" placeholder="NAME (e.g. AMAN)" oninput="this.value = this.value.replace(/[^A-Za-z]/g, '')">
+        <input type="text" id="pSurname" placeholder="SURNAME (e.g. AMANOW)" oninput="this.value = this.value.replace(/[^A-Za-z]/g, '')">
+        <input type="text" id="pPass" placeholder="PASSPORT (e.g. I-AS123456)">
+        <p id="txt-fee" style="font-size:12px; color:gray;">* Включая комиссию 5%</p>
+        <button class="btn-buy" style="width:100%" onclick="confirmBooking()" id="btn-confirm">ОПЛАТИТЬ</button>
+        <button onclick="closeModal()" style="width:100%; background:none; border:none; color:gray; margin-top:10px;">Отмена</button>
     </div>
 </div>
 
 <script>
     const API = 'https://sapar-project-production.up.railway.app';
+    let currentTicket = null;
 
-    function togglePage(page) {
-        document.getElementById('search-section').classList.remove('active-page');
-        document.getElementById('cabinet-section').classList.remove('active-page');
-        if(page === 'search') document.getElementById('search-section').classList.add('active-page');
-        else document.getElementById('cabinet-section').classList.add('active-page');
+    const i18n = {
+        ru: { title: "Поиск авиабилетов", from: "Откуда", to: "Куда", find: "НАЙТИ", buy: "КУПИТЬ", fee: "* Комиссия 5% включена" },
+        tk: { title: "Awia bilet gözlegi", from: "Nireden", to: "Nirä", find: "TAP", buy: "SATYN AL", fee: "* 5% komissiýa goşuldy" },
+        en: { title: "Search Flights", from: "From", to: "To", find: "SEARCH", buy: "BUY", fee: "* 5% fee included" }
+    };
+
+    function setLang(lang) {
+        document.getElementById('txt-title').innerText = i18n[lang].title;
+        document.getElementById('lbl-from').innerText = i18n[lang].from;
+        document.getElementById('lbl-to').innerText = i18n[lang].to;
+        document.getElementById('btn-find').innerText = i18n[lang].find;
+        document.getElementById('txt-fee').innerText = i18n[lang].fee;
     }
 
     window.onload = async () => {
         document.getElementById('dateStart').value = "2026-04-05";
         const res = await fetch(`${API}/api/cities`);
         const cities = await res.json();
-        const f = document.getElementById('from'), t = document.getElementById('to');
-        cities.forEach(c => { f.add(new Option(c, c)); t.add(new Option(c, c)); });
+        cities.forEach(c => {
+            document.getElementById('from').add(new Option(c, c));
+            document.getElementById('to').add(new Option(c, c));
+        });
+        setLang('ru');
     };
 
     async function search() {
@@ -85,41 +87,41 @@
         const res = await fetch(`${API}/api/search?from=${f}&to=${t}&date=${d}`);
         const data = await res.json();
         const div = document.getElementById('results');
-        div.innerHTML = data.length ? '' : 'Bilet tapylmady.';
-        data.forEach(ticket => {
-            div.innerHTML += `<div class="ticket-card">
-                <div><b>${ticket.time}</b><br><small>${ticket.airline}</small></div>
-                <div style="text-align:right"><b style="color:#00873d; font-size:20px;">${ticket.price} TMT</b><br>
-                <button onclick="openModal(${ticket.id})" style="padding:5px 15px; background:#00873d; color:white; border:none; border-radius:4px; cursor:pointer;">ALMAK</button></div>
+        div.innerHTML = '';
+        data.forEach(tick => {
+            const feePrice = (tick.price * 1.05).toFixed(0);
+            div.innerHTML += `<div class="ticket">
+                <div><b style="font-size:20px">${tick.time}</b><br>${tick.airline}</div>
+                <div style="text-align:right"><b style="color:var(--green); font-size:22px">${feePrice} TMT</b><br>
+                <button class="btn-buy" onclick="openModal(${JSON.stringify(tick).replace(/"/g, '&quot;')})">ВЫБРАТЬ</button></div>
             </div>`;
         });
     }
 
-    function openModal(id) { document.getElementById('tId').value = id; document.getElementById('modal').style.display = 'flex'; }
+    function openModal(tick) {
+        currentTicket = tick;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-    async function bookNow() {
-        const name = document.getElementById('pName').value, doc = document.getElementById('pDoc').value;
-        await fetch(`${API}/api/book`, {
+    async function confirmBooking() {
+        const name = document.getElementById('pName').value;
+        const surname = document.getElementById('pSurname').value;
+        const pass = document.getElementById('pPass').value;
+
+        if(!name || !surname || !pass) return alert("Fill all fields in LATIN!");
+
+        const res = await fetch(`${API}/api/book`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ trip_id: document.getElementById('tId').value, name, passport: doc })
+            body: JSON.stringify({ trip_id: currentTicket.id, name, surname, passport: pass, price: currentTicket.price })
         });
-        alert("Bilet alyndy!"); closeModal();
-    }
-
-    async function loadMy() {
-        const pass = document.getElementById('myPass').value;
-        const res = await fetch(`${API}/api/my-bookings?passport=${encodeURIComponent(pass)}`);
-        const data = await res.json();
-        const div = document.getElementById('myResults');
-        div.innerHTML = data.length ? '' : 'Bilet tapylmady.';
-        data.forEach(b => {
-            div.innerHTML += `<div class="ticket-card" style="border-left:8px solid gold">
-                <div><b>${b.departure} → ${b.arrival}</b><br><small>${b.date} | ${b.time}</small></div>
-                <div style="text-align:right">ID: #${b.b_id}<br><b>Confirmed</b></div>
-            </div>`;
-        });
+        const result = await res.json();
+        if(result.success) {
+            alert(`SUCCESS! Ticket for ${name} confirmed. Total: ${result.total} TMT`);
+            closeModal();
+        }
     }
 </script>
 </body>
