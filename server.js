@@ -8,61 +8,60 @@ app.use(cors());
 app.use(express.json());
 
 const dbPath = path.resolve(__dirname, 'sapar.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) console.error('DB Error:', err.message);
-    else {
-        console.log('Database connected.');
-        initDB();
-    }
-});
+const db = new sqlite3.Database(dbPath, () => initDB());
 
 function initDB() {
     db.serialize(() => {
-        // Создаем таблицу с колонкой date
         db.run(`CREATE TABLE IF NOT EXISTS trips (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            departure TEXT,
-            arrival TEXT,
-            time TEXT,
-            airline TEXT,
-            price INTEGER,
-            date TEXT
+            departure TEXT, arrival TEXT, time TEXT, airline TEXT, price INTEGER, date TEXT
+        )`);
+
+        db.run(`CREATE TABLE IF NOT EXISTS bookings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, trip_id INTEGER, passenger_name TEXT, passport TEXT
         )`);
 
         db.get("SELECT count(*) as count FROM trips", (err, row) => {
             if (row && row.count === 0) {
                 const ins = 'INSERT INTO trips (departure, arrival, time, airline, price, date) VALUES (?,?,?,?,?,?)';
-                // Данные на разные даты
-                db.run(ins, ["Ashgabat (ASB)", "Istanbul (IST)", "10:30", "Turkmenistan Airlines", 2450, "2026-04-05"]);
-                db.run(ins, ["Ashgabat (ASB)", "Istanbul (IST)", "22:15", "Turkish Airlines", 4100, "2026-04-05"]);
-                db.run(ins, ["Ashgabat (ASB)", "Moscow (VKO)", "08:00", "Turkmenistan Airlines", 3200, "2026-04-06"]);
-                db.run(ins, ["Istanbul (IST)", "Ashgabat (ASB)", "15:45", "Turkish Airlines", 3950, "2026-04-06"]);
-                console.log('Database seeded with dates.');
+                
+                // РЕАЛЬНЫЕ РЕЙСЫ (Примерные данные из расписания Turkmenistan Airlines & Tutu)
+                const flights = [
+                    ["Ashgabat (ASB)", "Moscow (DME)", "07:35", "Turkmenistan Airlines", 3450, "2026-04-05"],
+                    ["Moscow (DME)", "Ashgabat (ASB)", "11:10", "Turkmenistan Airlines", 3200, "2026-04-10"],
+                    ["Ashgabat (ASB)", "Istanbul (IST)", "20:10", "Turkish Airlines", 4200, "2026-04-05"],
+                    ["Istanbul (IST)", "Ashgabat (ASB)", "03:45", "Turkish Airlines", 3900, "2026-04-12"],
+                    ["Ashgabat (ASB)", "Kazan (KZN)", "10:00", "Turkmenistan Airlines", 3100, "2026-04-06"],
+                    ["Ashgabat (ASB)", "Dubai (DXB)", "15:20", "flydubai", 2800, "2026-04-05"],
+                    ["Ashgabat (ASB)", "Frankfurt (FRA)", "09:15", "Turkmenistan Airlines", 5600, "2026-04-07"]
+                ];
+
+                flights.forEach(f => db.run(ins, f));
+                console.log("Database updated with real flights!");
             }
         });
     });
 }
 
-// Получение списка городов
 app.get('/api/cities', (req, res) => {
-    const sql = `SELECT DISTINCT departure AS city FROM trips UNION SELECT DISTINCT arrival AS city FROM trips`;
-    db.all(sql, [], (err, rows) => {
-        if (err) return res.status(500).json([]);
-        res.json(rows.map(row => row.city));
+    db.all(`SELECT DISTINCT departure AS city FROM trips UNION SELECT DISTINCT arrival AS city FROM trips`, (err, rows) => {
+        res.json(rows ? rows.map(r => r.city) : []);
     });
 });
 
-// Поиск по городам И дате
 app.get('/api/search', (req, res) => {
     const { from, to, date } = req.query;
-    const sql = `SELECT * FROM trips WHERE departure = ? AND arrival = ? AND date = ?`;
-    db.all(sql, [from, to, date], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
+    db.all(`SELECT * FROM trips WHERE departure = ? AND arrival = ? AND date = ?`, [from, to, date], (err, rows) => {
+        res.json(rows || []);
     });
 });
 
-app.get('/', (req, res) => res.send('SAPAR API v2 (Dates) Online ✅'));
+app.post('/api/book', (req, res) => {
+    const { trip_id, name, passport } = req.body;
+    db.run(`INSERT INTO bookings (trip_id, passenger_name, passport) VALUES (?, ?, ?)`, [trip_id, name, passport], function(err) {
+        res.json({ success: !err, id: this.lastID });
+    });
+});
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Server is running on port ${PORT}`));
