@@ -3,125 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM — Официальные авиабилеты</title>
+    <title>SAPAR.TM — Hyzmatlar</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #eef2f3; margin: 0; }
-        .nav { background: #00873d; color: white; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; }
-        .main-form { max-width: 800px; margin: -30px auto 20px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        label { font-size: 13px; color: #555; margin-bottom: 5px; display: block; }
-        select, input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .find-btn { width: 100%; background: #ff5e62; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .find-btn:hover { background: #ff4145; }
-        .ticket-card { background: white; max-width: 800px; margin: 15px auto; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 10px solid #00873d; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .price-tag { font-size: 24px; color: #00873d; font-weight: bold; }
-        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; }
+        .nav-bar { background: #00873d; color: white; display: flex; justify-content: space-around; padding: 15px; position: sticky; top: 0; z-index: 100; }
+        .nav-item { cursor: pointer; font-weight: bold; opacity: 0.8; }
+        .nav-item:hover, .active { opacity: 1; border-bottom: 2px solid white; }
+        
+        .page { display: none; padding: 20px; max-width: 800px; margin: auto; }
+        .visible { display: block; }
+
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #ff5e62; color: white; border: none; font-weight: bold; cursor: pointer; }
+        .ticket { border-left: 8px solid #00873d; display: flex; justify-content: space-between; align-items: center; }
+        .support-link { display: block; text-align: center; padding: 20px; background: #e8f5e9; color: #00873d; text-decoration: none; border-radius: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="nav">SAPAR.TM</div>
-<div style="height: 100px; background: #00873d;"></div>
+<div class="nav-bar">
+    <div class="nav-item active" onclick="showPage('search-page', this)">Gözleg</div>
+    <div class="nav-item" onclick="showPage('cabinet-page', this)">Meniň biletlerim</div>
+    <div class="nav-item" onclick="showPage('support-page', this)">Gollanma</div>
+</div>
 
-<div class="main-form">
-    <div class="grid">
-        <div>
-            <label>Nireden (Откуда)</label>
-            <select id="from"></select>
-        </div>
-        <div>
-            <label>Nirä (Куда)</label>
-            <select id="to"></select>
-        </div>
-        <div>
-            <label>Ýolagçy (Кто летит)</label>
-            <select id="pass">
-                <option>1 Взрослый</option>
-                <option>2 Взрослых</option>
-            </select>
-        </div>
+<div id="search-page" class="page visible">
+    <div class="card">
+        <label>Nireden:</label><select id="from"></select>
+        <label>Nirä:</label><select id="to"></select>
+        <label>Sene:</label><input type="date" id="dateStart">
+        <button onclick="searchFlights()">TAP</button>
     </div>
-    <div class="grid">
-        <div>
-            <label>Gidýän güni (Туда)</label>
-            <input type="date" id="dateStart">
-        </div>
-        <div>
-            <label>Gaýdýan güni (Обратно)</label>
-            <input type="date" id="dateEnd">
-        </div>
-        <div style="display: flex; align-items: flex-end;">
-            <button class="find-btn" onclick="search()">TAP (НАЙТИ)</button>
-        </div>
+    <div id="searchResults"></div>
+</div>
+
+<div id="cabinet-page" class="page">
+    <div class="card">
+        <h3>Biletiňi tap</h3>
+        <p style="font-size: 13px; color: #666;">Biletleriňizi görmek üçin pasport belgiňizi giriziň.</p>
+        <input type="text" id="myPassport" placeholder="Meselem: I-AS 123456">
+        <button onclick="loadMyBookings()" style="background: #00873d;">GÖRKEZ</button>
+    </div>
+    <div id="myResults"></div>
+</div>
+
+<div id="support-page" class="page">
+    <div class="card">
+        <h3>Kömek gerekmi?</h3>
+        <p>Biz bilen habarlaşmak üçin aşakdaky düwmä basyň:</p>
+        <a href="https://t.me/your_bot" class="support-link">💬 Telegram Goldawy (24/7)</a>
+        <p style="margin-top:20px;">📞 Telefon: +993 12 000000</p>
+        <p>📧 Email: support@sapar.tm</p>
     </div>
 </div>
 
-<div id="results"></div>
-
-<div id="modal">
-    <div style="background:white; padding:30px; border-radius:15px; width:350px;">
+<div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
+    <div class="card" style="width:320px;">
         <h3>Satyn almak</h3>
-        <input type="hidden" id="tId">
-        <input type="text" id="pName" placeholder="Adyňyz we Familiýaňyz" style="margin-bottom:10px;">
-        <input type="text" id="pDoc" placeholder="Pasport belgiňiz" style="margin-bottom:10px;">
-        <button class="find-btn" onclick="bookNow()">TASSYKLAMAK</button>
-        <button onclick="closeModal()" style="width:100%; margin-top:10px; background:none; border:none; color:gray; cursor:pointer;">Yza</button>
+        <input type="hidden" id="tripId">
+        <input type="text" id="pName" placeholder="Adyňyz we Familiýaňyz">
+        <input type="text" id="pPass" placeholder="Pasport belgi">
+        <button onclick="confirmBooking()">Tassyklamak</button>
+        <button onclick="document.getElementById('modal').style.display='none'" style="background:none; color:gray;">Yza</button>
     </div>
 </div>
 
 <script>
     const API = 'https://sapar-project-production.up.railway.app';
 
+    function showPage(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(id).classList.add('visible');
+        el.classList.add('active');
+    }
+
     window.onload = async () => {
         document.getElementById('dateStart').value = "2026-04-05";
         const res = await fetch(`${API}/api/cities`);
         const cities = await res.json();
         const f = document.getElementById('from'), t = document.getElementById('to');
-        cities.forEach(c => {
-            f.add(new Option(c, c));
-            t.add(new Option(c, c));
-        });
+        cities.forEach(c => { f.add(new Option(c, c)); t.add(new Option(c, c)); });
     };
 
-    async function search() {
-        const f = document.getElementById('from').value, 
-              t = document.getElementById('to').value, 
-              d = document.getElementById('dateStart').value;
-        const resDiv = document.getElementById('results');
-        resDiv.innerHTML = '<p style="text-align:center">Biletler gözlenýär...</p>';
-
+    async function searchFlights() {
+        const f = document.getElementById('from').value, t = document.getElementById('to').value, d = document.getElementById('dateStart').value;
         const res = await fetch(`${API}/api/search?from=${f}&to=${t}&date=${d}`);
         const data = await res.json();
-        
-        resDiv.innerHTML = data.length ? '' : '<p style="text-align:center">Bu senede bilet tapylmady.</p>';
+        const div = document.getElementById('searchResults');
+        div.innerHTML = data.length ? '' : 'Bilet tapylmady.';
         data.forEach(ticket => {
-            resDiv.innerHTML += `
-            <div class="ticket-card">
-                <div>
-                    <span style="font-size:22px; font-weight:bold;">${ticket.time}</span><br>
-                    <span style="color:#666;">${ticket.airline}</span>
-                </div>
-                <div style="text-align:right">
-                    <div class="price-tag">${ticket.price} TMT</div>
-                    <button onclick="openModal(${ticket.id})" style="padding:8px 20px; background:#00873d; color:white; border:none; border-radius:5px; cursor:pointer;">ALMAK</button>
-                </div>
+            div.innerHTML += `<div class="card ticket">
+                <div><b>${ticket.time}</b><br><small>${ticket.airline}</small></div>
+                <div style="text-align:right"><b>${ticket.price} TMT</b><br>
+                <button style="padding:5px 10px; width:auto;" onclick="openModal(${ticket.id})">ALMAK</button></div>
             </div>`;
         });
     }
 
-    function openModal(id) { document.getElementById('tId').value = id; document.getElementById('modal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function openModal(id) { document.getElementById('tripId').value = id; document.getElementById('modal').style.display = 'flex'; }
 
-    async function bookNow() {
-        const name = document.getElementById('pName').value;
-        const doc = document.getElementById('pDoc').value;
-        const res = await fetch(`${API}/api/book`, {
+    async function confirmBooking() {
+        const name = document.getElementById('pName').value, pass = document.getElementById('pPass').value, tid = document.getElementById('tripId').value;
+        await fetch(`${API}/api/book`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ trip_id: document.getElementById('tId').value, name, passport: doc })
+            body: JSON.stringify({ trip_id: tid, name, passport: pass })
         });
-        const result = await res.json();
-        if(result.success) { alert("Sapar.tm: Bilet üstünlikli alyndy!"); closeModal(); }
+        alert("Üstünlikli alyndy!");
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    async function loadMyBookings() {
+        const pass = document.getElementById('myPassport').value;
+        const res = await fetch(`${API}/api/my-bookings?passport=${encodeURIComponent(pass)}`);
+        const data = await res.json();
+        const div = document.getElementById('myResults');
+        div.innerHTML = data.length ? '' : 'Siziň adyňyza bilet tapylmady.';
+        data.forEach(b => {
+            div.innerHTML += `<div class="card" style="border-left: 5px solid gold;">
+                <p><b>Bron ID: #${b.booking_id}</b></p>
+                <p>${b.departure} → ${b.arrival}</p>
+                <p>Sene: ${b.date} | Wagty: ${b.time}</p>
+                <p><small>Ýolagçy: ${b.passenger_name}</small></p>
+            </div>`;
+        });
     }
 </script>
 </body>
