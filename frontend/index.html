@@ -1,37 +1,85 @@
-async function searchFlights() {
-    const from = document.getElementById('fromCity').value; // Код IATA (ASB)
-    const to = document.getElementById('toCity').value;     // Код IATA (KZN)
-    const date = document.getElementById('travelDate').value; // ГГГГ-ММ-ДД
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPAR.TM — Поиск авиабилетов</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        .search-form { display: flex; flex-direction: column; gap: 10px; }
+        input, button { padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        #flightResults { margin-top: 20px; }
+        .ticket-card { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px; background: #fafafa; transition: 0.3s; }
+        .ticket-card:hover { border-color: #007bff; }
+        .price { color: #28a745; font-size: 1.2em; font-weight: bold; }
+    </style>
+</head>
+<body>
 
-    const resultsDiv = document.getElementById('flightResults');
-    resultsDiv.innerHTML = '<p>Ищем лучшие варианты...</p>';
+<div class="container">
+    <h1>SAPAR.TM</h1>
+    <div class="search-form">
+        <input type="text" id="fromCity" placeholder="Откуда (например, ASB)" maxlength="3">
+        <input type="text" id="toCity" placeholder="Куда (например, KZN)" maxlength="3">
+        <input type="date" id="travelDate">
+        <button onclick="searchFlights()">Найти билеты</button>
+    </div>
 
-    try {
-        // Запрос идет к твоему серверу на Railway
-        const response = await fetch(`/api/search?origin=${from}&destination=${to}&date=${date}`);
-        const data = await response.json();
+    <div id="flightResults">
+        </div>
+</div>
 
-        resultsDiv.innerHTML = ''; // Очистка
+<script>
+    async function searchFlights() {
+        const from = document.getElementById('fromCity').value.toUpperCase();
+        const to = document.getElementById('toCity').value.toUpperCase();
+        const date = document.getElementById('travelDate').value;
 
-        if (data.length > 0) {
-            data.forEach(flight => {
-                const ticket = document.createElement('div');
-                ticket.className = 'ticket-card';
-                ticket.innerHTML = `
-                    <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
-                        <h3>Цена: ${flight.value} RUB</h3>
-                        <p>Маршрут: ${flight.origin} → ${flight.destination}</p>
-                        <p>Дата вылета: ${flight.depart_date}</p>
-                        <a href="https://www.aviasales.ru" target="_blank" style="color: blue;">Перейти к покупке</a>
-                    </div>
-                `;
-                resultsDiv.appendChild(ticket);
-            });
-        } else {
-            resultsDiv.innerHTML = '<p>Билеты не найдены на эту дату.</p>';
+        const resultsDiv = document.getElementById('flightResults');
+        
+        if (!from || !to || !date) {
+            alert("Пожалуйста, заполните все поля!");
+            return;
         }
-    } catch (err) {
-        resultsDiv.innerHTML = '<p>Произошла ошибка при поиске.</p>';
-        console.error(err);
+
+        resultsDiv.innerHTML = '<p style="text-align:center;">Ищем лучшие варианты...</p>';
+
+        try {
+            // Запрос к твоему серверу на Railway
+            const response = await fetch(`/api/search?origin=${from}&destination=${to}&date=${date}`);
+            const data = await response.json();
+
+            resultsDiv.innerHTML = ''; 
+
+            if (data && data.length > 0) {
+                data.forEach(flight => {
+                    const ticket = document.createElement('div');
+                    ticket.className = 'ticket-card';
+                    ticket.innerHTML = `
+                        <div style="display:flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${flight.origin} ✈ ${flight.destination}</strong><br>
+                                <small>Дата: ${flight.depart_date}</small>
+                            </div>
+                            <div class="price">${flight.value} RUB</div>
+                        </div>
+                        <p><a href="https://www.aviasales.ru" target="_blank" style="color: #007bff; text-decoration: none;">Купить на Aviasales</a></p>
+                    `;
+                    resultsDiv.appendChild(ticket);
+                });
+            } else {
+                resultsDiv.innerHTML = '<p style="text-align:center;">Билеты на эту дату не найдены.</p>';
+            }
+        } catch (err) {
+            resultsDiv.innerHTML = '<p style="text-align:center; color:red;">Ошибка при поиске. Проверьте соединение с сервером.</p>';
+            console.error("Ошибка:", err);
+        }
     }
-}
+</script>
+
+</body>
+</html>
