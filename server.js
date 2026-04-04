@@ -9,13 +9,17 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const TOKEN = process.env.TRAVELPAYOUTS_TOKEN; // Ваш токен
-const MARKER = process.env.MARKER; // Ваш маркер
+const TOKEN = process.env.TRAVELPAYOUTS_TOKEN;
+const MARKER = process.env.MARKER;
 
-// Функция генерации подписи согласно документации Travelpayouts
+// Генерация MD5 подписи: token:marker:params_sorted_by_key
 function generateSignature(params) {
     const sortedKeys = Object.keys(params).sort();
-    const orderedParams = sortedKeys.map(key => params[key]).join(':');
+    const orderedParams = sortedKeys.map(key => {
+        // Если параметр - объект (как passengers), превращаем в строку аккуратно
+        return typeof params[key] === 'object' ? JSON.stringify(params[key]) : params[key];
+    }).join(':');
+    
     const dataString = `${TOKEN}:${MARKER}:${orderedParams}`;
     return crypto.createHash('md5').update(dataString).digest('hex');
 }
@@ -35,19 +39,26 @@ app.post('/api/search-live', async (req, res) => {
     };
 
     try {
-        // 1. Инициализация поиска
+        // 1. Инициализация поиска (Start)
         const signature = generateSignature(searchParams);
         const start = await axios.post('https://tickets-api.travelpayouts.com/search/affiliate/start', 
             { ...searchParams, signature },
-            { headers: { 'x-affiliate-user-id': TOKEN, 'x-real-host': searchParams.host, 'x-user-ip': searchParams.user_ip } }
+            { 
+                headers: { 
+                    'x-affiliate-user-id': TOKEN, 
+                    'x-real-host': searchParams.host, 
+                    'x-user-ip': searchParams.user_ip,
+                    'Content-Type': 'application/json'
+                } 
+            }
         );
 
         const { search_id, results_url } = start.data;
 
-        // 2. Ожидание данных (Aviasales рекомендует паузу)
-        await new Promise(r => setTimeout(r, 5000));
+        // 2. Ожидание (рекомендовано 5-10 сек)
+        await new Promise(r => setTimeout(r, 6000));
 
-        // 3. Получение результатов
+        // 3. Получение результатов (Results)
         const results = await axios.post(`${results_url}/search/affiliate/results`, {
             search_id,
             last_update_timestamp: 0
@@ -55,9 +66,9 @@ app.post('/api/search-live', async (req, res) => {
 
         res.json(results.data);
     } catch (error) {
-        console.error(error.response?.data || error.message);
-        res.status(500).json({ error: "Ошибка поиска в реальном времени" });
+        console.error("API ERROR:", error.response?.data || error.message);
+        res.status(500).json({ error: "Ошибка поиска в реальном времени. Проверьте доступ к API." });
     }
 });
 
-app.listen(PORT, () => console.log(`Бизнес-сервер запущен на порту ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
