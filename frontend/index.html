@@ -2,93 +2,85 @@
 <html lang="ru" translate="no">
 <head>
     <meta charset="UTF-8">
-    <meta name="google" content="notranslate">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM — Поиск билетов</title>
+    <title>SAPAR.TM — Поиск билетов (Бизнес)</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h1 { color: #0052cc; margin-bottom: 25px; font-weight: bold; }
-        .search-form { display: flex; flex-direction: column; gap: 12px; }
-        input { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
-        /* Кнопка теперь четко синяя с правильным текстом */
-        button { padding: 14px; background-color: #0052cc; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: 600; text-transform: uppercase; }
-        button:hover { background-color: #003d99; }
-        #results { margin-top: 20px; text-align: left; font-size: 14px; }
-        .ticket { border-left: 4px solid #0052cc; padding: 10px; margin-bottom: 10px; background: #f9f9f9; border-radius: 4px; }
+        :root { --main: #0052cc; --gold: #d4af37; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 100%; max-width: 420px; }
+        h1 { color: var(--main); text-align: center; letter-spacing: 3px; margin-bottom: 30px; }
+        .input-group { display: flex; flex-direction: column; gap: 12px; }
+        input { padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--main); }
+        button { padding: 18px; background: var(--main); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .ticket { border: 1px solid #eee; padding: 20px; border-radius: 15px; margin-top: 20px; border-left: 5px solid var(--main); }
+        .price { font-size: 24px; font-weight: bold; color: #27ae60; }
+        .buy-link { display: block; background: #ff9800; color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 8px; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-card">
     <h1>SAPAR.TM</h1>
-    <div class="search-form">
-        <input type="text" id="fromCity" list="cities" placeholder="Откуда (например, Ашхабад)">
-        <input type="text" id="toCity" list="cities" placeholder="Куда (например, Казань)">
-        
+    <div class="input-group">
+        <input type="text" id="from" list="cities" placeholder="Откуда (ASB)">
+        <input type="text" id="to" list="cities" placeholder="Куда (KZN)">
         <datalist id="cities">
             <option value="Ашхабад (ASB)">
             <option value="Казань (KZN)">
             <option value="Москва (MOW)">
-            <option value="Стамбул (IST)">
-            <option value="Дубай (DXB)">
         </datalist>
-
-        <input type="date" id="travelDate">
-        <button id="searchBtn">Найти билеты</button>
+        <input type="date" id="date">
+        <button id="searchBtn">ПОИСК РЕЙСОВ</button>
     </div>
     <div id="results"></div>
 </div>
 
 <script>
-    const API_URL = 'https://sapar-project-production.up.railway.app';
+    const MARKER = '716446'; // Ваш маркер
 
-    function getIataCode(str) {
-        const match = str.match(/\(([^)]+)\)/);
-        return match ? match[1] : str.toUpperCase().trim();
+    function getCode(str) {
+        const m = str.match(/\(([^)]+)\)/);
+        return m ? m[1] : str.toUpperCase().trim();
     }
 
-    document.getElementById('searchBtn').onclick = async function() {
-        const fromInput = document.getElementById('fromCity').value;
-        const toInput = document.getElementById('toCity').value;
-        const dateInput = document.getElementById('travelDate').value;
-        const resultsDiv = document.getElementById('results');
+    document.getElementById('searchBtn').onclick = async () => {
+        const from = getCode(document.getElementById('from').value);
+        const to = getCode(document.getElementById('to').value);
+        const date = document.getElementById('date').value;
+        const resDiv = document.getElementById('results');
 
-        if (!fromInput || !toInput || !dateInput) {
-            alert("Пожалуйста, заполните все поля");
-            return;
-        }
+        if(!from || !to || !date) return alert("Заполните поля");
 
-        const from = getIataCode(fromInput);
-        const to = getIataCode(toInput);
-
-        resultsDiv.innerHTML = '<p style="text-align:center;">Поиск реальных рейсов...</p>';
+        resDiv.innerHTML = '<p style="text-align:center">Ищем реальные билеты...</p>';
 
         try {
-            const response = await fetch(`${API_URL}/api/search?origin=${from}&destination=${to}&date=${dateInput}`);
-            
-            if (!response.ok) throw new Error();
-            
+            const response = await fetch('/api/search-live', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ origin: from, destination: to, date: date })
+            });
             const data = await response.json();
-            resultsDiv.innerHTML = '';
+            resDiv.innerHTML = '';
 
-            if (data && data.length > 0) {
-                data.forEach(flight => {
-                    resultsDiv.innerHTML += `
+            if (data.tickets && data.tickets.length > 0) {
+                data.tickets.forEach(t => {
+                    const price = t.proposals[0].value;
+                    const buyUrl = `https://www.aviasales.ru/search/${from}${date.replace(/-/g,'')}${to}1?marker=${MARKER}`;
+                    
+                    resDiv.innerHTML += `
                         <div class="ticket">
-                            <strong>Цена: ${flight.value} RUB</strong><br>
-                            <span>Рейс: ${flight.origin} → ${flight.destination}</span><br>
-                            <small>Дата: ${flight.depart_date}</small>
+                            <div class="price">${price} RUB</div>
+                            <div>${from} ➔ ${to}</div>
+                            <a href="${buyUrl}" target="_blank" class="buy-link">ЗАБРОНИРОВАТЬ</a>
                         </div>`;
                 });
             } else {
-                resultsDiv.innerHTML = '<p>На эту дату рейсов не найдено. Попробуйте поискать на соседние даты (например, через неделю).</p>';
+                resDiv.innerHTML = '<p>Билеты не найдены. Попробуйте другую дату.</p>';
             }
-        } catch (err) {
-            resultsDiv.innerHTML = '<p style="color:red;">Ошибка связи с API. Убедитесь, что сервер на Railway запущен.</p>';
+        } catch (e) {
+            resDiv.innerHTML = '<p style="color:red">Ошибка связи с сервером.</p>';
         }
     };
 </script>
-
 </body>
 </html>

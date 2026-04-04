@@ -1,48 +1,63 @@
 const express = require('express');
 const axios = require('axios');
+const crypto = require('crypto');
 const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-// Railway сам подставит нужный PORT через переменную окружения
-const PORT = process.env.PORT || 3000;
-
 app.use(cors());
-app.use(express.static('public')); // Здесь лежат твои HTML, CSS и JS
+app.use(express.json());
 
-// Маршрут для поиска билетов
-app.get('/api/search', async (req, res) => {
-    const { origin, destination, date } = req.query;
+const PORT = process.env.PORT || 3000;
+const TOKEN = process.env.TRAVELPAYOUTS_TOKEN; // Ваш токен
+const MARKER = process.env.MARKER; // Ваш маркер
 
-    if (!origin || !destination || !date) {
-        return res.status(400).json({ error: "Укажите города и дату" });
-    }
+// Функция генерации подписи согласно документации Travelpayouts
+function generateSignature(params) {
+    const sortedKeys = Object.keys(params).sort();
+    const orderedParams = sortedKeys.map(key => params[key]).join(':');
+    const dataString = `${TOKEN}:${MARKER}:${orderedParams}`;
+    return crypto.createHash('md5').update(dataString).digest('hex');
+}
+
+app.post('/api/search-live', async (req, res) => {
+    const { origin, destination, date } = req.body;
+    const userIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+    const searchParams = {
+        marker: MARKER,
+        host: "sapar-project-production.up.railway.app",
+        user_ip: userIP.replace('::ffff:', ''),
+        locale: "ru",
+        trip_class: "Y",
+        passengers: { adults: 1, children: 0, infants: 0 },
+        directions: [{ origin, destination, date }]
+    };
 
     try {
-        const response = await axios.get('https://api.travelpayouts.com/v2/prices/latest', {
-            params: {
-                origin: origin.toUpperCase(),      // Например, ASB
-                destination: destination.toUpperCase(), // Например, KZN
-                beginning_of_period: date,
-                one_way: true,
-                currency: 'rub',
-                limit: 15,
-                token: process.env.TRAVELPAYOUTS_TOKEN, // Берется из Railway
-                marker: process.env.MARKER               // Берется из Railway
-            }
+        // 1. Инициализация поиска
+        const signature = generateSignature(searchParams);
+        const start = await axios.post('https://tickets-api.travelpayouts.com/search/affiliate/start', 
+            { ...searchParams, signature },
+            { headers: { 'x-affiliate-user-id': TOKEN, 'x-real-host': searchParams.host, 'x-user-ip': searchParams.user_ip } }
+        );
+
+        const { search_id, results_url } = start.data;
+
+        // 2. Ожидание данных (Aviasales рекомендует паузу)
+        await new Promise(r => setTimeout(r, 5000));
+
+        // 3. Получение результатов
+        const results = await axios.post(`${results_url}/search/affiliate/results`, {
+            search_id,
+            last_update_timestamp: 0
         });
 
-        if (response.data.success) {
-            res.json(response.data.data);
-        } else {
-            res.status(400).json({ error: "Ошибка API Travelpayouts" });
-        }
+        res.json(results.data);
     } catch (error) {
-        console.error("Ошибка сервера:", error.message);
-        res.status(500).json({ error: "Не удалось получить данные о рейсах" });
+        console.error(error.response?.data || error.message);
+        res.status(500).json({ error: "Ошибка поиска в реальном времени" });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Сервер SAPAR.TM запущен на порту ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Бизнес-сервер запущен на порту ${PORT}`));
