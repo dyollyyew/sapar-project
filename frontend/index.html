@@ -72,6 +72,10 @@
             padding: 0 45px; border-radius: 12px; font-weight: 900;
             cursor: pointer; height: 55px; font-size: 18px; align-self: flex-end;
         }
+
+        #res { max-width: 1100px; margin: 20px auto; padding: 0 20px; }
+        .ticket { background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .price { font-size: 24px; font-weight: 800; color: var(--primary-green); }
     </style>
 </head>
 <body>
@@ -95,12 +99,12 @@
         <div class="input-group">
             <label id="lbl-from">Nireden</label>
             <i class="fa-solid fa-plane-departure"></i>
-            <input type="text" id="from" value="MOW">
+            <input type="text" id="from" placeholder="MOW" value="MOW">
         </div>
         <div class="input-group">
             <label id="lbl-to">Nirä</label>
             <i class="fa-solid fa-plane-arrival"></i>
-            <input type="text" id="to" value="KZN">
+            <input type="text" id="to" placeholder="ASB" value="ASB">
         </div>
         <div class="input-group">
             <label id="lbl-date">Sene</label>
@@ -114,12 +118,15 @@
 
 <script>
     const translations = {
-        ru: { title: "Интересные путешествия только с нами", from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК" },
-        tm: { title: "Gyzykly syýahatlar diňe biziň bilen", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG" },
-        en: { title: "Exciting journeys only with us", from: "Origin", to: "Destination", date: "Date", search: "SEARCH" }
+        ru: { title: "Интересные путешествия только с нами", from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК", loading: "Загрузка..." },
+        tm: { title: "Gyzykly syýahatlar diňe biziň bilen", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG", loading: "Garaşyň..." },
+        en: { title: "Exciting journeys only with us", from: "Origin", to: "Destination", date: "Date", search: "SEARCH", loading: "Loading..." }
     };
 
+    let currentLang = 'tm';
+
     function setLang(lang) {
+        currentLang = lang;
         document.querySelectorAll('.lang-switcher button').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-${lang}`).classList.add('active');
         document.getElementById('hero-title').innerText = translations[lang].title;
@@ -129,10 +136,47 @@
         document.getElementById('btn-search-text').innerText = translations[lang].search;
     }
 
-    // ВСТАВЬ СЮДА СВОЮ ФУНКЦИЮ FETCH, КОТОРУЮ ТЫ НЕ ХОТЕЛ МЕНЯТЬ
+    // ВОТ ОН - ТВОЙ ВОССТАНОВЛЕННЫЙ ПОИСК
     async function searchTickets() {
-        console.log("Кнопка нажата. ID найдены.");
-        // Твой старый рабочий код поиска...
+        const from = document.getElementById('from').value.toUpperCase();
+        const to = document.getElementById('to').value.toUpperCase();
+        const date = document.getElementById('date').value;
+        const resDiv = document.getElementById('res');
+
+        if (!from || !to || !date) {
+            alert("Пожалуйста, заполните все поля");
+            return;
+        }
+
+        resDiv.innerHTML = `<p style="text-align:center;">${translations[currentLang].loading}</p>`;
+
+        try {
+            // Запрос к твоему API (серверной части), который общается с Aviasales
+            const response = await fetch(`/api/search-live?origin=${from}&destination=${to}&date=${date}`);
+            const data = await response.json();
+
+            resDiv.innerHTML = "";
+
+            if (data.tickets && data.tickets.length > 0) {
+                data.tickets.forEach(ticket => {
+                    resDiv.innerHTML += `
+                        <div class="ticket">
+                            <div>
+                                <strong>${ticket.airline}</strong><br>
+                                <span>${ticket.origin} ✈ ${ticket.destination}</span>
+                            </div>
+                            <div class="price">${ticket.price} ₽</div>
+                            <a href="https://www.aviasales.ru${ticket.link}" target="_blank" style="background:var(--primary-green); color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold;">SAtyn al</a>
+                        </div>
+                    `;
+                });
+            } else {
+                resDiv.innerHTML = "<p style='text-align:center;'>Билеты не найдены</p>";
+            }
+        } catch (error) {
+            console.error(error);
+            resDiv.innerHTML = "<p style='text-align:center; color:red;'>Ошибка сервера. Проверьте соединение.</p>";
+        }
     }
 </script>
 
