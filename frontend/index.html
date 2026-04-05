@@ -51,4 +51,16 @@
                             <div class="ticket">
                                 <div class="price">${price} RUB</div>
                                 <div>${from} ➔ ${to}</div>
-                                <a href="https://www.aviasales.ru/search/${from}${date.
+                                <a href="https://www.aviasales.ru/search/${from}${date.replace(/-/g,'')}${to}1?marker=716446" target="_blank" class="buy-btn">ЗАБРОНИРОВАТЬ</a>
+                            </div>`;
+                    });
+                } else {
+                    resDiv.innerHTML = "<p>Билетов не найдено.</p>";
+                }
+            } catch (e) {
+                resDiv.innerHTML = "<p style='color:red'>Ошибка связи. Проверьте логи в Railway.</p>";
+            }
+        }
+    </script>
+</body>
+</html>
