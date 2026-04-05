@@ -2,63 +2,50 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SAPAR.TM — Бронирование</title>
+    <title>SAPAR.TM</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
-        .app { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h1 { text-align: center; color: #0052cc; margin-bottom: 25px; }
-        input, button { width: 100%; padding: 14px; margin: 8px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
-        button { background: #0052cc; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #0041a3; }
-        .ticket { border: 1px solid #eee; padding: 15px; margin-top: 15px; border-radius: 12px; border-left: 5px solid #0052cc; }
-        .price { color: #2ecc71; font-size: 22px; font-weight: bold; }
-        .buy-btn { display: block; text-align: center; background: #f39c12; color: white; text-decoration: none; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: bold; }
+        body { font-family: Arial, sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 50px; }
+        .app { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 350px; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #0052cc; color: white; border: none; font-weight: bold; cursor: pointer; }
+        .ticket { border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 8px; border-left: 4px solid #0052cc; }
     </style>
 </head>
 <body>
     <div class="app">
-        <h1>SAPAR.TM</h1>
+        <h1 style="text-align:center; color:#0052cc;">SAPAR.TM</h1>
         <input type="text" id="from" placeholder="Откуда (ASB)" value="ASB">
         <input type="text" id="to" placeholder="Куда (KZN)" value="KZN">
         <input type="date" id="date">
         <button onclick="search()">НАЙТИ БИЛЕТЫ</button>
-        <div id="results"></div>
+        <div id="res"></div>
     </div>
 
     <script>
         async function search() {
-            const from = document.getElementById('from').value.trim().toUpperCase();
-            const to = document.getElementById('to').value.trim().toUpperCase();
-            const date = document.getElementById('date').value;
-            const resDiv = document.getElementById('results');
-
-            if(!date) return alert("Выберите дату");
-            resDiv.innerHTML = "<p style='text-align:center'>Ищем реальные цены...</p>";
-
+            const resDiv = document.getElementById('res');
+            resDiv.innerHTML = "Поиск...";
             try {
                 const response = await fetch('/api/search-live', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ origin: from, destination: to, date: date })
+                    body: JSON.stringify({
+                        origin: document.getElementById('from').value.toUpperCase(),
+                        destination: document.getElementById('to').value.toUpperCase(),
+                        date: document.getElementById('date').value
+                    })
                 });
                 const data = await response.json();
                 resDiv.innerHTML = "";
-
                 if (data.tickets && data.tickets.length > 0) {
                     data.tickets.forEach(t => {
-                        const price = t.proposals[0].value;
-                        resDiv.innerHTML += `
-                            <div class="ticket">
-                                <div class="price">${price} RUB</div>
-                                <div>${from} ➔ ${to}</div>
-                                <a href="https://www.aviasales.ru/search/${from}${date.replace(/-/g,'')}${to}1?marker=716446" target="_blank" class="buy-btn">ЗАБРОНИРОВАТЬ</a>
-                            </div>`;
+                        resDiv.innerHTML += `<div class="ticket"><b>${t.proposals[0].value} RUB</b><br>Прямой рейс</div>`;
                     });
                 } else {
-                    resDiv.innerHTML = "<p>Билетов не найдено.</p>";
+                    resDiv.innerHTML = "Билетов не найдено.";
                 }
             } catch (e) {
-                resDiv.innerHTML = "<p style='color:red'>Ошибка связи. Проверьте логи в Railway.</p>";
+                resDiv.innerHTML = "<span style='color:red'>Ошибка связи с сервером.</span>";
             }
         }
     </script>
