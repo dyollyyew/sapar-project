@@ -6,117 +6,110 @@
     <title>SAPAR.TM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary-green: #27ae60; --header-bg: #f2f5f8; --gold: #d4af37; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; }
-        header { background: var(--header-bg); padding: 15px 10%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        .logo { font-size: 28px; font-weight: 900; display: flex; align-items: center; gap: 12px; color: #000; }
-        .logo i { color: var(--primary-green); font-size: 32px; }
-        .lang-switcher button { background: white; border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; }
-        .lang-switcher button.active { background: #1e293b; color: white; }
-        .hero { position: relative; background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; padding: 140px 20px 200px; text-align: center; color: white; border-bottom: 5px solid var(--gold); }
-        .hero h2 { font-size: 48px; margin: 0; font-weight: 900; text-shadow: 2px 4px 10px rgba(0,0,0,0.7); }
-        .search-container { max-width: 1100px; margin: -100px auto 50px; padding: 0 20px; position: relative; z-index: 10; }
-        .search-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.2); display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
-        .input-group { position: relative; min-width: 200px; }
-        .input-group label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 800; color: #64748b; text-transform: uppercase; }
-        .input-group input { width: 100%; padding: 15px 15px 15px 50px; border: 2px solid #f1f5f9; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
-        .input-group i { position: absolute; left: 18px; top: 43px; color: var(--primary-green); font-size: 20px; }
-        .btn-search { background: var(--primary-green); color: white; border: none; padding: 0 45px; border-radius: 12px; font-weight: 900; cursor: pointer; height: 55px; font-size: 18px; align-self: flex-end; }
-        #res { max-width: 1100px; margin: 20px auto; }
-        .error-msg { color: red; text-align: center; font-weight: bold; padding: 20px; }
+        :root { --green: #27ae60; --dark: #1e293b; }
+        body { font-family: sans-serif; margin: 0; background: #f4f7f6; }
+        
+        header { background: white; padding: 15px 10%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .logo { font-size: 24px; font-weight: bold; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--green); }
+
+        /* Блок с самолетом */
+        .hero { 
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+            height: 350px; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; color: white; text-align: center;
+        }
+        .hero h2 { font-size: 40px; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+
+        .search-box { 
+            max-width: 1000px; margin: -50px auto 20px; background: white; 
+            padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+        }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 12px; font-weight: bold; color: #666; text-transform: uppercase; }
+        .input-group input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; min-width: 200px; }
+
+        .gozleg-btn { 
+            background: var(--green); color: white; border: none; padding: 12px 40px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; align-self: flex-end; font-size: 16px;
+        }
+        #res { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+        .error { color: red; text-align: center; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo"><i class="fa-solid fa-paper-plane"></i> SAPAR.TM</div>
-    <div class="lang-switcher">
-        <button onclick="setLang('ru')" id="btn-ru">RU</button>
-        <button onclick="setLang('tm')" id="btn-tm" class="active">TM</button>
-        <button onclick="setLang('en')" id="btn-en">EN</button>
-    </div>
 </header>
 
 <div class="hero">
     <h2 id="hero-title">Gyzykly syýahatlar diňe biziň bilen</h2>
-    <p id="hero-desc">Dünýäniň ähli künjegine uçuşlar</p>
+    <p>Dünýäniň ähli künjegine uçuşlar</p>
 </div>
 
-<div class="search-container">
-    <div class="search-card">
-        <div class="input-group">
-            <label id="lbl-from">Nireden</label>
-            <i class="fa-solid fa-plane-departure"></i>
-            <input type="text" id="from" value="ASB">
-        </div>
-        <div class="input-group">
-            <label id="lbl-to">Nirä</label>
-            <i class="fa-solid fa-plane-arrival"></i>
-            <input type="text" id="to" value="KZN">
-        </div>
-        <div class="input-group">
-            <label id="lbl-date">Sene</label>
-            <i class="fa-solid fa-calendar-alt"></i>
-            <input type="date" id="date">
-        </div>
-        <button class="btn-search" onclick="searchTickets()" id="btn-search-text">GOZLEG</button>
+<div class="search-box">
+    <div class="input-group">
+        <label>Nireden</label>
+        <input type="text" id="from" value="ASB">
     </div>
-    <div id="res"></div>
+    <div class="input-group">
+        <label>Nirä</label>
+        <input type="text" id="to" value="KZN">
+    </div>
+    <div class="input-group">
+        <label>Sene</label>
+        <input type="date" id="date">
+    </div>
+    <button class="gozleg-btn" onclick="searchTickets()">GOZLEG</button>
 </div>
+
+<div id="res"></div>
 
 <script>
-    const translations = {
-        ru: { title: "Интересные путешествия только с нами", from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК", loading: "Загрузка..." },
-        tm: { title: "Gyzykly syýahatlar diňe biziň bilen", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG", loading: "Garaşyň..." },
-        en: { title: "Exciting journeys only with us", from: "Origin", to: "Destination", date: "Date", search: "SEARCH", loading: "Loading..." }
-    };
-
-    let currentLang = 'tm';
-
-    function setLang(lang) {
-        currentLang = lang;
-        document.querySelectorAll('.lang-switcher button').forEach(b => b.classList.remove('active'));
-        document.getElementById(`btn-${lang}`).classList.add('active');
-        document.getElementById('hero-title').innerText = translations[lang].title;
-        document.getElementById('lbl-from').innerText = translations[lang].from;
-        document.getElementById('lbl-to').innerText = translations[lang].to;
-        document.getElementById('lbl-date').innerText = translations[lang].date;
-        document.getElementById('btn-search-text').innerText = translations[lang].search;
-    }
-
     async function searchTickets() {
         const from = document.getElementById('from').value.toUpperCase();
         const to = document.getElementById('to').value.toUpperCase();
         const date = document.getElementById('date').value;
         const resDiv = document.getElementById('res');
 
-        if (!from || !to || !date) return;
+        if (!from || !to || !date) {
+            alert("Ähli meýdançalary dolduryň!");
+            return;
+        }
 
-        resDiv.innerHTML = `<p style="text-align:center;">${translations[currentLang].loading}</p>`;
+        resDiv.innerHTML = "<p style='text-align:center;'>Garaşyň...</p>";
 
         try {
-            // Исправленный путь запроса к бэкенду
+            // ВАЖНО: Мы используем относительный путь, чтобы Railway сам находил API
             const response = await fetch(`/api/search-live?origin=${from}&destination=${to}&date=${date}`);
+            
+            if (!response.ok) throw new Error("Server error");
+
             const data = await response.json();
-
-            if (!response.ok) throw new Error();
-
             resDiv.innerHTML = "";
+
             if (data.tickets && data.tickets.length > 0) {
                 data.tickets.forEach(t => {
-                    resDiv.innerHTML += `<div style="background:white; padding:15px; margin-bottom:10px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                        <div><b>${t.airline}</b><br>${t.origin} ➔ ${t.destination}</div>
-                        <div style="color:var(--primary-green); font-weight:bold; font-size:20px;">${t.price} TMT</div>
-                        <a href="${t.link}" target="_blank" style="background:var(--primary-green); color:white; padding:8px 15px; border-radius:5px; text-decoration:none;">Satyn al</a>
-                    </div>`;
+                    resDiv.innerHTML += `
+                        <div style="background:white; padding:20px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee;">
+                            <div><b>${t.airline}</b><br>${t.origin} ➔ ${t.destination}</div>
+                            <div style="color:#27ae60; font-size:20px; font-weight:bold;">${t.price} TMT</div>
+                            <a href="${t.link}" target="_blank" style="background:#27ae60; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Satyn al</a>
+                        </div>`;
                 });
             } else {
                 resDiv.innerHTML = "<p style='text-align:center;'>Bilet tapylmady.</p>";
             }
         } catch (e) {
-            resDiv.innerHTML = "<p class='error-msg'>Ошибка сервера. Проверьте соединение.</p>";
+            // Это та самая ошибка со скриншота
+            resDiv.innerHTML = "<p class='error'>Ошибка сервера. Проверьте соединение.</p>";
         }
     }
 </script>
+
 </body>
 </html>
