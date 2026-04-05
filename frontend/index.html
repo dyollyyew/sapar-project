@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="tm">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Счастливого пути!</title>
+    <title>SAPAR.TM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary-green: #27ae60;
             --header-bg: #f2f5f8;
             --gold: #d4af37;
-            --dark-bg: #1e293b;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; }
 
-        /* ШАПКА: Светло-серая, как на твоем макете */
         header {
             background: var(--header-bg); 
             padding: 15px 10%; 
@@ -32,26 +30,29 @@
             background: white; border: 1px solid #ddd; padding: 8px 15px; 
             border-radius: 8px; cursor: pointer; font-weight: 700;
         }
-        .lang-switcher button.active { background: var(--dark-bg); color: white; border-color: var(--dark-bg); }
+        .lang-switcher button.active { background: #1e293b; color: white; }
 
-        /* БЛОК С КОВРОМ: Используем локальный путь */
+        /* Фоновое изображение с самолетом */
         .hero {
             position: relative;
             background-image: 
-                linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
-                url('./kover-gushly-gel-253x366-ruchnaja-rabota.avif'); /* Прямая ссылка на твой файл */
+                linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
+                url('https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?q=80&w=2070&auto=format&fit=crop'); 
             background-size: cover; 
             background-position: center;
-            padding: 120px 20px 180px; 
+            padding: 140px 20px 200px; 
             text-align: center; 
             color: white;
             border-bottom: 5px solid var(--gold);
         }
         
-        .hero h2 { font-size: 48px; margin: 0; font-weight: 900; text-shadow: 2px 4px 10px rgba(0,0,0,0.8); }
-        .hero p { font-size: 20px; margin-top: 10px; opacity: 0.9; text-shadow: 1px 2px 5px rgba(0,0,0,0.5); }
+        .hero h2 { 
+            font-size: 48px; 
+            margin: 0; 
+            font-weight: 900; 
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.7); 
+        }
 
-        /* КАРТОЧКА ПОИСКА */
         .search-container { max-width: 1100px; margin: -100px auto 50px; padding: 0 20px; position: relative; z-index: 10; }
         .search-card {
             background: white; padding: 40px; border-radius: 20px;
@@ -60,7 +61,6 @@
         }
 
         .input-group label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 800; color: #64748b; text-transform: uppercase; }
-        .input-group { position: relative; }
         .input-group input {
             width: 100%; padding: 15px 15px 15px 50px; border: 2px solid #f1f5f9;
             border-radius: 12px; font-size: 16px; box-sizing: border-box;
@@ -86,7 +86,7 @@
 </header>
 
 <div class="hero">
-    <h2 id="hero-title">Gyzykly syýahatlar biziň bile</h2>
+    <h2 id="hero-title">Gyzykly syýahatlar diňe biziň bilen</h2>
     <p id="hero-desc">Dünýäniň ähli künjegine uçuşlar</p>
 </div>
 
@@ -113,22 +113,16 @@
 </div>
 
 <script>
-    // ТВОЯ ОСНОВНАЯ ЛОГИКА
     const translations = {
-        ru: { title: "Интересные путешествия с нами", desc: "Удобный поиск билетов по всему миру", from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК", loading: "Ищем билеты..." },
-        tm: { title: "Gyzykly syýahatlar biziň bile", desc: "Dünýäniň ähli künjegine uçuşlar", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG", loading: "Gözlenilýär..." },
-        en: { title: "Exciting journeys with us", desc: "Best flight deals worldwide", from: "Origin", to: "Destination", date: "Date", search: "SEARCH", loading: "Searching..." }
+        ru: { title: "Интересные путешествия только с нами", from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК" },
+        tm: { title: "Gyzykly syýahatlar diňe biziň bilen", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG" },
+        en: { title: "Exciting journeys only with us", from: "Origin", to: "Destination", date: "Date", search: "SEARCH" }
     };
 
-    let currentLang = 'tm';
-
     function setLang(lang) {
-        currentLang = lang;
         document.querySelectorAll('.lang-switcher button').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-${lang}`).classList.add('active');
-        
         document.getElementById('hero-title').innerText = translations[lang].title;
-        document.getElementById('hero-desc').innerText = translations[lang].desc;
         document.getElementById('lbl-from').innerText = translations[lang].from;
         document.getElementById('lbl-to').innerText = translations[lang].to;
         document.getElementById('lbl-date').innerText = translations[lang].date;
@@ -136,11 +130,7 @@
     }
 
     async function searchTickets() {
-        const resDiv = document.getElementById('res');
-        resDiv.innerHTML = `<div style='text-align:center; padding:50px;'>${translations[currentLang].loading}</div>`;
-        
-        // Сюда вставь свой fetch запрос к API, который у тебя был
-        console.log("Логика поиска сохранена и готова к работе");
+        console.log("Поиск запущен...");
     }
 </script>
 
