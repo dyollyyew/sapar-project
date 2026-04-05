@@ -10,11 +10,17 @@
             --primary-green: #27ae60;
             --header-bg: #f2f5f8;
             --gold: #d4af37;
+            --dark-bg: #1e293b;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: #fff; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f8fafc; 
+            margin: 0; 
+            padding: 0; 
+        }
 
-        /* Шапка: серый фон, черный текст, зеленый лого */
+        /* ШАПКА */
         header {
             background: var(--header-bg); 
             padding: 15px 10%; 
@@ -24,18 +30,40 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .logo { font-size: 28px; font-weight: 900; display: flex; align-items: center; gap: 12px; color: #000; }
-        .logo i { color: var(--primary-green); font-size: 32px; }
+        .logo { 
+            font-size: 28px; 
+            font-weight: 900; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            color: #000; 
+        }
+        .logo i { 
+            color: var(--primary-green); 
+            font-size: 32px; 
+        }
 
-        .lang-switcher button { background: white; border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; }
-        .lang-switcher button.active { background: #1e293b; color: white; }
+        .lang-switcher button { 
+            background: white; 
+            border: 1px solid #ddd; 
+            padding: 8px 15px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 700;
+            transition: 0.3s;
+        }
+        .lang-switcher button.active { 
+            background: var(--dark-bg); 
+            color: white; 
+            border-color: var(--dark-bg); 
+        }
 
-        /* ЦЕНТРАЛЬНЫЙ БЛОК С ТВОИМ КОВРОМ */
+        /* ГЛАВНЫЙ БЛОК С КОВРОМ (Берет картинку из твоей папки) */
         .hero {
             position: relative;
             background-image: 
-                linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
-                url('https://i.ibb.co/L9H8S6f/original-image.png'); /* Твой ковер */
+                linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
+                url('./kover-gushly-gel-253x366-ruchnaja-rabota.avif'); 
             background-size: cover; 
             background-position: center;
             padding: 120px 20px 180px; 
@@ -44,29 +72,96 @@
             border-bottom: 5px solid var(--gold);
         }
         
-        .hero h2 { font-size: 48px; margin: 0; font-weight: 900; text-shadow: 2px 4px 10px rgba(0,0,0,0.8); }
-        .hero p { font-size: 20px; margin-top: 10px; opacity: 0.9; text-shadow: 1px 2px 5px rgba(0,0,0,0.5); }
+        .hero h2 { 
+            font-size: 48px; 
+            margin: 0; 
+            font-weight: 900; 
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.8); 
+        }
+        .hero p { 
+            font-size: 20px; 
+            margin-top: 10px; 
+            opacity: 0.9; 
+            text-shadow: 1px 2px 5px rgba(0,0,0,0.5); 
+        }
 
         /* КАРТОЧКА ПОИСКА */
-        .search-container { max-width: 1100px; margin: -100px auto 50px; padding: 0 20px; position: relative; z-index: 10; }
+        .search-container { 
+            max-width: 1100px; 
+            margin: -100px auto 50px; 
+            padding: 0 20px; 
+            position: relative; 
+            z-index: 10; 
+        }
         .search-card {
-            background: white; padding: 40px; border-radius: 20px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) auto; gap: 20px;
+            background: white; 
+            padding: 40px; 
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) auto; 
+            gap: 20px;
         }
 
-        .input-group label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 800; color: #64748b; }
-        .input-group { position: relative; }
-        .input-group input {
-            width: 100%; padding: 15px 15px 15px 50px; border: 2px solid #f1f5f9;
-            border-radius: 12px; font-size: 16px; box-sizing: border-box;
+        .input-group label { 
+            display: block; 
+            margin-bottom: 10px; 
+            font-size: 13px; 
+            font-weight: 800; 
+            color: #64748b; 
+            text-transform: uppercase;
         }
-        .input-group i { position: absolute; left: 18px; top: 43px; color: var(--primary-green); font-size: 20px; }
+        .input-group { 
+            position: relative; 
+        }
+        .input-group input {
+            width: 100%; 
+            padding: 15px 15px 15px 50px; 
+            border: 2px solid #f1f5f9;
+            border-radius: 12px; 
+            font-size: 16px; 
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-group input:focus {
+            border-color: var(--primary-green);
+        }
+        .input-group i { 
+            position: absolute; 
+            left: 18px; 
+            top: 43px; 
+            color: var(--primary-green); 
+            font-size: 20px; 
+        }
 
         .btn-search {
-            background: var(--primary-green); color: white; border: none;
-            padding: 0 45px; border-radius: 12px; font-weight: 900;
-            cursor: pointer; height: 55px; font-size: 18px;
+            background: var(--primary-green); 
+            color: white; 
+            border: none;
+            padding: 0 45px; 
+            border-radius: 12px; 
+            font-weight: 900;
+            cursor: pointer; 
+            height: 55px; 
+            font-size: 18px; 
+            transition: 0.3s;
+            align-self: end;
+        }
+        .btn-search:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3); 
+        }
+
+        /* РЕЗУЛЬТАТЫ */
+        .ticket {
+            background: white; 
+            border-radius: 20px; 
+            display: flex; 
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0; 
+            overflow: hidden; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
     </style>
 </head>
@@ -82,7 +177,8 @@
 </header>
 
 <div class="hero">
-    <h2 id="hero-title">Gyzykly syýahatlar biziň bile</h2> <p id="hero-desc">Best prices on all flights worldwide</p>
+    <h2 id="hero-title">Gyzykly syýahatlar biziň bile</h2>
+    <p id="hero-desc">Dünýäniň ähli künjegine uçuşlar</p>
 </div>
 
 <div class="search-container">
@@ -108,16 +204,20 @@
 </div>
 
 <script>
-    /* Твоя основная логика (fetch, переводы и т.д.) осталась полностью без изменений */
+    // ОСНОВНАЯ ЛОГИКА (Переводы)
     const translations = {
-        ru: { title: "Интересные путешествия с нами", desc: "Удобный поиск билетов по всему миру", from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК" },
-        tm: { title: "Gyzykly syýahatlar biziň bile", desc: "Dünýäniň ähli künjegine uçuşlar", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG" },
-        en: { title: "Exciting journeys with us", desc: "Best flight deals worldwide", from: "Origin", to: "Destination", date: "Date", search: "SEARCH" }
+        ru: { title: "Интересные путешествия с нами", desc: "Удобный поиск билетов по всему миру", from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК", loading: "Ищем билеты..." },
+        tm: { title: "Gyzykly syýahatlar biziň bile", desc: "Dünýäniň ähli künjegine uçuşlar", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG", loading: "Gözlenilýär..." },
+        en: { title: "Exciting journeys with us", desc: "Best flight deals worldwide", from: "Origin", to: "Destination", date: "Date", search: "SEARCH", loading: "Searching..." }
     };
 
+    let currentLang = 'ru';
+
     function setLang(lang) {
+        currentLang = lang;
         document.querySelectorAll('.lang-switcher button').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-${lang}`).classList.add('active');
+        
         document.getElementById('hero-title').innerText = translations[lang].title;
         document.getElementById('hero-desc').innerText = translations[lang].desc;
         document.getElementById('lbl-from').innerText = translations[lang].from;
@@ -126,9 +226,68 @@
         document.getElementById('btn-search-text').innerText = translations[lang].search;
     }
 
+    // ОСНОВНАЯ ЛОГИКА (Поиск билетов)
     async function searchTickets() {
-        /* Твой оригинальный код поиска билетов здесь */
+        const resDiv = document.getElementById('res');
+        const from = document.getElementById('from').value.trim();
+        const to = document.getElementById('to').value.trim();
+        const date = document.getElementById('date').value;
+
+        if (!from || !to || !date) {
+            alert("Пожалуйста, заполните все поля!");
+            return;
+        }
+
+        resDiv.innerHTML = `<div style='text-align:center; padding:50px; color:var(--primary-green); font-weight:bold; font-size:18px;'>
+            <i class="fa-solid fa-spinner fa-spin"></i> ${translations[currentLang].loading}
+        </div>`;
+
+        try {
+            // Твой API запрос (если он отличается, просто замени этот блок fetch)
+            const response = await fetch('/api/search-live', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ origin: from, destination: to, date: date })
+            });
+            
+            const data = await response.json();
+            resDiv.innerHTML = "";
+
+            if (data.tickets && data.tickets.length > 0) {
+                data.tickets.forEach(t => {
+                    resDiv.innerHTML += `
+                        <div class="ticket">
+                            <div style="width: 220px; padding: 30px; background: #fafafa; border-right: 1px dashed #ddd; text-align: center;">
+                                <span style="font-size: 28px; font-weight: 900; color: #1e293b; margin-bottom: 15px; display: block;">${t.price.toLocaleString()} ₽</span>
+                                <a style="background: var(--primary-green); color: white; text-decoration: none; padding: 12px 25px; border-radius: 10px; font-weight: 800; display: inline-block;" href="https://www.aviasales.ru${t.link}" target="_blank">КУПИТЬ</a>
+                            </div>
+                            <div style="flex:1; padding:30px;">
+                                <div style="font-weight:900; color:var(--primary-green); margin-bottom:15px; font-size:18px;">${t.airline}</div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <div style="font-size:24px; font-weight:900;">${new Date(t.departure_at).getHours()}:${String(new Date(t.departure_at).getMinutes()).padStart(2, '0')}</div>
+                                        <div style="color:#64748b; font-weight:bold;">${t.origin}</div>
+                                    </div>
+                                    <div style="flex:1; border-bottom:2px dashed #ddd; margin:0 20px; position:relative; top:-5px;">
+                                        <i class="fa-solid fa-plane" style="position:absolute; left:50%; top:-10px; transform:translateX(-50%); background:white; padding:0 10px; color:var(--primary-green);"></i>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <div style="font-size:24px; font-weight:900;">--:--</div>
+                                        <div style="color:#64748b; font-weight:bold;">${t.destination}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+            } else {
+                resDiv.innerHTML = "<div style='text-align:center; padding:50px; font-size:18px; font-weight:bold; color:#64748b;'>Ничего не найдено 😔</div>";
+            }
+        } catch (e) { 
+            resDiv.innerHTML = "<div style='text-align:center; padding:50px; color:red; font-weight:bold;'>Произошла ошибка при поиске.</div>"; 
+            console.error(e);
+        }
     }
 </script>
+
 </body>
 </html>
