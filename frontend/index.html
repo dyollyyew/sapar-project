@@ -3,62 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Поиск всех рейсов</title>
+    <title>SAPAR.TM - Бронирование рейсов</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f4f7f9; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-        h1 { text-align: center; color: #0052cc; font-size: 28px; margin-bottom: 30px; }
-        .input-group { margin-bottom: 15px; position: relative; }
-        label { display: block; margin-bottom: 5px; font-size: 14px; color: #666; }
-        input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: border-color 0.3s; }
-        input:focus { border-color: #0052cc; outline: none; }
-        button { width: 100%; padding: 16px; background: #0052cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #003d99; }
+        :root {
+            --primary-green: #27ae60;
+            --accent-red: #eb5757;
+            --bg-gray: #f4f7f9;
+            --dark-gray: #333;
+            --text-secondary: #777;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg-gray); margin: 0; color: var(--dark-gray); }
+
+        /* Шапка с лого и языками */
+        header {
+            background: white;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .logo { font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 10px; color: var(--dark-gray); }
+        .logo i { color: var(--primary-green); font-size: 28px; } /* Лого как у ТГ */
+
+        .lang-switcher button {
+            background: none; border: 1px solid #ddd; padding: 5px 10px; 
+            border-radius: 4px; cursor: pointer; margin-left: 5px; font-size: 12px;
+        }
+        .lang-switcher button:hover { background: #eee; }
+
+        /* Контейнер поиска */
+        .search-section {
+            max-width: 1000px; margin: 40px auto; padding: 20px;
+        }
+
+        .search-card {
+            background: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+            display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;
+        }
+
+        .input-group { flex: 1; min-width: 180px; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+        .input-group input { 
+            width: 100%; padding: 14px; border: 1px solid #e0e0e0; 
+            border-radius: 10px; font-size: 15px; background: #fafafa;
+        }
+
+        .btn-main {
+            background: var(--primary-green); color: white; border: none;
+            padding: 15px 30px; border-radius: 10px; font-weight: bold;
+            cursor: pointer; transition: 0.3s; height: 48px;
+        }
+        .btn-main:hover { background: #219150; transform: translateY(-2px); }
+
+        /* Результаты */
+        #res { max-width: 800px; margin: 30px auto; }
         
-        #res { margin-top: 25px; }
-        .ticket-card { background: #fff; border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 15px; border-radius: 12px; transition: transform 0.2s; }
-        .ticket-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .price { color: #27ae60; font-size: 20px; font-weight: 800; }
-        .route { font-weight: bold; font-size: 18px; color: #333; }
-        .info { font-size: 14px; color: #777; margin: 5px 0; }
-        .buy-link { display: block; text-align: center; background: #ff9f00; color: white; padding: 10px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 12px; }
+        .ticket-card {
+            background: white; border-radius: 16px; display: flex;
+            margin-bottom: 20px; overflow: hidden; border: 1px solid #eee;
+            transition: 0.3s;
+        }
+        .ticket-card:hover { border-color: var(--primary-green); box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+
+        .price-side {
+            width: 200px; background: #fdfdfd; border-right: 1px dashed #eee;
+            padding: 30px 20px; text-align: center; display: flex; flex-direction: column; justify-content: center;
+        }
+        .price-val { font-size: 26px; font-weight: 900; color: var(--dark-gray); margin-bottom: 15px; }
+
+        .buy-btn {
+            background: var(--accent-red); color: white; text-decoration: none;
+            padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px;
+        }
+
+        .info-side { flex: 1; padding: 25px; }
+        .flight-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: var(--text-secondary); }
+
+        .route-row { display: flex; justify-content: space-between; align-items: center; }
+        .time { font-size: 24px; font-weight: 800; }
+        .iata { font-size: 14px; color: var(--text-secondary); }
+        
+        .plane-path { flex: 1; border-bottom: 2px solid #eee; margin: 0 30px; position: relative; height: 1px; }
+        .plane-path i { position: absolute; left: 50%; top: -10px; transform: translateX(-50%); color: #ccc; background: white; padding: 0 10px; }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>SAPAR.TM</h1>
-        
-        <div class="input-group">
-            <label>Откуда (Город или код)</label>
-            <input type="text" id="from" placeholder="Напр: Москва или MOW" value="MOW">
-        </div>
 
-        <div class="input-group">
-            <label>Куда (Город или код)</label>
-            <input type="text" id="to" placeholder="Напр: Казань или KZN" value="KZN">
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-paper-plane"></i> SAPAR.TM
         </div>
-
-        <div class="input-group">
-            <label>Дата вылета</label>
-            <input type="date" id="date">
+        <div class="lang-switcher">
+            <button onclick="changeLang('ru')">RU</button>
+            <button onclick="changeLang('tm')">TM</button>
+            <button onclick="changeLang('en')">EN</button>
         </div>
+    </header>
 
-        <button onclick="searchTickets()">НАЙТИ ВСЕ РЕЙСЫ</button>
+    <div class="search-section">
+        <div class="search-card">
+            <div class="input-group">
+                <label id="lbl-from">Откуда</label>
+                <input type="text" id="from" placeholder="MOW" value="MOW">
+            </div>
+            <div class="input-group">
+                <label id="lbl-to">Куда</label>
+                <input type="text" id="to" placeholder="KZN" value="KZN">
+            </div>
+            <div class="input-group">
+                <label id="lbl-date">Дата</label>
+                <input type="date" id="date">
+            </div>
+            <button class="btn-main" onclick="searchTickets()" id="btn-search">НАЙТИ РЕЙСЫ</button>
+        </div>
 
         <div id="res"></div>
     </div>
 
     <script>
+        // ЛОГИКА ОСТАЕТСЯ ПРЕЖНЕЙ, МЕНЯЕМ ТОЛЬКО ВЫВОД (HTML)
         async function searchTickets() {
             const resDiv = document.getElementById('res');
             const from = document.getElementById('from').value.trim();
             const to = document.getElementById('to').value.trim();
             const date = document.getElementById('date').value;
 
-            if (!from || !to || !date) return alert("Заполни все поля, бро!");
+            if (!from || !to || !date) return alert("Заполни все поля!");
 
-            resDiv.innerHTML = "<div style='text-align:center;'>🔍 Ищем все доступные рейсы...</div>";
+            resDiv.innerHTML = "<div style='text-align:center; color:var(--text-secondary);'>🔍 Поиск лучших цен...</div>";
 
             try {
                 const response = await fetch('/api/search-live', {
@@ -74,23 +152,45 @@
                     data.tickets.forEach(t => {
                         resDiv.innerHTML += `
                             <div class="ticket-card">
-                                <div class="ticket-header">
-                                    <span class="route">${t.origin} ➔ ${t.destination}</span>
-                                    <span class="price">${t.price.toLocaleString()} ₽</span>
+                                <div class="price-side">
+                                    <div class="price-val">${t.price.toLocaleString()} ₽</div>
+                                    <a class="buy-btn" href="https://www.aviasales.ru${t.link}" target="_blank">КУПИТЬ</a>
                                 </div>
-                                <div class="info">📅 Дата: ${new Date(t.departure_at).toLocaleString('ru-RU')}</div>
-                                <div class="info">✈️ Авиакомпания: ${t.airline}</div>
-                                <div class="info">🔢 Номер рейса: ${t.flight_number}</div>
-                                <a class="buy-link" href="https://www.aviasales.ru${t.link}" target="_blank">ВЫБРАТЬ РЕЙС</a>
+                                <div class="info-side">
+                                    <div class="flight-header">
+                                        <span>${t.airline}</span>
+                                        <span>Рейс #${t.flight_number}</span>
+                                    </div>
+                                    <div class="route-row">
+                                        <div>
+                                            <div class="time">${new Date(t.departure_at).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}</div>
+                                            <div class="iata">${t.origin}</div>
+                                        </div>
+                                        <div class="plane-path"><i class="fa-solid fa-plane"></i></div>
+                                        <div style="text-align:right">
+                                            <div class="time">--:--</div>
+                                            <div class="iata">${t.destination}</div>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top:15px; font-size:12px; color:var(--text-secondary)">
+                                        📅 ${new Date(t.departure_at).toLocaleDateString('ru-RU')}
+                                    </div>
+                                </div>
                             </div>
                         `;
                     });
                 } else {
-                    resDiv.innerHTML = "<div style='text-align:center;'>☹️ Рейсов на эту дату не найдено. Попробуй другую дату.</div>";
+                    resDiv.innerHTML = "<div style='text-align:center;'>☹️ Ничего не нашли.</div>";
                 }
             } catch (e) {
-                resDiv.innerHTML = "<div style='text-align:center; color:red;'>Ошибка связи с сервером. Проверь логи в Railway.</div>";
+                resDiv.innerHTML = "<div style='text-align:center; color:var(--accent-red);'>Ошибка сервера.</div>";
             }
+        }
+
+        // Заглушка для переключения языков (логика будет позже)
+        function changeLang(lang) {
+            console.log("Смена языка на:", lang);
+            // Тут мы будем менять текст lbl-from, lbl-to и т.д.
         }
     </script>
 </body>
