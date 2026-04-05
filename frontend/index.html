@@ -1,86 +1,76 @@
 <!DOCTYPE html>
-<html lang="ru" translate="no">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SAPAR.TM — Поиск билетов (Бизнес)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPAR.TM — Поиск авиабилетов</title>
     <style>
-        :root { --main: #0052cc; --gold: #d4af37; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 100%; max-width: 420px; }
-        h1 { color: var(--main); text-align: center; letter-spacing: 3px; margin-bottom: 30px; }
-        .input-group { display: flex; flex-direction: column; gap: 12px; }
-        input { padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 16px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--main); }
-        button { padding: 18px; background: var(--main); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .ticket { border: 1px solid #eee; padding: 20px; border-radius: 15px; margin-top: 20px; border-left: 5px solid var(--main); }
-        .price { font-size: 24px; font-weight: bold; color: #27ae60; }
-        .buy-link { display: block; background: #ff9800; color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 8px; margin-top: 15px; font-weight: bold; }
+        :root { --blue: #0052cc; --light: #f4f7f9; }
+        body { font-family: 'Arial', sans-serif; background: var(--light); display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h1 { text-align: center; color: var(--blue); letter-spacing: 2px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: var(--blue); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .ticket-card { border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-top: 15px; border-left: 5px solid var(--blue); animation: fadeIn 0.5s; }
+        .price { font-size: 20px; font-weight: bold; color: #2ecc71; }
+        .buy-btn { display: block; text-align: center; background: #f39c12; color: white; text-decoration: none; padding: 10px; border-radius: 8px; margin-top: 10px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="app-card">
+<div class="container">
     <h1>SAPAR.TM</h1>
-    <div class="input-group">
-        <input type="text" id="from" list="cities" placeholder="Откуда (ASB)">
-        <input type="text" id="to" list="cities" placeholder="Куда (KZN)">
-        <datalist id="cities">
-            <option value="Ашхабад (ASB)">
-            <option value="Казань (KZN)">
-            <option value="Москва (MOW)">
-        </datalist>
-        <input type="date" id="date">
-        <button id="searchBtn">ПОИСК РЕЙСОВ</button>
-    </div>
-    <div id="results"></div>
+    <input type="text" id="fromCity" placeholder="Откуда (например: ASB)" value="ASB">
+    <input type="text" id="toCity" placeholder="Куда (например: KZN)" value="KZN">
+    <input type="date" id="travelDate">
+    <button onclick="searchFlights()">НАЙТИ БИЛЕТЫ</button>
+    <div id="flightResults"></div>
 </div>
 
 <script>
-    const MARKER = '716446'; // Ваш маркер
+    async function searchFlights() {
+        const from = document.getElementById('fromCity').value.toUpperCase().trim();
+        const to = document.getElementById('toCity').value.toUpperCase().trim();
+        const date = document.getElementById('travelDate').value;
+        const resultsDiv = document.getElementById('flightResults');
 
-    function getCode(str) {
-        const m = str.match(/\(([^)]+)\)/);
-        return m ? m[1] : str.toUpperCase().trim();
-    }
+        if (!from || !to || !date) return alert("Заполните все поля!");
 
-    document.getElementById('searchBtn').onclick = async () => {
-        const from = getCode(document.getElementById('from').value);
-        const to = getCode(document.getElementById('to').value);
-        const date = document.getElementById('date').value;
-        const resDiv = document.getElementById('results');
-
-        if(!from || !to || !date) return alert("Заполните поля");
-
-        resDiv.innerHTML = '<p style="text-align:center">Ищем реальные билеты...</p>';
+        resultsDiv.innerHTML = "<p style='text-align:center;'>Ищем лучшие цены в реальном времени...</p>";
 
         try {
             const response = await fetch('/api/search-live', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ origin: from, destination: to, date: date })
             });
+
             const data = await response.json();
-            resDiv.innerHTML = '';
+            resultsDiv.innerHTML = "";
 
             if (data.tickets && data.tickets.length > 0) {
-                data.tickets.forEach(t => {
-                    const price = t.proposals[0].value;
-                    const buyUrl = `https://www.aviasales.ru/search/${from}${date.replace(/-/g,'')}${to}1?marker=${MARKER}`;
-                    
-                    resDiv.innerHTML += `
-                        <div class="ticket">
-                            <div class="price">${price} RUB</div>
-                            <div>${from} ➔ ${to}</div>
-                            <a href="${buyUrl}" target="_blank" class="buy-link">ЗАБРОНИРОВАТЬ</a>
-                        </div>`;
+                data.tickets.forEach(ticket => {
+                    const proposal = ticket.proposals[0];
+                    const card = document.createElement('div');
+                    card.className = 'ticket-card';
+                    card.innerHTML = `
+                        <div class="price">${proposal.value} RUB</div>
+                        <div>Рейс: ${from} → ${to}</div>
+                        <small>Дата: ${date}</small>
+                        <a href="https://www.aviasales.ru/search/${from}${date.replace(/-/g,'')}${to}1?marker=716446" 
+                           target="_blank" class="buy-btn">ЗАБРОНИРОВАТЬ</a>
+                    `;
+                    resultsDiv.appendChild(card);
                 });
             } else {
-                resDiv.innerHTML = '<p>Билеты не найдены. Попробуйте другую дату.</p>';
+                resultsDiv.innerHTML = "<p>Билетов на эту дату не нашлось.</p>";
             }
-        } catch (e) {
-            resDiv.innerHTML = '<p style="color:red">Ошибка связи с сервером.</p>';
+        } catch (err) {
+            resultsDiv.innerHTML = "<p style='color:red;'>Ошибка связи с сервером. Проверьте логи Railway.</p>";
         }
-    };
+    }
 </script>
+
 </body>
 </html>
