@@ -2,39 +2,63 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SAPAR.TM - Поиск билетов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPAR.TM - Поиск всех рейсов</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 40px; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 400px; }
-        h1 { text-align: center; color: #0052cc; margin-bottom: 25px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; background: #0052cc; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        body { font-family: 'Inter', sans-serif; background: #f4f7f9; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h1 { text-align: center; color: #0052cc; font-size: 28px; margin-bottom: 30px; }
+        .input-group { margin-bottom: 15px; position: relative; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; color: #666; }
+        input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: border-color 0.3s; }
+        input:focus { border-color: #0052cc; outline: none; }
+        button { width: 100%; padding: 16px; background: #0052cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         button:hover { background: #003d99; }
-        #res { margin-top: 20px; }
-        .ticket { border-left: 4px solid #0052cc; background: #fff; padding: 15px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .price { color: #27ae60; font-size: 1.2em; font-weight: bold; }
-        .buy-btn { display: block; text-align: center; background: #f39c12; color: white; padding: 8px; margin-top: 10px; text-decoration: none; border-radius: 4px; font-size: 0.9em; }
+        
+        #res { margin-top: 25px; }
+        .ticket-card { background: #fff; border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 15px; border-radius: 12px; transition: transform 0.2s; }
+        .ticket-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .price { color: #27ae60; font-size: 20px; font-weight: 800; }
+        .route { font-weight: bold; font-size: 18px; color: #333; }
+        .info { font-size: 14px; color: #777; margin: 5px 0; }
+        .buy-link { display: block; text-align: center; background: #ff9f00; color: white; padding: 10px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 12px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>SAPAR.TM</h1>
-        <input type="text" id="from" placeholder="Откуда (например, ASB)" value="ASB">
-        <input type="text" id="to" placeholder="Куда (например, KZN)" value="KZN">
-        <input type="date" id="date">
-        <button onclick="search()">НАЙТИ БИЛЕТЫ</button>
+        
+        <div class="input-group">
+            <label>Откуда (Город или код)</label>
+            <input type="text" id="from" placeholder="Напр: Москва или MOW" value="MOW">
+        </div>
+
+        <div class="input-group">
+            <label>Куда (Город или код)</label>
+            <input type="text" id="to" placeholder="Напр: Казань или KZN" value="KZN">
+        </div>
+
+        <div class="input-group">
+            <label>Дата вылета</label>
+            <input type="date" id="date">
+        </div>
+
+        <button onclick="searchTickets()">НАЙТИ ВСЕ РЕЙСЫ</button>
+
         <div id="res"></div>
     </div>
 
     <script>
-        async function search() {
+        async function searchTickets() {
             const resDiv = document.getElementById('res');
-            const from = document.getElementById('from').value.trim().toUpperCase();
-            const to = document.getElementById('to').value.trim().toUpperCase();
+            const from = document.getElementById('from').value.trim();
+            const to = document.getElementById('to').value.trim();
             const date = document.getElementById('date').value;
 
-            if (!date) return alert("Выбери дату!");
-            resDiv.innerHTML = "🔍 Ищем лучшие варианты...";
+            if (!from || !to || !date) return alert("Заполни все поля, бро!");
+
+            resDiv.innerHTML = "<div style='text-align:center;'>🔍 Ищем все доступные рейсы...</div>";
 
             try {
                 const response = await fetch('/api/search-live', {
@@ -49,19 +73,23 @@
                 if (data.tickets && data.tickets.length > 0) {
                     data.tickets.forEach(t => {
                         resDiv.innerHTML += `
-                            <div class="ticket">
-                                <div class="price">${t.price} RUB</div>
-                                <div>Рейс: ${t.origin} ➔ ${t.destination}</div>
-                                <div style="font-size: 0.8em; color: #666;">Авиакомпания: ${t.airline}</div>
-                                <a class="buy-btn" href="https://www.aviasales.ru${t.link}" target="_blank">КУПИТЬ БИЛЕТ</a>
+                            <div class="ticket-card">
+                                <div class="ticket-header">
+                                    <span class="route">${t.origin} ➔ ${t.destination}</span>
+                                    <span class="price">${t.price.toLocaleString()} ₽</span>
+                                </div>
+                                <div class="info">📅 Дата: ${new Date(t.departure_at).toLocaleString('ru-RU')}</div>
+                                <div class="info">✈️ Авиакомпания: ${t.airline}</div>
+                                <div class="info">🔢 Номер рейса: ${t.flight_number}</div>
+                                <a class="buy-link" href="https://www.aviasales.ru${t.link}" target="_blank">ВЫБРАТЬ РЕЙС</a>
                             </div>
                         `;
                     });
                 } else {
-                    resDiv.innerHTML = "☹️ Билетов не найдено.";
+                    resDiv.innerHTML = "<div style='text-align:center;'>☹️ Рейсов на эту дату не найдено. Попробуй другую дату.</div>";
                 }
             } catch (e) {
-                resDiv.innerHTML = "<span style='color:red;'>Ошибка связи с сервером</span>";
+                resDiv.innerHTML = "<div style='text-align:center; color:red;'>Ошибка связи с сервером. Проверь логи в Railway.</div>";
             }
         }
     </script>
