@@ -8,26 +8,25 @@
     <style>
         :root {
             --primary-green: #27ae60;
-            --carpet-red: #8b0000; /* Темно-бордовый цвет ковра */
+            --carpet-red: #8b0000; 
             --bg-gray: #f8fafc;
             --dark-gray: #1e293b;
-            --gold: #d4af37; /* Золотистый для узоров */
+            --gold: #d4af37;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-gray); margin: 0; }
 
-        /* TURKMEN CARPET STRIPE - ТА САМАЯ ПОЛОСКА */
+        /* Верхняя полоска орнамента */
         .carpet-stripe {
-            height: 12px;
+            height: 10px;
             background: var(--carpet-red);
             background-image: repeating-linear-gradient(45deg, 
                 transparent, transparent 10px, 
-                rgba(212, 175, 55, 0.3) 10px, rgba(212, 175, 55, 0.3) 20px);
-            border-bottom: 2px solid var(--gold);
+                rgba(212, 175, 55, 0.4) 10px, rgba(212, 175, 55, 0.4) 20px);
         }
 
         header {
-            background: white; padding: 20px 10%; display: flex;
+            background: white; padding: 15px 10%; display: flex;
             justify-content: space-between; align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
@@ -41,51 +40,63 @@
         }
         .lang-switcher button.active { background: var(--carpet-red); color: white; border-color: var(--carpet-red); }
 
-        /* HERO SECTION */
+        /* ГЛАВНЫЙ БЛОК С КОВРОМ (HERO) */
         .hero {
-            background: linear-gradient(rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.9)), 
-                        url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f2?auto=format&fit=crop&w=1350&q=80');
-            background-size: cover; background-position: center;
-            padding: 100px 20px 160px; text-align: center; color: white;
+            /* Паттерн ковра через SVG или повторяющееся изображение */
+            background: linear-gradient(rgba(139, 0, 0, 0.85), rgba(139, 0, 0, 0.85)), 
+                        url('https://www.transparenttextures.com/patterns/bo-play.png'), /* Текстура ткани */
+                        url('https://i.pinimg.com/originals/f3/73/80/f37380962b186f87498263884860f7e4.jpg'); /* Здесь можно заменить на прямую ссылку на гёли */
+            background-size: cover, auto, 400px;
+            background-repeat: no-repeat, repeat, repeat;
+            padding: 100px 20px 180px; text-align: center; color: white;
+            border-bottom: 5px solid var(--gold);
         }
-        .hero h2 { font-size: 42px; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        
+        .hero h2 { font-size: 48px; margin-bottom: 10px; font-weight: 900; text-shadow: 3px 3px 6px rgba(0,0,0,0.5); }
+        .hero p { font-size: 20px; opacity: 0.9; font-weight: 500; }
 
-        /* SEARCH CARD */
-        .search-container { max-width: 1150px; margin: -80px auto 50px; padding: 0 20px; }
+        /* КАРТОЧКА ПОИСКА */
+        .search-container { max-width: 1150px; margin: -100px auto 50px; padding: 0 20px; }
         .search-card {
-            background: white; padding: 35px; border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+            background: white; padding: 40px; border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
             display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) auto; gap: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
-        .input-group label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 800; color: #475569; }
+        .input-group label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 800; color: #475569; text-transform: uppercase; }
+        .input-group { position: relative; }
         .input-group input {
-            width: 100%; padding: 15px 15px 15px 45px; border: 2px solid #f1f5f9;
-            border-radius: 12px; font-size: 16px; transition: 0.3s; box-sizing: border-box;
+            width: 100%; padding: 16px 15px 16px 50px; border: 2px solid #f1f5f9;
+            border-radius: 12px; font-size: 16px; transition: 0.3s; box-sizing: border-box; font-weight: 600;
         }
-        .input-group input:focus { border-color: var(--carpet-red); outline: none; background: #fff; }
-        .input-group i { position: absolute; left: 18px; top: 43px; color: var(--carpet-red); font-size: 18px; }
+        .input-group input:focus { border-color: var(--carpet-red); outline: none; box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.1); }
+        .input-group i { position: absolute; left: 20px; top: 43px; color: var(--carpet-red); font-size: 20px; }
 
         .btn-search {
             background: var(--primary-green); color: white; border: none;
-            padding: 0 45px; border-radius: 12px; font-weight: 800;
-            cursor: pointer; height: 55px; font-size: 17px; transition: 0.4s;
+            padding: 0 50px; border-radius: 12px; font-weight: 900;
+            cursor: pointer; height: 60px; font-size: 18px; transition: 0.4s;
+            text-transform: uppercase; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
         }
-        .btn-search:hover { background: #1e8449; transform: scale(1.02); box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3); }
+        .btn-search:hover { background: #1e8449; transform: translateY(-3px); box-shadow: 0 12px 25px rgba(39, 174, 96, 0.5); }
 
-        /* TICKET */
+        /* БИЛЕТЫ */
+        #res { margin-top: 40px; }
         .ticket {
-            background: white; border-radius: 20px; display: flex; margin-bottom: 25px;
-            border: 1px solid #e2e8f0; transition: 0.3s; overflow: hidden;
+            background: white; border-radius: 24px; display: flex; margin-bottom: 30px;
+            border: 1px solid #e2e8f0; transition: 0.4s; overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
-        .ticket:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: var(--gold); }
+        .ticket:hover { transform: scale(1.01); border-color: var(--gold); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
         
-        .t-side { width: 240px; padding: 40px; background: #fafafa; border-right: 1px dashed #e2e8f0; text-align: center; }
-        .price { font-size: 32px; font-weight: 900; color: var(--dark-gray); margin-bottom: 20px; display: block; }
+        .t-side { width: 250px; padding: 40px; background: #fafafa; border-right: 1px dashed #e2e8f0; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .price { font-size: 34px; font-weight: 900; color: var(--dark-gray); margin-bottom: 25px; display: block; }
         .btn-buy {
             background: var(--carpet-red); color: white; text-decoration: none;
-            padding: 14px 30px; border-radius: 10px; font-weight: 800; display: block;
+            padding: 16px; border-radius: 12px; font-weight: 800; display: block; transition: 0.3s;
         }
+        .btn-buy:hover { background: #600000; }
     </style>
 </head>
 <body>
@@ -102,38 +113,38 @@
 </header>
 
 <div class="hero">
-    <h2 id="hero-title">Saparaly syýahatlar biziň bilen başlanýar</h2>
-    <p id="hero-desc">Удобный поиск и бронирование авиабилетов по всему миру</p>
+    <h2 id="hero-title">Saparaly syýahatlar biziň bilen</h2>
+    <p id="hero-desc">Dünýäniň ähli künjegine iň amatly uçuşlar</p>
 </div>
 
 <div class="search-container">
     <div class="search-card">
-        <div class="input-group" style="position:relative">
-            <label id="lbl-from">Откуда</label>
-            <i class="fa-solid fa-location-arrow"></i>
+        <div class="input-group">
+            <label id="lbl-from">Nireden</label>
+            <i class="fa-solid fa-plane-departure"></i>
             <input type="text" id="from" placeholder="MOW" value="MOW">
         </div>
-        <div class="input-group" style="position:relative">
-            <label id="lbl-to">Куда</label>
-            <i class="fa-solid fa-map-pin"></i>
+        <div class="input-group">
+            <label id="lbl-to">Nirä</label>
+            <i class="fa-solid fa-plane-arrival"></i>
             <input type="text" id="to" placeholder="KZN" value="KZN">
         </div>
-        <div class="input-group" style="position:relative">
-            <label id="lbl-date">Дата</label>
-            <i class="fa-solid fa-calendar-day"></i>
+        <div class="input-group">
+            <label id="lbl-date">Sene</label>
+            <i class="fa-solid fa-calendar-alt"></i>
             <input type="date" id="date">
         </div>
-        <button class="btn-search" onclick="searchTickets()" id="btn-search-text">ПОИСК</button>
+        <button class="btn-search" onclick="searchTickets()" id="btn-search-text">GOZLEG</button>
     </div>
     <div id="res"></div>
 </div>
 
 <script>
-    // Весь твой JS код без изменений, только слова в словаре для красоты
+    // Весь твой JS остается рабочим, логика поиска не тронута
     const translations = {
         ru: { title: "Путешествуйте с комфортом", desc: "Удобный поиск билетов по всему миру", from: "Откуда", to: "Куда", date: "Дата вылета", search: "ПОИСК", buy: "КУПИТЬ", loading: "Ищем билеты..." },
         tm: { title: "Saparaly syýahatlar", desc: "Dünýäniň ähli künjegine uçuşlar", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG", buy: "SATYN AL", loading: "Gözlenilýär..." },
-        en: { title: "Travel with Comfort", desc: "Easy flight search worldwide", from: "From", to: "To", date: "Departure", search: "SEARCH", buy: "BUY", loading: "Searching..." }
+        en: { title: "Travel with Comfort", desc: "Best flights worldwide", from: "Origin", to: "Destination", date: "Date", search: "SEARCH", buy: "BUY", loading: "Searching..." }
     };
 
     let currentLang = 'ru';
@@ -156,9 +167,9 @@
         const to = document.getElementById('to').value.trim();
         const date = document.getElementById('date').value;
 
-        if (!from || !to || !date) return alert("Заполните поля!");
+        if (!from || !to || !date) return alert("Заполни поля!");
 
-        resDiv.innerHTML = `<div style='text-align:center; padding:50px; font-weight:bold; color:var(--carpet-red)'>${translations[currentLang].loading}</div>`;
+        resDiv.innerHTML = `<div style='text-align:center; padding:60px; font-weight:bold; color:var(--carpet-red)'>${translations[currentLang].loading}</div>`;
 
         try {
             const response = await fetch('/api/search-live', {
@@ -177,23 +188,32 @@
                                 <span class="price">${t.price.toLocaleString()} ₽</span>
                                 <a class="btn-buy" href="https://www.aviasales.ru${t.link}" target="_blank">${translations[currentLang].buy}</a>
                             </div>
-                            <div style="flex:1; padding:35px;">
-                                <div style="font-weight:900; color:var(--carpet-red); font-size:18px;">${t.airline}</div>
-                                <div style="display:flex; justify-content:space-between; margin-top:20px;">
-                                    <div><div style="font-size:26px; font-weight:900;">${new Date(t.departure_at).getHours()}:${new Date(t.departure_at).getMinutes()}</div><div style="color:#64748b">${t.origin}</div></div>
-                                    <div style="flex:1; border-bottom:2px dashed #cbd5e1; margin:0 30px; position:relative; top:-10px;"><i class="fa-solid fa-plane" style="position:absolute; left:50%; top:-10px; background:white; padding:0 15px; color:var(--gold);"></i></div>
-                                    <div style="text-align:right;"><div style="font-size:26px; font-weight:900;">--:--</div><div style="color:#64748b">${t.destination}</div></div>
+                            <div style="flex:1; padding:40px;">
+                                <div style="font-weight:900; color:var(--carpet-red); font-size:20px; display:flex; justify-content:space-between;">
+                                    <span>${t.airline}</span>
+                                    <span style="color:#94a3b8; font-size:14px;">#${t.flight_number}</span>
                                 </div>
-                                <div style="margin-top:20px; font-size:13px; color:#94a3b8; font-weight:bold;">📅 Рейс #${t.flight_number}</div>
+                                <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                                    <div>
+                                        <div style="font-size:28px; font-weight:900;">${new Date(t.departure_at).getHours()}:${String(new Date(t.departure_at).getMinutes()).padStart(2, '0')}</div>
+                                        <div style="color:#64748b; font-weight:bold;">${t.origin}</div>
+                                    </div>
+                                    <div style="flex:1; border-bottom:2px dashed #cbd5e1; margin:0 35px; position:relative; top:-15px;">
+                                        <i class="fa-solid fa-plane" style="position:absolute; left:50%; top:-10px; background:white; padding:0 15px; color:var(--gold); font-size:20px;"></i>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <div style="font-size:28px; font-weight:900;">--:--</div>
+                                        <div style="color:#64748b; font-weight:bold;">${t.destination}</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top:20px; font-size:14px; color:#94a3b8;">📅 ${new Date(t.departure_at).toLocaleDateString()}</div>
                             </div>
                         </div>`;
                 });
             } else {
-                resDiv.innerHTML = "<div style='text-align:center; padding:50px;'>☹️ Ничего не найдено</div>";
+                resDiv.innerHTML = "<div style='text-align:center; padding:60px; font-weight:bold;'>☹️ Магlumat tapylmady.</div>";
             }
-        } catch (e) {
-            resDiv.innerHTML = "Error!";
-        }
+        } catch (e) { resDiv.innerHTML = "Error!"; }
     }
 </script>
 </body>
