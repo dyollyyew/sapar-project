@@ -1,53 +1,44 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>SAPAR.TM</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 50px; }
-        .app { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 350px; }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        button { background: #0052cc; color: white; border: none; font-weight: bold; cursor: pointer; }
-        .ticket { border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 8px; border-left: 4px solid #0052cc; }
-    </style>
-</head>
-<body>
-    <div class="app">
-        <h1 style="text-align:center; color:#0052cc;">SAPAR.TM</h1>
-        <input type="text" id="from" placeholder="Откуда (ASB)" value="ASB">
-        <input type="text" id="to" placeholder="Куда (KZN)" value="KZN">
-        <input type="date" id="date">
-        <button onclick="search()">НАЙТИ БИЛЕТЫ</button>
-        <div id="res"></div>
-    </div>
+async function search() {
+    const resDiv = document.getElementById('res');
+    const from = document.getElementById('from').value.trim().toUpperCase();
+    const to = document.getElementById('to').value.trim().toUpperCase();
+    const date = document.getElementById('date').value;
 
-    <script>
-        async function search() {
-            const resDiv = document.getElementById('res');
-            resDiv.innerHTML = "Поиск...";
-            try {
-                const response = await fetch('/api/search-live', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        origin: document.getElementById('from').value.toUpperCase(),
-                        destination: document.getElementById('to').value.toUpperCase(),
-                        date: document.getElementById('date').value
-                    })
-                });
-                const data = await response.json();
-                resDiv.innerHTML = "";
-                if (data.tickets && data.tickets.length > 0) {
-                    data.tickets.forEach(t => {
-                        resDiv.innerHTML += `<div class="ticket"><b>${t.proposals[0].value} RUB</b><br>Прямой рейс</div>`;
-                    });
-                } else {
-                    resDiv.innerHTML = "Билетов не найдено.";
-                }
-            } catch (e) {
-                resDiv.innerHTML = "<span style='color:red'>Ошибка связи с сервером.</span>";
-            }
+    if (!date) return alert("Пожалуйста, выберите дату!");
+
+    resDiv.innerHTML = "🔍 Ищем билеты...";
+
+    try {
+        // Если ты запускаешь файл просто с компьютера, укажи полный URL Railway здесь
+        const response = await fetch('/api/search-live', { 
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ origin: from, destination: to, date: date })
+        });
+
+        if (!response.ok) throw new Error("Сервер ответил ошибкой: " + response.status);
+
+        const data = await response.json();
+        resDiv.innerHTML = "";
+
+        if (data.tickets && data.tickets.length > 0) {
+            data.tickets.forEach(t => {
+                const price = t.proposals[0].value;
+                resDiv.innerHTML += `
+                    <div class="ticket" style="border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 8px; border-left: 4px solid #0052cc;">
+                        <b style="color: #2ecc71; font-size: 1.2em;">${price} RUB</b><br>
+                        <span>Рейс: ${from} → ${to}</span><br>
+                        <a href="https://www.aviasales.ru/search/${from}${date.replace(/-/g,'')}${to}1?marker=716446" 
+                           target="_blank" 
+                           style="display: inline-block; margin-top: 5px; color: #0052cc;">Купить билет →</a>
+                    </div>`;
+            });
+        } else {
+            resDiv.innerHTML = "☹️ Билетов не найдено. Попробуйте другую дату.";
         }
-    </script>
-</body>
-</html>
+    } catch (e) {
+        // Теперь ты увидишь РЕАЛЬНУЮ причину ошибки прямо на экране
+        resDiv.innerHTML = `<span style="color:red">Ошибка: ${e.message}</span>`;
+        console.error("Full error details:", e);
+    }
+}
