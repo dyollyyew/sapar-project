@@ -7,61 +7,60 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --green: #27ae60; --dark: #1e293b; }
-        body { font-family: sans-serif; margin: 0; background: #f4f7f6; }
-        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f4f7f6; }
         header { background: white; padding: 15px 10%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .logo { font-size: 24px; font-weight: bold; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+        .logo { font-size: 24px; font-weight: bold; color: var(--dark); display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .logo i { color: var(--green); }
-
-        /* Блок с самолетом */
         .hero { 
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
                         url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?q=80&w=2070&auto=format&fit=crop');
             background-size: cover; background-position: center;
-            height: 350px; display: flex; flex-direction: column; 
+            height: 300px; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; color: white; text-align: center;
         }
-        .hero h2 { font-size: 40px; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-
+        .hero h2 { font-size: 36px; margin: 0; }
         .search-box { 
             max-width: 1000px; margin: -50px auto 20px; background: white; 
-            padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+            padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;
         }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        .input-group label { font-size: 12px; font-weight: bold; color: #666; text-transform: uppercase; }
-        .input-group input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; min-width: 200px; }
-
-        .gozleg-btn { 
-            background: var(--green); color: white; border: none; padding: 12px 40px; 
-            border-radius: 8px; font-weight: bold; cursor: pointer; align-self: flex-end; font-size: 16px;
-        }
+        .input-group { display: flex; flex-direction: column; gap: 5px; position: relative; }
+        .input-group label { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; }
+        .input-group input { padding: 12px 12px 12px 40px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; min-width: 180px; }
+        .input-group i { position: absolute; left: 12px; top: 32px; color: var(--green); }
+        .gozleg-btn { background: var(--green); color: white; border: none; padding: 12px 35px; border-radius: 8px; font-weight: bold; cursor: pointer; align-self: flex-end; font-size: 16px; transition: 0.3s; }
+        .gozleg-btn:hover { background: #219150; }
         #res { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
-        .error { color: red; text-align: center; font-weight: bold; margin-top: 20px; }
+        .ticket { background: white; padding: 20px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--green); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .price { color: var(--green); font-size: 22px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo"><i class="fa-solid fa-paper-plane"></i> SAPAR.TM</div>
+    <a href="/" class="logo"><i class="fa-solid fa-paper-plane"></i> SAPAR.TM</a>
+    <div style="font-weight: bold; color: var(--dark);">TM</div>
 </header>
 
 <div class="hero">
-    <h2 id="hero-title">Gyzykly syýahatlar diňe biziň bilen</h2>
+    <h2>Gyzykly syýahatlar diňe biziň bilen</h2>
     <p>Dünýäniň ähli künjegine uçuşlar</p>
 </div>
 
 <div class="search-box">
     <div class="input-group">
         <label>Nireden</label>
-        <input type="text" id="from" value="ASB">
+        <i class="fa-solid fa-plane-departure"></i>
+        <input type="text" id="from" placeholder="ASB" value="ASB">
     </div>
     <div class="input-group">
         <label>Nirä</label>
-        <input type="text" id="to" value="KZN">
+        <i class="fa-solid fa-plane-arrival"></i>
+        <input type="text" id="to" placeholder="KZN" value="KZN">
     </div>
     <div class="input-group">
         <label>Sene</label>
+        <i class="fa-solid fa-calendar-days"></i>
         <input type="date" id="date">
     </div>
     <button class="gozleg-btn" onclick="searchTickets()">GOZLEG</button>
@@ -71,20 +70,20 @@
 
 <script>
     async function searchTickets() {
-        const from = document.getElementById('from').value.toUpperCase();
-        const to = document.getElementById('to').value.toUpperCase();
+        const from = document.getElementById('from').value.trim().toUpperCase();
+        const to = document.getElementById('to').value.trim().toUpperCase();
         const date = document.getElementById('date').value;
         const resDiv = document.getElementById('res');
 
         if (!from || !to || !date) {
-            alert("Ähli meýdançalary dolduryň!");
+            alert("Meýdançalary dolduryň!");
             return;
         }
 
-        resDiv.innerHTML = "<p style='text-align:center;'>Garaşyň...</p>";
+        resDiv.innerHTML = "<p style='text-align:center; color: #666;'>Garaşyň, biletler gözlenilýär...</p>";
 
         try {
-            // ВАЖНО: Мы используем относительный путь, чтобы Railway сам находил API
+            // Прямой запрос к API. Если Railway выдает ошибку, попробуй добавить полный адрес перед /api
             const response = await fetch(`/api/search-live?origin=${from}&destination=${to}&date=${date}`);
             
             if (!response.ok) throw new Error("Server error");
@@ -95,18 +94,23 @@
             if (data.tickets && data.tickets.length > 0) {
                 data.tickets.forEach(t => {
                     resDiv.innerHTML += `
-                        <div style="background:white; padding:20px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee;">
-                            <div><b>${t.airline}</b><br>${t.origin} ➔ ${t.destination}</div>
-                            <div style="color:#27ae60; font-size:20px; font-weight:bold;">${t.price} TMT</div>
-                            <a href="${t.link}" target="_blank" style="background:#27ae60; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Satyn al</a>
+                        <div class="ticket">
+                            <div>
+                                <div style="font-weight:bold; font-size: 18px;">${t.airline || 'Awiakompaniýa'}</div>
+                                <div style="color: #666;">${t.origin} ➔ ${t.destination}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="price">${t.price} TMT</div>
+                                <a href="${t.link}" target="_blank" style="background:var(--green); color:white; padding:8px 15px; border-radius:5px; text-decoration:none; display:inline-block; margin-top:5px; font-size:14px;">Satyn al</a>
+                            </div>
                         </div>`;
                 });
             } else {
                 resDiv.innerHTML = "<p style='text-align:center;'>Bilet tapylmady.</p>";
             }
         } catch (e) {
-            // Это та самая ошибка со скриншота
-            resDiv.innerHTML = "<p class='error'>Ошибка сервера. Проверьте соединение.</p>";
+            console.error("Fetch error:", e);
+            resDiv.innerHTML = "<p style='text-align:center; color:red; font-weight:bold;'>Сервер не отвечает. Попробуйте обновить страницу.</p>";
         }
     }
 </script>
