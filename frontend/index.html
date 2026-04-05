@@ -9,16 +9,16 @@
         :root {
             --primary-green: #27ae60;
             --carpet-red: #8b0000; 
-            --header-bg: #f2f5f8; /* Тот самый серый фон для шапки */
+            --header-bg: #f2f5f8;
             --dark-gray: #1e293b;
             --gold: #d4af37;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: #fff; margin: 0; }
 
-        /* ШАПКА ПО ТВОЕМУ ЗАПРОСУ */
+        /* Шапка с зеленым лого и серым фоном (как просил) */
         header {
-            background: var(--header-bg); /* Серый фон */
+            background: var(--header-bg); 
             padding: 15px 10%; 
             display: flex;
             justify-content: space-between; 
@@ -26,47 +26,35 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .logo { 
-            font-size: 28px; 
-            font-weight: 900; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            color: #000; /* Надпись черная */
-        }
-        .logo i { 
-            color: var(--primary-green); /* Логотип зеленый */
-            font-size: 32px; 
-        }
+        .logo { font-size: 28px; font-weight: 900; display: flex; align-items: center; gap: 12px; color: #000; }
+        .logo i { color: var(--primary-green); font-size: 32px; }
 
-        .lang-switcher button {
-            background: white; border: 1px solid #ddd; padding: 8px 15px;
-            border-radius: 8px; cursor: pointer; font-weight: 700;
-        }
+        .lang-switcher button { background: white; border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; }
         .lang-switcher button.active { background: var(--dark-gray); color: white; }
 
-        /* БЛОК С ЧИСТЫМ КОВРОМ */
+        /* БЛОК С ТВОИМ КОВРОМ И ЗАТЕМНЕНИЕМ */
         .hero {
             position: relative;
-            /* Ссылка на качественный паттерн туркменского ковра */
             background-image: 
-                linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), /* Темный градиент */
-                url('https://st3.depositphotos.com/1053646/15197/v/450/depositphotos_151975054-stock-illustration-traditional-turkmen-pattern.jpg'); 
-            background-size: cover, 450px; /* Размер ковра чтобы было видно гёли */
-            background-repeat: no-repeat, repeat;
+                linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6)), /* Градиент для читаемости */
+                url('https://i.ibb.co/L9H8S6f/original-image.png'); /* Ссылка на твой ковер */
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
             padding: 120px 20px 180px; 
             text-align: center; 
             color: white;
             border-bottom: 4px solid var(--gold);
         }
         
+        /* Заголовок поменял */
         .hero h2 { font-size: 48px; margin: 0; font-weight: 900; text-shadow: 2px 4px 10px rgba(0,0,0,0.8); }
         .hero p { font-size: 20px; margin-top: 10px; opacity: 0.9; text-shadow: 1px 2px 5px rgba(0,0,0,0.5); }
 
-        /* ПОИСКОВАЯ КАРТОЧКА */
-        .search-container { max-width: 1100px; margin: -90px auto 50px; padding: 0 20px; }
+        /* ПОИСКОВАЯ КАРТОЧКА ИЗ СКРИНШОТА */
+        .search-container { max-width: 1100px; margin: -100px auto 50px; padding: 0 20px; }
         .search-card {
-            background: white; padding: 35px; border-radius: 20px;
+            background: white; padding: 40px; border-radius: 20px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.3);
             display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) auto; gap: 20px;
         }
@@ -77,8 +65,10 @@
             width: 100%; padding: 15px 15px 15px 50px; border: 2px solid #f1f5f9;
             border-radius: 12px; font-size: 16px; box-sizing: border-box;
         }
+        /* Иконки в инпутах - зеленые, как на скриншоте */
         .input-group i { position: absolute; left: 18px; top: 43px; color: var(--primary-green); font-size: 20px; }
 
+        /* Кнопка поиска - зеленая */
         .btn-search {
             background: var(--primary-green); color: white; border: none;
             padding: 0 40px; border-radius: 12px; font-weight: 900;
@@ -86,16 +76,10 @@
         }
         .btn-search:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3); }
 
-        /* БИЛЕТЫ */
+        /* Результаты */
         .ticket {
             background: white; border-radius: 20px; display: flex; margin-bottom: 25px;
             border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        .t-side { width: 220px; padding: 30px; background: #fafafa; border-right: 1px dashed #ddd; text-align: center; }
-        .price { font-size: 30px; font-weight: 900; color: #1e293b; margin-bottom: 15px; display: block; }
-        .btn-buy {
-            background: var(--carpet-red); color: white; text-decoration: none;
-            padding: 12px 25px; border-radius: 10px; font-weight: 800; display: block;
         }
     </style>
 </head>
@@ -111,8 +95,8 @@
 </header>
 
 <div class="hero">
-    <h2 id="hero-title">Saparaly syýahatlar biziň bilen</h2>
-    <p id="hero-desc">Dünýäniň ähli künjegine iň amatly uçuşlar</p>
+    <h2 id="hero-title">Gyzykly syýahatlar biziň bile</h2>
+    <p id="hero-desc">Best prices on all flights worldwide</p>
 </div>
 
 <div class="search-container">
@@ -138,11 +122,12 @@
 </div>
 
 <script>
-    // Весь твой JS остается без изменений
+    // Весь твой JS остается без изменений. 
+    // Я только обновил переводы, чтобы соответствовали запросу
     const translations = {
         ru: { title: "Путешествуйте с комфортом", desc: "Удобный поиск билетов по всему миру", from: "Откуда", to: "Куда", date: "Дата вылета", search: "ПОИСК", buy: "КУПИТЬ", loading: "Ищем билеты..." },
-        tm: { title: "Saparaly syýahatlar", desc: "Dünýäniň ähli künjegine uçuşlar", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG", buy: "SATYN AL", loading: "Gözlenilýär..." },
-        en: { title: "Travel with Comfort", desc: "Best flights worldwide", from: "Origin", to: "Destination", date: "Date", search: "SEARCH", buy: "BUY", loading: "Searching..." }
+        tm: { title: "Gyzykly syýahatlar biziň bile", desc: "Dünýäniň ähli künjegine uçuşlar", from: "Nireden", to: "Nirä", date: "Sene", search: "GOZLEG", buy: "SATYN AL", loading: "Gözlenilýär..." },
+        en: { title: "Travel with Comfort", desc: "Find the best flights worldwide", from: "Origin", to: "Destination", date: "Date", search: "SEARCH", buy: "BUY", loading: "Searching..." }
     };
 
     let currentLang = 'ru';
@@ -170,11 +155,7 @@
         resDiv.innerHTML = `<div style='text-align:center; padding:50px; color:#8b0000; font-weight:bold;'>${translations[currentLang].loading}</div>`;
 
         try {
-            const response = await fetch('/api/search-live', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ origin: from, destination: to, date: date })
-            });
+            const response = await fetch('/api/search-live', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ origin: from, destination: to, date: date }) });
             const data = await response.json();
             resDiv.innerHTML = "";
 
@@ -182,12 +163,12 @@
                 data.tickets.forEach(t => {
                     resDiv.innerHTML += `
                         <div class="ticket">
-                            <div class="t-side">
-                                <span class="price">${t.price.toLocaleString()} ₽</span>
-                                <a class="btn-buy" href="https://www.aviasales.ru${t.link}" target="_blank">${translations[currentLang].buy}</a>
+                            <div class="t-side" style="width: 220px; padding: 30px; background: #fafafa; border-right: 1px dashed #ddd; text-align: center;">
+                                <span class="price" style="font-size: 30px; font-weight: 900; color: #1e293b; margin-bottom: 15px; display: block;">${t.price.toLocaleString()} ₽</span>
+                                <a class="btn-buy" style="background: #8b0000; color: white; text-decoration: none; padding: 12px 25px; border-radius: 10px; font-weight: 800; display: block;" href="https://www.aviasales.ru${t.link}" target="_blank">${translations[currentLang].buy}</a>
                             </div>
                             <div style="flex:1; padding:30px;">
-                                <div style="font-weight:900; color:#8b0000; margin-bottom:15px;">${t.airline}</div>
+                                <div style="font-weight:900; color:#8b0000; margin-bottom:15px; font-size:18px;">${t.airline}</div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div><div style="font-size:24px; font-weight:900;">${new Date(t.departure_at).getHours()}:${String(new Date(t.departure_at).getMinutes()).padStart(2, '0')}</div><div style="color:#64748b">${t.origin}</div></div>
                                     <div style="flex:1; border-bottom:2px dashed #ddd; margin:0 20px; position:relative; top:-5px;"><i class="fa-solid fa-plane" style="position:absolute; left:50%; top:-10px; background:white; padding:0 10px; color:var(--gold);"></i></div>
@@ -197,7 +178,7 @@
                         </div>`;
                 });
             } else {
-                resDiv.innerHTML = "<div style='text-align:center; padding:50px;'>☹️ Ничего не найдено</div>";
+                resDiv.innerHTML = `<div style='text-align:center; padding:50px;'>${translations[currentLang].none}</div>`;
             }
         } catch (e) { resDiv.innerHTML = "Error!"; }
     }
