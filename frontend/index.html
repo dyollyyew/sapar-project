@@ -6,76 +6,24 @@
     <title>SAPAR.TM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary-green: #27ae60;
-            --header-bg: #f2f5f8;
-            --gold: #d4af37;
-        }
-
+        :root { --primary-green: #27ae60; --header-bg: #f2f5f8; --gold: #d4af37; }
         body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; }
-
-        header {
-            background: var(--header-bg); 
-            padding: 15px 10%; 
-            display: flex;
-            justify-content: space-between; 
-            align-items: center;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
+        header { background: var(--header-bg); padding: 15px 10%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
         .logo { font-size: 28px; font-weight: 900; display: flex; align-items: center; gap: 12px; color: #000; }
         .logo i { color: var(--primary-green); font-size: 32px; }
-
-        .lang-switcher button { 
-            background: white; border: 1px solid #ddd; padding: 8px 15px; 
-            border-radius: 8px; cursor: pointer; font-weight: 700;
-        }
+        .lang-switcher button { background: white; border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; }
         .lang-switcher button.active { background: #1e293b; color: white; }
-
-        .hero {
-            position: relative;
-            background-image: 
-                linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
-                url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?q=80&w=2070&auto=format&fit=crop'); 
-            background-size: cover; 
-            background-position: center;
-            padding: 140px 20px 200px; 
-            text-align: center; 
-            color: white;
-            border-bottom: 5px solid var(--gold);
-        }
-        
-        .hero h2 { 
-            font-size: 48px; 
-            margin: 0; 
-            font-weight: 900; 
-            text-shadow: 2px 4px 10px rgba(0,0,0,0.7); 
-        }
-
+        .hero { position: relative; background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; padding: 140px 20px 200px; text-align: center; color: white; border-bottom: 5px solid var(--gold); }
+        .hero h2 { font-size: 48px; margin: 0; font-weight: 900; text-shadow: 2px 4px 10px rgba(0,0,0,0.7); }
         .search-container { max-width: 1100px; margin: -100px auto 50px; padding: 0 20px; position: relative; z-index: 10; }
-        .search-card {
-            background: white; padding: 40px; border-radius: 20px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;
-        }
-
+        .search-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.2); display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
         .input-group { position: relative; min-width: 200px; }
         .input-group label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 800; color: #64748b; text-transform: uppercase; }
-        .input-group input {
-            width: 100%; padding: 15px 15px 15px 50px; border: 2px solid #f1f5f9;
-            border-radius: 12px; font-size: 16px; box-sizing: border-box;
-        }
+        .input-group input { width: 100%; padding: 15px 15px 15px 50px; border: 2px solid #f1f5f9; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
         .input-group i { position: absolute; left: 18px; top: 43px; color: var(--primary-green); font-size: 20px; }
-
-        .btn-search {
-            background: var(--primary-green); color: white; border: none;
-            padding: 0 45px; border-radius: 12px; font-weight: 900;
-            cursor: pointer; height: 55px; font-size: 18px; align-self: flex-end;
-        }
-
-        #res { max-width: 1100px; margin: 20px auto; padding: 0 20px; }
-        .ticket { background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .price { font-size: 24px; font-weight: 800; color: var(--primary-green); }
+        .btn-search { background: var(--primary-green); color: white; border: none; padding: 0 45px; border-radius: 12px; font-weight: 900; cursor: pointer; height: 55px; font-size: 18px; align-self: flex-end; }
+        #res { max-width: 1100px; margin: 20px auto; }
+        .error-msg { color: red; text-align: center; font-weight: bold; padding: 20px; }
     </style>
 </head>
 <body>
@@ -99,12 +47,12 @@
         <div class="input-group">
             <label id="lbl-from">Nireden</label>
             <i class="fa-solid fa-plane-departure"></i>
-            <input type="text" id="from" placeholder="MOW" value="MOW">
+            <input type="text" id="from" value="ASB">
         </div>
         <div class="input-group">
             <label id="lbl-to">Nirä</label>
             <i class="fa-solid fa-plane-arrival"></i>
-            <input type="text" id="to" placeholder="ASB" value="ASB">
+            <input type="text" id="to" value="KZN">
         </div>
         <div class="input-group">
             <label id="lbl-date">Sene</label>
@@ -136,49 +84,39 @@
         document.getElementById('btn-search-text').innerText = translations[lang].search;
     }
 
-    // ВОТ ОН - ТВОЙ ВОССТАНОВЛЕННЫЙ ПОИСК
     async function searchTickets() {
         const from = document.getElementById('from').value.toUpperCase();
         const to = document.getElementById('to').value.toUpperCase();
         const date = document.getElementById('date').value;
         const resDiv = document.getElementById('res');
 
-        if (!from || !to || !date) {
-            alert("Пожалуйста, заполните все поля");
-            return;
-        }
+        if (!from || !to || !date) return;
 
         resDiv.innerHTML = `<p style="text-align:center;">${translations[currentLang].loading}</p>`;
 
         try {
-            // Запрос к твоему API (серверной части), который общается с Aviasales
+            // Исправленный путь запроса к бэкенду
             const response = await fetch(`/api/search-live?origin=${from}&destination=${to}&date=${date}`);
             const data = await response.json();
 
-            resDiv.innerHTML = "";
+            if (!response.ok) throw new Error();
 
+            resDiv.innerHTML = "";
             if (data.tickets && data.tickets.length > 0) {
-                data.tickets.forEach(ticket => {
-                    resDiv.innerHTML += `
-                        <div class="ticket">
-                            <div>
-                                <strong>${ticket.airline}</strong><br>
-                                <span>${ticket.origin} ✈ ${ticket.destination}</span>
-                            </div>
-                            <div class="price">${ticket.price} ₽</div>
-                            <a href="https://www.aviasales.ru${ticket.link}" target="_blank" style="background:var(--primary-green); color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold;">SAtyn al</a>
-                        </div>
-                    `;
+                data.tickets.forEach(t => {
+                    resDiv.innerHTML += `<div style="background:white; padding:15px; margin-bottom:10px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <div><b>${t.airline}</b><br>${t.origin} ➔ ${t.destination}</div>
+                        <div style="color:var(--primary-green); font-weight:bold; font-size:20px;">${t.price} TMT</div>
+                        <a href="${t.link}" target="_blank" style="background:var(--primary-green); color:white; padding:8px 15px; border-radius:5px; text-decoration:none;">Satyn al</a>
+                    </div>`;
                 });
             } else {
-                resDiv.innerHTML = "<p style='text-align:center;'>Билеты не найдены</p>";
+                resDiv.innerHTML = "<p style='text-align:center;'>Bilet tapylmady.</p>";
             }
-        } catch (error) {
-            console.error(error);
-            resDiv.innerHTML = "<p style='text-align:center; color:red;'>Ошибка сервера. Проверьте соединение.</p>";
+        } catch (e) {
+            resDiv.innerHTML = "<p class='error-msg'>Ошибка сервера. Проверьте соединение.</p>";
         }
     }
 </script>
-
 </body>
 </html>
