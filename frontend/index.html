@@ -2,23 +2,28 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SAPAR.TM - Бронирование</title>
+    <title>SAPAR.TM - Поиск билетов</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 50px; }
-        .app { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 350px; }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        button { background: #0052cc; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 40px; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 400px; }
+        h1 { text-align: center; color: #0052cc; margin-bottom: 25px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: #0052cc; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         button:hover { background: #003d99; }
+        #res { margin-top: 20px; }
+        .ticket { border-left: 4px solid #0052cc; background: #fff; padding: 15px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .price { color: #27ae60; font-size: 1.2em; font-weight: bold; }
+        .buy-btn { display: block; text-align: center; background: #f39c12; color: white; padding: 8px; margin-top: 10px; text-decoration: none; border-radius: 4px; font-size: 0.9em; }
     </style>
 </head>
 <body>
-    <div class="app">
-        <h1 style="text-align:center; color:#0052cc; margin-top: 0;">SAPAR.TM</h1>
+    <div class="container">
+        <h1>SAPAR.TM</h1>
         <input type="text" id="from" placeholder="Откуда (например, ASB)" value="ASB">
         <input type="text" id="to" placeholder="Куда (например, KZN)" value="KZN">
         <input type="date" id="date">
         <button onclick="search()">НАЙТИ БИЛЕТЫ</button>
-        <div id="res" style="margin-top: 15px;"></div>
+        <div id="res"></div>
     </div>
 
     <script>
@@ -28,44 +33,35 @@
             const to = document.getElementById('to').value.trim().toUpperCase();
             const date = document.getElementById('date').value;
 
-            if (!date) return alert("Пожалуйста, выберите дату!");
-
-            resDiv.innerHTML = "<div style='text-align:center;'>🔍 Ищем билеты...</div>";
+            if (!date) return alert("Выбери дату!");
+            resDiv.innerHTML = "🔍 Ищем лучшие варианты...";
 
             try {
-                const response = await fetch('/api/search-live', { 
+                const response = await fetch('/api/search-live', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ origin: from, destination: to, date: date })
                 });
-
-                if (!response.ok) throw new Error("Ошибка сервера: " + response.status);
 
                 const data = await response.json();
                 resDiv.innerHTML = "";
 
                 if (data.tickets && data.tickets.length > 0) {
                     data.tickets.forEach(t => {
-                        const price = t.proposals[0].value;
-                        
-                        // ВАЖНО: Ниже идут теги карточки билета, не удаляй их!
                         resDiv.innerHTML += `
-                            <div style="border: 1px solid #eee; padding: 15px; margin-top: 10px; border-radius: 8px; border-left: 5px solid #0052cc; background: #fff;">
-                                <b style="color: #2ecc71; font-size: 1.3em;">${price} RUB</b><br>
-                                <span style="color: #555; display: inline-block; margin-top: 5px;">Рейс: <b>${from}</b> ➔ <b>${to}</b></span><br>
-                                <a href="https://www.aviasales.ru/search/${from}${date.replace(/-/g,'')}${to}1?marker=716446" 
-                                   target="_blank" 
-                                   style="display: block; text-align: center; margin-top: 12px; background: #f39c12; color: white; padding: 10px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                                   КУПИТЬ БИЛЕТ
-                                </a>
+                            <div class="ticket">
+                                <div class="price">${t.price} RUB</div>
+                                <div>Рейс: ${t.origin} ➔ ${t.destination}</div>
+                                <div style="font-size: 0.8em; color: #666;">Авиакомпания: ${t.airline}</div>
+                                <a class="buy-btn" href="https://www.aviasales.ru${t.link}" target="_blank">КУПИТЬ БИЛЕТ</a>
                             </div>
                         `;
                     });
                 } else {
-                    resDiv.innerHTML = "<div style='text-align:center; color:#555;'>☹️ Билетов на эту дату не найдено.</div>";
+                    resDiv.innerHTML = "☹️ Билетов не найдено.";
                 }
             } catch (e) {
-                resDiv.innerHTML = `<div style="color:red; text-align:center; padding: 10px; border: 1px solid red; border-radius: 8px;">Ошибка: ${e.message}</div>`;
+                resDiv.innerHTML = "<span style='color:red;'>Ошибка связи с сервером</span>";
             }
         }
     </script>
