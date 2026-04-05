@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 const TOKEN = process.env.TRAVELPAYOUTS_TOKEN;
 const MARKER = process.env.MARKER;
 
+// Функция для генерации подписи (Signature)
 function generateSignature(params) {
     const sortedKeys = Object.keys(params).sort();
     const orderedParams = sortedKeys.map(key => {
@@ -37,14 +38,19 @@ app.post('/api/search-live', async (req, res) => {
 
     try {
         const signature = generateSignature(searchParams);
+        
+        // 1. Старт поиска
         const start = await axios.post('https://tickets-api.travelpayouts.com/search/affiliate/start', 
             { ...searchParams, signature },
             { headers: { 'x-affiliate-user-id': TOKEN, 'x-real-host': searchParams.host, 'x-user-ip': searchParams.user_ip } }
         );
 
         const { search_id, results_url } = start.data;
-        await new Promise(r => setTimeout(r, 7000)); // Ждем 7 секунд для сбора билетов
+        
+        // 2. Ждем, пока API соберет билеты (7 секунд)
+        await new Promise(r => setTimeout(r, 7000));
 
+        // 3. Получаем результаты
         const results = await axios.post(`${results_url}/search/affiliate/results`, {
             search_id,
             last_update_timestamp: 0
@@ -53,7 +59,7 @@ app.post('/api/search-live', async (req, res) => {
         res.json(results.data);
     } catch (error) {
         console.error("API ERROR:", error.response?.data || error.message);
-        res.status(500).json({ error: "Ошибка на стороне API Aviasales" });
+        res.status(500).json({ error: "Ошибка API" });
     }
 });
 

@@ -2,35 +2,38 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SAPAR.TM — LIVE</title>
+    <title>SAPAR.TM — Бронирование</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 380px; }
-        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        button { background: #0052cc; color: white; font-weight: bold; cursor: pointer; border: none; }
-        .ticket { border: 1px solid #eee; padding: 15px; margin-top: 10px; border-left: 4px solid #0052cc; border-radius: 8px; }
-        .price { color: #27ae60; font-size: 20px; font-weight: bold; }
+        body { font-family: sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .app { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h1 { text-align: center; color: #0052cc; margin-bottom: 25px; }
+        input, button { width: 100%; padding: 14px; margin: 8px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
+        button { background: #0052cc; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #0041a3; }
+        .ticket { border: 1px solid #eee; padding: 15px; margin-top: 15px; border-radius: 12px; border-left: 5px solid #0052cc; }
+        .price { color: #2ecc71; font-size: 22px; font-weight: bold; }
+        .buy-btn { display: block; text-align: center; background: #f39c12; color: white; text-decoration: none; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2 style="text-align:center; color:#0052cc;">SAPAR.TM</h2>
+    <div class="app">
+        <h1>SAPAR.TM</h1>
         <input type="text" id="from" placeholder="Откуда (ASB)" value="ASB">
         <input type="text" id="to" placeholder="Куда (KZN)" value="KZN">
         <input type="date" id="date">
-        <button onclick="runSearch()">НАЙТИ БИЛЕТЫ</button>
-        <div id="out"></div>
+        <button onclick="search()">НАЙТИ БИЛЕТЫ</button>
+        <div id="results"></div>
     </div>
 
     <script>
-        async function runSearch() {
+        async function search() {
             const from = document.getElementById('from').value.trim().toUpperCase();
             const to = document.getElementById('to').value.trim().toUpperCase();
             const date = document.getElementById('date').value;
-            const out = document.getElementById('out');
+            const resDiv = document.getElementById('results');
 
-            if(!date) return alert("Выбери дату!");
-            out.innerHTML = "Ищем реальные билеты...";
+            if(!date) return alert("Выберите дату");
+            resDiv.innerHTML = "<p style='text-align:center'>Ищем реальные цены...</p>";
 
             try {
                 const response = await fetch('/api/search-live', {
@@ -39,25 +42,13 @@
                     body: JSON.stringify({ origin: from, destination: to, date: date })
                 });
                 const data = await response.json();
-                out.innerHTML = "";
+                resDiv.innerHTML = "";
 
                 if (data.tickets && data.tickets.length > 0) {
                     data.tickets.forEach(t => {
                         const price = t.proposals[0].value;
-                        out.innerHTML += `
+                        resDiv.innerHTML += `
                             <div class="ticket">
                                 <div class="price">${price} RUB</div>
                                 <div>${from} ➔ ${to}</div>
-                                <a href="https://www.aviasales.ru/search/${from}${date.replace(/-/g,'')}${to}1?marker=716446" target="_blank" style="color:#0052cc; text-decoration:none; font-weight:bold;">Купить билет →</a>
-                            </div>`;
-                    });
-                } else {
-                    out.innerHTML = "Билетов не найдено. Попробуй другую дату.";
-                }
-            } catch (e) {
-                out.innerHTML = "Ошибка связи. Проверь логи в Railway.";
-            }
-        }
-    </script>
-</body>
-</html>
+                                <a href="https://www.aviasales.ru/search/${from}${date.
