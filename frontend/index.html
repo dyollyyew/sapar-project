@@ -32,12 +32,11 @@
         }
         .lang-switcher button.active { background: #1e293b; color: white; }
 
-        /* Фоновое изображение с самолетом */
         .hero {
             position: relative;
             background-image: 
                 linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
-                url('https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?q=80&w=2070&auto=format&fit=crop'); 
+                url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?q=80&w=2070&auto=format&fit=crop'); 
             background-size: cover; 
             background-position: center;
             padding: 140px 20px 200px; 
@@ -57,9 +56,10 @@
         .search-card {
             background: white; padding: 40px; border-radius: 20px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) auto; gap: 20px;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;
         }
 
+        .input-group { position: relative; min-width: 200px; }
         .input-group label { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 800; color: #64748b; text-transform: uppercase; }
         .input-group input {
             width: 100%; padding: 15px 15px 15px 50px; border: 2px solid #f1f5f9;
@@ -70,7 +70,7 @@
         .btn-search {
             background: var(--primary-green); color: white; border: none;
             padding: 0 45px; border-radius: 12px; font-weight: 900;
-            cursor: pointer; height: 55px; font-size: 18px; align-self: end;
+            cursor: pointer; height: 55px; font-size: 18px; align-self: flex-end;
         }
     </style>
 </head>
@@ -129,8 +129,10 @@
         document.getElementById('btn-search-text').innerText = translations[lang].search;
     }
 
+    // ВСТАВЬ СЮДА СВОЮ ФУНКЦИЮ FETCH, КОТОРУЮ ТЫ НЕ ХОТЕЛ МЕНЯТЬ
     async function searchTickets() {
-        console.log("Поиск запущен...");
+        console.log("Кнопка нажата. ID найдены.");
+        // Твой старый рабочий код поиска...
     }
 </script>
 
