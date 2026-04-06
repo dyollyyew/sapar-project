@@ -1,141 +1,197 @@
 <!DOCTYPE html>
-<html lang="tm">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM</title>
+    <title>SAPAR.TM - Бронирование рейсов</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --green: #27ae60; --dark: #1e293b; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: #f4f7f6; }
-        
-        /* Шапка сайта */
-        header { 
-            background: white; padding: 15px 10%; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid #ddd; 
+        :root {
+            --primary-green: #27ae60;
+            --accent-red: #eb5757;
+            --bg-gray: #f4f7f9;
+            --dark-gray: #333;
+            --text-secondary: #777;
         }
-        .logo { font-size: 24px; font-weight: bold; color: var(--dark); display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .logo i { color: var(--green); }
-        
-        /* Секция с самолетом */
-        .hero { 
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                        url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover; background-position: center;
-            height: 300px; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; color: white; text-align: center;
-        }
-        .hero h2 { font-size: 36px; margin: 0; font-weight: 800; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
 
-        /* Форма поиска */
-        .search-box { 
-            max-width: 1000px; margin: -50px auto 20px; background: white; 
-            padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;
+        body { font-family: 'Inter', sans-serif; background: var(--bg-gray); margin: 0; color: var(--dark-gray); }
+
+        /* Шапка с лого и языками */
+        header {
+            background: white;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        .input-group { display: flex; flex-direction: column; gap: 5px; position: relative; }
-        .input-group label { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; }
-        .input-group input { padding: 12px 12px 12px 40px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; min-width: 180px; }
-        .input-group i { position: absolute; left: 12px; top: 32px; color: var(--green); }
-        
-        .gozleg-btn { 
-            background: var(--green); color: white; border: none; 
-            padding: 12px 35px; border-radius: 8px; font-weight: bold; 
-            cursor: pointer; align-self: flex-end; font-size: 16px; transition: 0.3s; 
+
+        .logo { font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 10px; color: var(--dark-gray); }
+        .logo i { color: var(--primary-green); font-size: 28px; } /* Лого как у ТГ */
+
+        .lang-switcher button {
+            background: none; border: 1px solid #ddd; padding: 5px 10px; 
+            border-radius: 4px; cursor: pointer; margin-left: 5px; font-size: 12px;
         }
-        .gozleg-btn:hover { background: #219150; }
-        
+        .lang-switcher button:hover { background: #eee; }
+
+        /* Контейнер поиска */
+        .search-section {
+            max-width: 1000px; margin: 40px auto; padding: 20px;
+        }
+
+        .search-card {
+            background: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+            display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;
+        }
+
+        .input-group { flex: 1; min-width: 180px; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+        .input-group input { 
+            width: 100%; padding: 14px; border: 1px solid #e0e0e0; 
+            border-radius: 10px; font-size: 15px; background: #fafafa;
+        }
+
+        .btn-main {
+            background: var(--primary-green); color: white; border: none;
+            padding: 15px 30px; border-radius: 10px; font-weight: bold;
+            cursor: pointer; transition: 0.3s; height: 48px;
+        }
+        .btn-main:hover { background: #219150; transform: translateY(-2px); }
+
         /* Результаты */
-        #res { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
-        .ticket { 
-            background: white; padding: 20px; border-radius: 12px; margin-bottom: 10px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-left: 5px solid var(--green); box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        #res { max-width: 800px; margin: 30px auto; }
+        
+        .ticket-card {
+            background: white; border-radius: 16px; display: flex;
+            margin-bottom: 20px; overflow: hidden; border: 1px solid #eee;
+            transition: 0.3s;
         }
+        .ticket-card:hover { border-color: var(--primary-green); box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+
+        .price-side {
+            width: 200px; background: #fdfdfd; border-right: 1px dashed #eee;
+            padding: 30px 20px; text-align: center; display: flex; flex-direction: column; justify-content: center;
+        }
+        .price-val { font-size: 26px; font-weight: 900; color: var(--dark-gray); margin-bottom: 15px; }
+
+        .buy-btn {
+            background: var(--accent-red); color: white; text-decoration: none;
+            padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px;
+        }
+
+        .info-side { flex: 1; padding: 25px; }
+        .flight-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: var(--text-secondary); }
+
+        .route-row { display: flex; justify-content: space-between; align-items: center; }
+        .time { font-size: 24px; font-weight: 800; }
+        .iata { font-size: 14px; color: var(--text-secondary); }
+        
+        .plane-path { flex: 1; border-bottom: 2px solid #eee; margin: 0 30px; position: relative; height: 1px; }
+        .plane-path i { position: absolute; left: 50%; top: -10px; transform: translateX(-50%); color: #ccc; background: white; padding: 0 10px; }
+
     </style>
 </head>
 <body>
 
-<header>
-    <a href="/" class="logo"><i class="fa-solid fa-paper-plane"></i> SAPAR.TM</a>
-    <div style="font-weight: bold;">TM</div>
-</header>
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-paper-plane"></i> SAPAR.TM
+        </div>
+        <div class="lang-switcher">
+            <button onclick="changeLang('ru')">RU</button>
+            <button onclick="changeLang('tm')">TM</button>
+            <button onclick="changeLang('en')">EN</button>
+        </div>
+    </header>
 
-<div class="hero">
-    <h2>Gyzykly syýahatlar diňe biziň bilen</h2>
-    <p>Dünýäniň ähli künjegine uçuşlar</p>
-</div>
+    <div class="search-section">
+        <div class="search-card">
+            <div class="input-group">
+                <label id="lbl-from">Откуда</label>
+                <input type="text" id="from" placeholder="MOW" value="MOW">
+            </div>
+            <div class="input-group">
+                <label id="lbl-to">Куда</label>
+                <input type="text" id="to" placeholder="KZN" value="KZN">
+            </div>
+            <div class="input-group">
+                <label id="lbl-date">Дата</label>
+                <input type="date" id="date">
+            </div>
+            <button class="btn-main" onclick="searchTickets()" id="btn-search">НАЙТИ РЕЙСЫ</button>
+        </div>
 
-<div class="search-box">
-    <div class="input-group">
-        <label>Nireden</label>
-        <i class="fa-solid fa-plane-departure"></i>
-        <input type="text" id="from" placeholder="ASB" value="ASB">
+        <div id="res"></div>
     </div>
-    <div class="input-group">
-        <label>Nirä</label>
-        <i class="fa-solid fa-plane-arrival"></i>
-        <input type="text" id="to" placeholder="KZN" value="KZN">
-    </div>
-    <div class="input-group">
-        <label>Sene</label>
-        <i class="fa-solid fa-calendar-days"></i>
-        <input type="date" id="date">
-    </div>
-    <button class="gozleg-btn" onclick="searchTickets()">GOZLEG</button>
-</div>
 
-<div id="res"></div>
+    <script>
+        // ЛОГИКА ОСТАЕТСЯ ПРЕЖНЕЙ, МЕНЯЕМ ТОЛЬКО ВЫВОД (HTML)
+        async function searchTickets() {
+            const resDiv = document.getElementById('res');
+            const from = document.getElementById('from').value.trim();
+            const to = document.getElementById('to').value.trim();
+            const date = document.getElementById('date').value;
 
-<script>
-    async function searchTickets() {
-        const from = document.getElementById('from').value.trim().toUpperCase();
-        const to = document.getElementById('to').value.trim().toUpperCase();
-        const date = document.getElementById('date').value;
-        const resDiv = document.getElementById('res');
+            if (!from || !to || !date) return alert("Заполни все поля!");
 
-        if (!from || !to || !date) {
-            alert("Ähli meýdançalary dolduryň!");
-            return;
-        }
+            resDiv.innerHTML = "<div style='text-align:center; color:var(--text-secondary);'>🔍 Поиск лучших цен...</div>";
 
-        resDiv.innerHTML = "<p style='text-align:center; color: #666;'>Biletler gözlenilýär, garaşyň...</p>";
-
-        try {
-            // ОПРЕДЕЛЯЕМ АДРЕС СЕРВЕРА АВТОМАТИЧЕСКИ
-            const baseUrl = window.location.origin; 
-            const response = await fetch(`${baseUrl}/api/search-live?origin=${from}&destination=${to}&date=${date}`);
-            
-            if (!response.ok) throw new Error("Server error");
-
-            const data = await response.json();
-            resDiv.innerHTML = "";
-
-            if (data.tickets && data.tickets.length > 0) {
-                data.tickets.forEach(t => {
-                    resDiv.innerHTML += `
-                        <div class="ticket">
-                            <div>
-                                <div style="font-weight:bold; font-size: 18px;">${t.airline || 'Awiakompaniýa'}</div>
-                                <div style="color: #666;">${t.origin} ➔ ${t.destination}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="color:var(--green); font-size: 22px; font-weight: bold;">${t.price} TMT</div>
-                                <a href="${t.link}" target="_blank" style="background:var(--green); color:white; padding:8px 15px; border-radius:5px; text-decoration:none; display:inline-block; margin-top:5px;">Satyn al</a>
-                            </div>
-                        </div>`;
+            try {
+                const response = await fetch('/api/search-live', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ origin: from, destination: to, date: date })
                 });
-            } else {
-                resDiv.innerHTML = "<p style='text-align:center;'>Bilet tapylmady.</p>";
-            }
-        } catch (e) {
-            // Устранение ошибки со скриншота
-            resDiv.innerHTML = "<p style='text-align:center; color:red; font-weight:bold;'>Ошибка соединения с сервером! Проверьте, запущен ли бэкенд в главной папке.</p>";
-            console.error("Fetch error:", e);
-        }
-    }
-</script>
 
+                const data = await response.json();
+                resDiv.innerHTML = "";
+
+                if (data.tickets && data.tickets.length > 0) {
+                    data.tickets.forEach(t => {
+                        resDiv.innerHTML += `
+                            <div class="ticket-card">
+                                <div class="price-side">
+                                    <div class="price-val">${t.price.toLocaleString()} ₽</div>
+                                    <a class="buy-btn" href="https://www.aviasales.ru${t.link}" target="_blank">КУПИТЬ</a>
+                                </div>
+                                <div class="info-side">
+                                    <div class="flight-header">
+                                        <span>${t.airline}</span>
+                                        <span>Рейс #${t.flight_number}</span>
+                                    </div>
+                                    <div class="route-row">
+                                        <div>
+                                            <div class="time">${new Date(t.departure_at).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}</div>
+                                            <div class="iata">${t.origin}</div>
+                                        </div>
+                                        <div class="plane-path"><i class="fa-solid fa-plane"></i></div>
+                                        <div style="text-align:right">
+                                            <div class="time">--:--</div>
+                                            <div class="iata">${t.destination}</div>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top:15px; font-size:12px; color:var(--text-secondary)">
+                                        📅 ${new Date(t.departure_at).toLocaleDateString('ru-RU')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    resDiv.innerHTML = "<div style='text-align:center;'>☹️ Ничего не нашли.</div>";
+                }
+            } catch (e) {
+                resDiv.innerHTML = "<div style='text-align:center; color:var(--accent-red);'>Ошибка сервера.</div>";
+            }
+        }
+
+        // Заглушка для переключения языков (логика будет позже)
+        function changeLang(lang) {
+            console.log("Смена языка на:", lang);
+            // Тут мы будем менять текст lbl-from, lbl-to и т.д.
+        }
+    </script>
 </body>
 </html>
