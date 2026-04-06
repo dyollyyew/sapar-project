@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="tm">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPAR.TM | Gözleg Netijeleri</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #27ae60;
+            --secondary: #1e293b;
+            --accent: #eb5757;
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --gray: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            color: var(--secondary);
+        }
+
+        /* Навигация */
+        header {
+            background: var(--white);
+            padding: 15px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i { color: var(--primary); }
+
+        /* Контейнер */
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Информация о текущем поиске */
+        .search-info-bar {
+            background: var(--secondary);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .route-details h2 { margin: 0; font-size: 22px; font-weight: 700; }
+        .route-details p { margin: 5px 0 0; opacity: 0.7; font-size: 14px; }
+
+        .btn-edit {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-edit:hover { background: var(--primary); border-color: var(--primary); }
+
+        /* Карточка билета */
+        .ticket-card {
+            background: var(--white);
+            border-radius: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .ticket-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .flight-info {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .airline-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .flight-path-ui {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .node { text-align: center; }
+        .node .time { font-size: 26px; font-weight: 800; color: var(--secondary); display: block; }
+        .node .code { font-size: 14px; color: var(--gray); font-weight: 600; }
+
+        .line-container {
+            flex: 1;
+            height: 2px;
+            background: #e2e8f0;
+            position: relative;
+        }
+
+        .line-container i {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--primary);
+            background: var(--white);
+            padding: 0 10px;
+            font-size: 20px;
+        }
+
+        /* Правая часть с ценой */
+        .booking-zone {
+            width: 200px;
+            background: #fafafa;
+            border-left: 2px dashed #f1f5f9;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .price-tag {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .price-tag span { font-size: 14px; color: var(--gray); margin-left: 4px; }
+
+        .btn-buy {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(235, 87, 87, 0.2);
+        }
+
+        .btn-buy:hover { filter: brightness(1.1); transform: scale(1.02); }
+
+        /* Лоадер */
+        .loading-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .loading-state i { font-size: 40px; color: var(--primary); margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo"><i class="fa-solid fa-paper-plane"></i> SAPAR.TM</a>
+    </header>
+
+    <div class="container">
+        <div class="search-info-bar">
+            <div class="route-details">
+                <h2 id="route-text">Gözleg...</h2>
+                <p id="date-text"></p>
+            </div>
+            <a href="/" class="btn-edit"><i class="fas fa-sliders-h"></i> Üýtget</a>
+        </div>
+
+        <div id="results-container">
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Iň amatly biletler gözlenilýär...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ЛОГИКУ НЕ ТРОГАЕМ - ТАК ЖЕ БЕРЕМ ПАРАМЕТРЫ ИЗ URL
+        const queryParams = new URLSearchParams(window.location.search);
+        const from = queryParams.get('from');
+        const to = queryParams.get('to');
+        const date = queryParams.get('date');
+
+        document.getElementById('route-text').innerText = `${from} ➔ ${to}`;
+        document.getElementById('date-text').innerText = `Uçuş senesi: ${date}`;
+
+        async function getTickets() {
+            const wrapper = document.getElementById('results-container');
+            
+            try {
+                const response = await fetch('/api/search-live', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ origin: from, destination: to, date: date })
+                });
+
+                const data = await response.json();
+                wrapper.innerHTML = "";
+
+                if (data.tickets && data.tickets.length > 0) {
+                    data.tickets.forEach(t => {
+                        const d = new Date(t.departure_at);
+                        wrapper.innerHTML += `
+                            <div class="ticket-card">
+                                <div class="flight-info">
+                                    <div class="airline-label">
+                                        <i class="fas fa-plane-departure"></i> ${t.airline || 'Awiakompaniýa'}
+                                    </div>
+                                    <div class="flight-path-ui">
+                                        <div class="node">
+                                            <span class="time">${d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'})}</span>
+                                            <span class="code">${t.origin}</span>
+                                        </div>
+                                        <div class="line-container">
+                                            <i class="fas fa-plane"></i>
+                                        </div>
+                                        <div class="node">
+                                            <span class="time">--:--</span>
+                                            <span class="code">${t.destination}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="booking-zone">
+                                    <div class="price-tag">${t.price.toLocaleString()}<span>RUB</span></div>
+                                    <a href="https://www.aviasales.ru${t.link}" class="btn-buy" target="_blank">SATYN AL</a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    wrapper.innerHTML = "<div class='loading-state'><p>Bilet tapylmady ☹️</p></div>";
+                }
+            } catch (err) {
+                wrapper.innerHTML = "<div class='loading-state' style='color:red;'><p>Bagyşlaň, ýalňyşlyk ýüze çykdy.</p></div>";
+            }
+        }
+
+        if(from && to && date) getTickets();
+    </script>
+</body>
+</html>
