@@ -1,84 +1,309 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPAR.TM - Turkmenistan Airlines Style</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --tkm-green: #00563b; /* Фирменный зеленый */
+            --tkm-gold: #c5a059;  /* Золотистый акцент */
+            --light-bg: #f5f7f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background-color: var(--light-bg);
+            display: flex;
+            height: 100vh;
+        }
+
+        /* САЙДБАР */
+        .sidebar {
+            width: 280px;
+            background: var(--tkm-green);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--tkm-gold);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.3s;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--tkm-gold);
+        }
+        .nav-link.active {
+            background: var(--tkm-gold);
+            color: var(--tkm-green);
+            font-weight: 600;
+        }
+
+        /* ОСНОВНОЙ КОНТЕНТ */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .search-hero {
+            background: var(--tkm-green);
+            height: 200px;
+            padding: 40px;
+            color: white;
+        }
+
+        .search-box {
+            max-width: 1000px;
+            margin: -60px auto 0;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+        }
+        .search-box input:focus { border-color: var(--tkm-green); }
+
+        .btn-find {
+            background: var(--tkm-green);
+            color: white;
+            border: none;
+            padding: 0 40px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-find:hover { background: #00402b; transform: translateY(-2px); }
+
+        /* КАРТОЧКА БИЛЕТА */
+        .ticket {
+            background: white;
+            margin: 20px auto;
+            max-width: 900px;
+            border-radius: 12px;
+            display: flex;
+            overflow: hidden;
+            border: 1px solid #eee;
+            transition: 0.3s;
+        }
+        .ticket:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+
+        .ticket-price-side {
+            width: 220px;
+            padding: 30px;
+            background: #fcfcfc;
+            border-right: 1px dashed #ddd;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .price { font-size: 26px; font-weight: bold; color: var(--tkm-green); margin-bottom: 15px; }
+
+        .btn-buy {
+            background: var(--tkm-gold);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .ticket-info-side {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .route-line {
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+            margin: 0 20px;
+            position: relative;
+            text-align: center;
+        }
+        .route-line i {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            color: var(--tkm-gold);
+        }
+
+        /* МОДАЛКА */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 40px; border-radius: 15px; width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
 <div class="sidebar">
     <div class="brand"><i class="fas fa-paper-plane"></i> SAPAR.TM</div>
     <div class="nav-link active"><i class="fas fa-search"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
-    
-    <div id="userSection" style="display:none;">
-        <div class="nav-link" onclick="openModal('lk')"><i class="fas fa-user-circle"></i> <span class="lang" data-tk="Hasabym" data-ru="Мой профиль">Hasabym</span></div>
-        <div class="nav-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="lang" data-tk="Çykyş" data-ru="Выход">Çykyş</span></div>
-    </div>
-
-    <div id="guestSection">
-        <div class="nav-link" onclick="openModal('login')"><i class="fas fa-sign-in-alt"></i> <span class="lang" data-tk="Giriş" data-ru="Войти">Giriş</span></div>
-    </div>
-    
+    <div class="nav-link" onclick="openModal('login')"><i class="fas fa-user"></i> <span class="lang" data-tk="Giriş" data-ru="Личный кабинет">Giriş</span></div>
     <div class="nav-link" id="adminBtn" style="display:none;" onclick="openModal('admin')"><i class="fas fa-cog"></i> Admin</div>
 </div>
 
 <div class="main-content">
     <div class="top-bar">
-        <div class="user-trigger" onclick="openModal('login')" style="cursor:pointer; margin-right: 15px; color: var(--tkm-green);">
-            <i class="fas fa-user-circle" style="font-size: 20px;"></i>
-        </div>
-        <div class="lang-switcher">
-            <span onclick="setLang('tk')" style="cursor:pointer; font-weight:bold;">TKM</span> | 
-            <span onclick="setLang('ru')" style="cursor:pointer; font-weight:bold;">РУС</span>
-        </div>
-    </div>
+        <span onclick="setLang('tk')" style="cursor:pointer; font-weight:bold;">TKM</span>
+        <span onclick="setLang('ru')" style="cursor:pointer; font-weight:bold;">РУС</span>
     </div>
 
+    <div class="search-hero">
+        <h1>Hoş geldiňiz! / Добро пожаловать!</h1>
+        <p>Лучшие цены на авиабилеты Туркменистана</p>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="from" placeholder="Nireden (Откуда)">
+        <input type="text" id="to" placeholder="Nirä (Куда)">
+        <input type="date" id="date">
+        <button class="btn-find" onclick="searchFlights()">BILET TAP</button>
+    </div>
+
+    <div id="results">
+        </div>
+</div>
+
+<div id="mainModal" class="modal" onclick="if(event.target==this) closeModal()">
+    <div class="modal-content" id="modalBody"></div>
+</div>
+
 <script>
-    // --- НОВАЯ ЛОГИКА ВХОДА И ВЫХОДА ---
+    // --- ТВОЯ ЛОГИКА (НЕ ТРОГАЕМ) ---
+    async function searchFlights() {
+        const from = document.getElementById('from').value.toUpperCase();
+        const to = document.getElementById('to').value.toUpperCase();
+        const date = document.getElementById('date').value;
+        const resDiv = document.getElementById('results');
+
+        resDiv.innerHTML = "<p style='text-align:center; margin-top:50px;'>Gözlenilýär...</p>";
+
+        try {
+            const response = await fetch('/api/search-live', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ origin: from, destination: to, date: date })
+            });
+
+            const data = await response.json();
+            resDiv.innerHTML = "";
+
+            data.tickets.forEach(t => {
+                const price = Math.round(t.price * 1.05); // Наценка 5%
+                resDiv.innerHTML += `
+                    <div class="ticket">
+                        <div class="ticket-price-side">
+                            <div class="price">${price.toLocaleString()} RUB</div>
+                            <button class="btn-buy" onclick="openModal('buy', ${price})">SATYN AL</button>
+                        </div>
+                        <div class="ticket-info-side">
+                            <div style="text-align:center">
+                                <div style="font-size:24px; font-weight:bold;">12:00</div>
+                                <div style="color:#777">${t.origin}</div>
+                            </div>
+                            <div class="route-line">
+                                <span style="font-size:11px; color:#999;">3h 30m</span>
+                                <i class="fas fa-plane"></i>
+                            </div>
+                            <div style="text-align:center">
+                                <div style="font-size:24px; font-weight:bold;">15:30</div>
+                                <div style="color:#777">${t.destination}</div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        } catch (e) {
+            resDiv.innerHTML = "<p style='text-align:center;'>Ошибка соединения с сервером.</p>";
+        }
+    }
+
+    // --- ИНТЕРФЕЙС ---
+    function setLang(l) {
+        document.querySelectorAll('.lang').forEach(el => el.innerText = el.getAttribute('data-' + l));
+    }
+
+    function openModal(type, data) {
+        const m = document.getElementById('mainModal');
+        const b = document.getElementById('modalBody');
+        m.style.display = 'flex';
+
+        if(type === 'login') {
+            b.innerHTML = `<h3>Giriş / Вход</h3>
+                <input type="text" id="u" placeholder="Login" style="width:100%; padding:10px; margin-bottom:10px;">
+                <input type="password" id="p" placeholder="Parol" style="width:100%; padding:10px; margin-bottom:10px;">
+                <button class="btn-buy" style="width:100%" onclick="doAuth()">Giriş</button>`;
+        } else if(type === 'buy') {
+            b.innerHTML = `<h3>Maglumatlary dolduryň</h3>
+                <input type="text" placeholder="Adyňyz" style="width:100%; padding:10px; margin-bottom:10px;">
+                <p>Bahasy: <b>${data} RUB</b></p>
+                <button class="btn-buy" style="width:100%" onclick="closeModal(); alert('Tölendi!')">TÖLEMEK</button>`;
+        }
+    }
+
+    function closeModal() { document.getElementById('mainModal').style.display = 'none'; }
 
     function doAuth() {
         const u = document.getElementById('u').value;
-        if (!u) return alert("Логин ýazyň!");
-
-        // Показываем секцию пользователя, скрываем гостевую
-        document.getElementById('userSection').style.display = 'block';
-        document.getElementById('guestSection').style.display = 'none';
-        
-        // Если админ
-        if(u === 'admin') {
-            document.getElementById('adminBtn').style.display = 'flex';
-        }
-
+        if(u === 'admin') document.getElementById('adminBtn').style.display = 'flex';
         closeModal();
-        console.log("Logged in as:", u);
-    }
-
-    function logout() {
-        // Скрываем секцию пользователя, возвращаем гостевую
-        document.getElementById('userSection').style.display = 'none';
-        document.getElementById('guestSection').style.display = 'block';
-        document.getElementById('adminBtn').style.display = 'none';
-        
-        // Очистка полей поиска (по желанию)
-        document.getElementById('results').innerHTML = "";
-        alert("Siz ulgamdan çykdyňyz / Вы вышли из системы"); [cite: 1, 5]
-    }
-
-    // Изменение иконки в top-bar в зависимости от статуса (опционально)
-    function updateTopBarIcon(isLoggedIn) {
-        const icon = document.querySelector('.user-trigger i');
-        if(isLoggedIn) {
-            icon.style.color = 'var(--tkm-gold)';
-        } else {
-            icon.style.color = 'var(--tkm-green)';
-        }
     }
 </script>
-
-<style>
-    /* Дополнение к стилям */
-    .top-bar {
-        display: flex;
-        align-items: center; /* Центрирование иконки и текста по вертикали */
-        justify-content: flex-end;
-    }
-    
-    .user-trigger:hover {
-        opacity: 0.7;
-        transform: scale(1.1);
-        transition: 0.2s;
-    }
-</style>
+</body>
+</html>
