@@ -4,101 +4,284 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAPAR.TM - Bilet Gözlegi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
-        header { background: #fff; padding: 15px 10%; display: flex; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .logo { font-size: 28px; font-weight: 900; color: #1a1a1a; text-decoration: none; }
-        .logo span { color: #2ecc71; }
-
-        /* ТВОЙ КОВЕР ТУТ */
-        .hero {
-            width: 100%; height: 320px;
-            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), 
-                        url('kover-gushly-gel-253x366-ruchnaja-rabota.jpg');
-            background-size: cover; background-position: center;
-            border-bottom: 5px solid #d4af37; display: flex; align-items: center; justify-content: center;
+        :root {
+            --primary: #2ecc71; /* Основной зеленый */
+            --primary-dark: #27ae60;
+            --gold: #d4af37;
+            --dark: #1a1a1a;
+            --bg: #f4f7f6;
         }
-        .hero::after { content: "Bagtly ýollar!"; color: white; font-size: 42px; font-weight: 900; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
 
-        .main-content { max-width: 1100px; margin: -50px auto 50px; padding: 0 20px; }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            /* КОВЕР НА ВЕСЬ ФОН */
+            background-image: linear-gradient(rgba(244, 247, 246, 0.92), rgba(244, 247, 246, 0.92)), 
+                              url('kover-gushly-gel-253x366-ruchnaja-rabota.jpg');
+            background-size: cover;
+            background-attachment: fixed; /* Ковер стоит, сайт скроллится */
+        }
 
-        /* КРАСИВАЯ ПАНЕЛЬ ПОИСКА */
+        /* ШАПКА */
+        header {
+            background: #ffffff;
+            padding: 15px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 100;
+        }
+
+        /* НОВЫЙ ЛОГОТИП В СТИЛЕ ТЕЛЕГРАМ */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 12px;
+        }
+
+        .telegram-icon {
+            width: 45px;
+            height: 45px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            box-shadow: 0 3px 6px rgba(46, 204, 113, 0.3);
+        }
+
+        .logo-text {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--dark);
+        }
+        .logo-text span { color: var(--primary); }
+
+        .main-content {
+            max-width: 1100px;
+            margin: 30px auto 50px;
+            padding: 0 20px;
+        }
+
+        /* ПАНЕЛЬ ПОИСКА */
         .search-panel {
-            background: #fff; padding: 30px; border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15); display: flex; gap: 15px; align-items: flex-end;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            border: 1px solid #eee;
         }
-        .input-group { flex: 1; display: flex; flex-direction: column; }
-        .input-group label { font-size: 12px; font-weight: 800; color: #888; margin-bottom: 8px; text-transform: uppercase; }
-        .input-group input { padding: 12px 15px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; outline: none; }
-        .input-group input:focus { border-color: #2ecc71; }
-        .btn-search { background: #2ecc71; color: white; border: none; padding: 0 40px; border-radius: 10px; font-weight: 700; height: 48px; cursor: pointer; font-size: 16px; }
+
+        .input-group { flex: 1; min-width: 220px; display: flex; flex-direction: column; }
+        .input-group label { 
+            font-size: 11px; 
+            font-weight: 800; 
+            color: #888; 
+            margin-bottom: 8px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-group input { 
+            padding: 14px 18px; 
+            border: 2px solid #eee; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            outline: none; 
+            transition: 0.2s;
+            box-sizing: border-box;
+        }
+        .input-group input:focus { border-color: var(--primary); background: #fff; }
+
+        .btn-search {
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 0 45px;
+            border-radius: 12px; 
+            font-weight: 800; 
+            height: 52px; 
+            cursor: pointer; 
+            transition: 0.2s;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+        .btn-search:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); }
+
+        /* ПОЛНЫЕ ДАННЫЕ БИЛЕТА */
+        .ticket {
+            background: #ffffff;
+            border-radius: 18px;
+            margin-top: 25px;
+            display: flex;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .ticket:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+
+        .flight-info { flex: 1; padding: 30px; display: flex; align-items: center; gap: 20px; }
         
-        .ticket { background: white; border-radius: 15px; margin-top: 20px; display: flex; border: 1px solid #eee; overflow: hidden; }
-        .flight-info { flex: 1; padding: 30px; display: flex; align-items: center; justify-content: space-between; }
-        .price-box { width: 220px; background: #fafafa; border-left: 2px dashed #eee; padding: 30px; text-align: center; }
-        .price { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
-        .buy-btn { background: #ff4757; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; display: inline-block; font-weight: 700; }
+        /* Детализация времени и рейса */
+        .time-block { text-align: center; min-width: 80px; }
+        .time { font-size: 32px; font-weight: 900; color: var(--dark); line-height: 1; }
+        .date { font-size: 13px; color: #888; margin-top: 4px; font-weight: 600; }
+        .city-code { font-size: 16px; font-weight: 800; color: #555; margin-top: 2px; text-transform: uppercase; }
+
+        .path-block { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .dur-text { font-size: 12px; color: #aaa; font-weight: 600; margin-bottom: 5px; }
+        .plane-line { width: 100%; height: 2px; background: #eee; position: relative; }
+        .plane-line i { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); color: var(--primary); background: #fff; padding: 0 10px; font-size: 20px; }
+        .stops { font-size: 11px; color: var(--primary); font-weight: 700; margin-top: 5px; text-transform: uppercase; }
+
+        .price-box { 
+            width: 260px; 
+            background: #fafafa; 
+            border-left: 2px dashed #eee; 
+            padding: 30px; 
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .price { font-size: 28px; font-weight: 900; color: var(--dark); margin-bottom: 15px; }
+        .buy-btn { 
+            background: #ff4757; 
+            color: white; 
+            text-decoration: none; 
+            padding: 14px 25px; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            display: inline-block;
+            font-size: 16px;
+            transition: 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .buy-btn:hover { background: #ee3545; }
+
+        .status { text-align: center; padding: 60px; color: #888; font-size: 18px; font-weight: 600; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="#" class="logo">SAPAR<span>.TM</span></a>
+    <a href="#" class="logo-container">
+        <div class="telegram-icon">
+            <i class="fas fa-paper-plane"></i>
+        </div>
+        <div class="logo-text">SAPAR<span>.TM</span></div>
+    </a>
+    <div style="font-weight: 900; color: var(--primary); font-size: 20px;">TKM</div>
 </header>
-
-<div class="hero"></div>
 
 <div class="main-content">
     <div class="search-panel">
         <div class="input-group">
-            <label>Nireden</label>
-            <input type="text" id="from" value="MOW">
+            <label>Nireden (Mysal: ASB)</label>
+            <input type="text" id="from" value="MOW" maxlength="3">
         </div>
         <div class="input-group">
-            <label>Nirä</label>
-            <input type="text" id="to" value="ASB">
+            <label>Nirä (Mysal: MOW)</label>
+            <input type="text" id="to" value="ASB" maxlength="3">
         </div>
         <div class="input-group">
-            <label>Sene</label>
+            <label>Uçuş senesi</label>
             <input type="date" id="date">
         </div>
-        <button class="btn-search" onclick="search()">GÖZLEG</button>
+        <button class="btn-search" onclick="searchFlights()">GÖZLEG</button>
     </div>
-    <div id="results"></div>
+
+    <div id="results-container">
+        </div>
 </div>
 
 <script>
-    async function search() {
-        const from = document.getElementById('from').value;
-        const to = document.getElementById('to').value;
+    // ВСЯ ЛОГИКА И СОЕДИНЕНИЕ ОСТАЛИСЬ ПРЕЖНИМИ
+    async function searchFlights() {
+        const from = document.getElementById('from').value.toUpperCase();
+        const to = document.getElementById('to').value.toUpperCase();
         const date = document.getElementById('date').value;
-        const res = document.getElementById('results');
-        
-        res.innerHTML = "<p style='text-align:center; padding:20px;'>Gözlenilýär...</p>";
-        
+        const container = document.getElementById('results-container');
+
+        if (!from || !to || !date) {
+            alert("Sarpasly dost, ähli öýjükleri dolduryň!");
+            return;
+        }
+
+        container.innerHTML = '<div class="status"><i class="fas fa-spinner fa-spin"></i> Biletler gözlenilýär, garaşyň...</div>';
+
         try {
             const response = await fetch('/api/search-live', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ origin: from, destination: to, date: date })
             });
+
             const data = await response.json();
-            res.innerHTML = "";
-            data.tickets.forEach(t => {
-                res.innerHTML += `
-                    <div class="ticket">
-                        <div class="flight-info">
-                            <div><b>${t.origin}</b></div>
-                            <div style="color:#2ecc71">✈</div>
-                            <div><b>${t.destination}</b></div>
-                        </div>
-                        <div class="price-box">
-                            <div class="price">${t.price} RUB</div>
-                            <a href="https://aviasales.ru${t.link}" class="buy-btn">SATYN AL</a>
-                        </div>
-                    </div>`;
-            });
-        } catch(e) { res.innerHTML = "Error!"; }
+            container.innerHTML = "";
+
+            if (data.tickets && data.tickets.length > 0) {
+                data.tickets.forEach(t => {
+                    const depAt = new Date(t.departure_at);
+                    
+                    // Форматирование даты
+                    const depDate = depAt.toLocaleDateString('tm-TM', { day: '2-digit', month: 'short' });
+                    const depTime = depAt.getHours() + ':' + String(depAt.getMinutes()).padStart(2, '0');
+
+                    container.innerHTML += `
+                        <div class="ticket">
+                            <div class="flight-info">
+                                <div class="time-block">
+                                    <div class="time">${depTime}</div>
+                                    <div class="date">${depDate}</div>
+                                    <div class="city-code">${t.origin}</div>
+                                </div>
+                                
+                                <div class="path-block">
+                                    <div class="dur-text">Gönümel uçuş</div>
+                                    <div class="plane-line">
+                                        <i class="fas fa-plane"></i>
+                                    </div>
+                                    <div class="stops">Duralgasyz</div>
+                                </div>
+                                
+                                <div class="time-block">
+                                    <div class="time">--:--</div>
+                                    <div class="date">Garaşylýar</div>
+                                    <div class="city-code">${t.destination}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="price-box">
+                                <div class="price">${t.price.toLocaleString('ru-RU')} RUB</div>
+                                <a href="https://www.aviasales.ru${t.link}" class="buy-btn" target="_blank">SATYN AL</a>
+                            </div>
+                        </div>`;
+                });
+            } else {
+                container.innerHTML = '<div class="status">Bagyşlaň, bu senede bilet tapylmady.</div>';
+            }
+        } catch (e) {
+            container.innerHTML = '<div class="status" style="color:red;">Сервер не отвечает. Проверьте подключение к API на Vercel.</div>';
+        }
     }
 </script>
 
