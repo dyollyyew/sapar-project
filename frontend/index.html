@@ -3,193 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Bilet Gözlegi</title>
+    <title>SAPAR.TM - International</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --tkm-green: #00563b; --tkm-gold: #c5a059; }
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; height: 100vh; background: #f5f7f9; }
 
-        /* Сайдбар из твоего дизайна */
+        /* Сайдбар */
         .sidebar { width: 260px; background: var(--tkm-green); color: white; padding: 25px; display: flex; flex-direction: column; }
         .brand { font-size: 22px; font-weight: bold; margin-bottom: 30px; border-bottom: 1px solid var(--tkm-gold); padding-bottom: 10px; }
-        .nav-link { padding: 12px; color: white; cursor: pointer; display: flex; align-items: center; gap: 12px; text-decoration: none; border-radius: 6px; }
-        .nav-link.active { background: #b08d4a; color: white; }
+        .nav-link { padding: 12px; color: white; cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 6px; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: var(--tkm-gold); }
 
-        /* Главная область */
+        /* Контент */
         .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-        .top-bar { background: white; padding: 15px 30px; display: flex; justify-content: flex-end; gap: 20px; border-bottom: 1px solid #ddd; }
+        .top-bar { background: white; padding: 15px 30px; display: flex; justify-content: flex-end; align-items: center; gap: 20px; border-bottom: 1px solid #ddd; }
         
-        /* Хедер с твоим слоганом */
+        /* Хедер Bagtly ýollar! */
         .hero { background: var(--tkm-green); color: white; padding: 60px 20px; text-align: center; }
-        .hero h1 { margin: 0; font-size: 32px; }
-        .hero p { color: white; opacity: 0.9; margin-top: 10px; }
+        .hero h1 { margin: 0; font-size: 32px; letter-spacing: 1px; }
+        .hero p { color: white; opacity: 0.8; margin-top: 10px; font-size: 18px; }
 
         /* Форма поиска */
-        .search-container { max-width: 1000px; margin: -40px auto 20px; width: 90%; position: relative; z-index: 10; }
-        .search-box { background: white; padding: 25px; border-radius: 12px; display: flex; gap: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .search-container { max-width: 1000px; margin: -40px auto 20px; width: 90%; z-index: 10; }
+        .search-box { background: white; padding: 25px; border-radius: 15px; display: flex; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .input-group { position: relative; flex: 1; }
-        .input-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
+        .input-group label { display: block; font-size: 11px; font-weight: bold; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; background: #f9f9f9; outline: none; box-sizing: border-box; font-size: 15px; }
         
-        /* Подсказки городов */
-        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 100; display: none; max-height: 200px; overflow-y: auto; }
-        .suggestions div { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
-        .suggestions div:hover { background: #f0f0f0; }
+        /* Подсказки */
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; z-index: 100; display: none; max-height: 200px; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .suggestions div { padding: 12px; cursor: pointer; border-bottom: 1px solid #f5f5f5; color: #333; }
+        .suggestions div:hover { background: #f0f0f0; color: var(--tkm-green); }
 
-        .btn-search { background: #00875a; color: white; border: none; padding: 0 30px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-search { background: #2ecc71; color: white; border: none; padding: 0 35px; border-radius: 8px; font-weight: bold; cursor: pointer; height: 45px; align-self: flex-end; }
 
-        /* Билеты */
-        .ticket { background: white; margin: 15px 0; border-radius: 12px; display: flex; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .ticket-info { flex: 1; padding: 20px; display: flex; justify-content: space-around; align-items: center; }
-        .ticket-buy { width: 180px; padding: 20px; background: #fafafa; border-left: 1px dashed #ddd; text-align: center; }
-        .price { font-size: 22px; font-weight: bold; color: var(--tkm-green); margin-bottom: 10px; }
-        .btn-buy { background: #000; color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; cursor: pointer; }
-
-        .page { display: none; padding: 40px; }
+        /* Секции страниц */
+        .page { display: none; padding: 30px; }
         .active-page { display: block; }
+
+        /* Карточка билета */
+        .ticket { background: white; margin-bottom: 15px; border-radius: 12px; display: flex; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+        .ticket-info { flex: 1; padding: 25px; display: flex; justify-content: space-around; align-items: center; }
+        .ticket-buy { width: 180px; padding: 25px; background: #fcfcfc; border-left: 1px dashed #ddd; text-align: center; }
+        .price { font-size: 24px; font-weight: bold; color: var(--tkm-green); margin-bottom: 10px; }
+        .btn-buy { background: #000; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
     <div class="brand">SAPAR.TM</div>
-    <div class="nav-link active" onclick="showP('search-p')"><i class="fas fa-search"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
-    <div id="user-nav" style="display:none;">
-        <div class="nav-link" onclick="showP('orders-p')"><i class="fas fa-ticket-alt"></i> <span class="lang" data-tk="Sargytlarym" data-ru="Мои заказы">Sargytlarym</span></div>
-        <div class="nav-link" onclick="showP('settings-p')"><i class="fas fa-user-cog"></i> <span class="lang" data-tk="Sazlamalar" data-ru="Настройки">Sazlamalar</span></div>
+    <div id="nav-guest">
+        <div class="nav-link active" onclick="showPage('search-page')"><i class="fas fa-search"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
+        <div class="nav-link" onclick="openLogin()"><i class="fas fa-user"></i> <span class="lang" data-tk="Giriş" data-ru="Войти">Giriş</span></div>
     </div>
-    <div class="nav-link" id="login-btn" onclick="openL()"><i class="fas fa-sign-in-alt"></i> <span class="lang" data-tk="Giriş" data-ru="Войти">Giriş</span></div>
+    <div id="nav-user" style="display:none;">
+        <div class="nav-link active" onclick="showPage('search-page')"><i class="fas fa-plane"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
+        <div class="nav-link" onclick="showPage('orders-page')"><i class="fas fa-ticket-alt"></i> <span class="lang" data-tk="Sargytlarym" data-ru="Мои заказы">Sargytlarym</span></div>
+        <div class="nav-link" onclick="showPage('settings-page')"><i class="fas fa-cog"></i> <span class="lang" data-tk="Sazlamalar" data-ru="Настройки">Sazlamalar</span></div>
+        <div class="nav-link" onclick="location.reload()" style="margin-top:20px; color:#ff7675;"><i class="fas fa-power-off"></i> <span class="lang" data-tk="Çykyş" data-ru="Выход">Çykyş</span></div>
+    </div>
 </div>
 
 <div class="main">
     <div class="top-bar">
-        <b style="cursor:pointer"><span onclick="setLang('tk')">TKM</span> | <span onclick="setLang('ru')">РУС</span></b>
+        <b style="cursor:pointer; color: var(--tkm-green);"><span onclick="changeLang('tk')">TKM</span> | <span onclick="changeLang('ru')">РУС</span></b>
     </div>
 
-    <div id="search-p" class="page active-page">
+    <div id="search-page" class="page active-page">
         <div class="hero">
-            <h1 id="slogan">Komfortly uçuş biziň bilen</h1>
+            <h1 id="slogan">Bagtly ýollar!</h1>
             <p>Premium travel experience</p>
         </div>
         <div class="search-container">
             <div class="search-box">
                 <div class="input-group">
-                    <input type="text" id="from" placeholder="Nireden" oninput="suggest(this, 's1')" autocomplete="off">
-                    <div id="s1" class="suggestions"></div>
+                    <label class="lang" data-tk="Nireden" data-ru="Откуда">Nireden</label>
+                    <input type="text" id="from" placeholder="MOW" oninput="showSuggest(this, 'Sug1')" autocomplete="off">
+                    <div id="Sug1" class="suggestions"></div>
                 </div>
                 <div class="input-group">
-                    <input type="text" id="to" placeholder="Nirä" oninput="suggest(this, 's2')" autocomplete="off">
-                    <div id="s2" class="suggestions"></div>
+                    <label class="lang" data-tk="Nirä" data-ru="Куда">Nirä</label>
+                    <input type="text" id="to" placeholder="ASB" oninput="showSuggest(this, 'Sug2')" autocomplete="off">
+                    <div id="Sug2" class="suggestions"></div>
                 </div>
-                <input type="date" id="date">
+                <div class="input-group">
+                    <label class="lang" data-tk="Sene" data-ru="Дата">Sene</label>
+                    <input type="date" id="date">
+                </div>
                 <button class="btn-search" onclick="searchFlights()">GÖZLEG</button>
             </div>
             <div id="results" style="margin-top: 30px;"></div>
         </div>
     </div>
 
-    <div id="orders-p" class="page">
-        <h2>Meniň sargytlarym</h2>
-        <div style="background:white; padding:20px; border-radius:8px;">Sargyt tapylmady.</div>
+    <div id="orders-page" class="page">
+        <h2 class="lang" data-tk="Meniň sargytlarym" data-ru="Мои заказы">Meniň sargytlarym</h2>
+        <div style="background:white; padding:20px; border-radius:12px;">Sargyt tapylmady.</div>
     </div>
 
-    <div id="settings-p" class="page">
-        <h2>Sazlamalar</h2>
-        <div style="background:white; padding:30px; border-radius:12px;">
-            <label>Ulanyjy ady:</label>
-            <input type="text" id="u-name-val" style="width:100%; padding:12px; margin:10px 0 20px; border:1px solid #ddd;">
-            <button class="btn-search" style="padding:12px 30px;">Yatda sakla</button>
+    <div id="settings-page" class="page">
+        <h2 class="lang" data-tk="Sazlamalar" data-ru="Настройки">Sazlamalar</h2>
+        <div style="background:white; padding:30px; border-radius:12px; max-width: 500px;">
+            <label>Profile Name:</label>
+            <input type="text" id="user-display-name" style="width:100%; padding:10px; margin:10px 0 20px; border:1px solid #ddd; border-radius:5px;">
+            <button class="btn-search" style="height: 40px;">Save Changes</button>
         </div>
     </div>
 </div>
 
 <script>
-    const cities = ["Ashgabat (ASB)", "Mary (MYP)", "Dashoguz (TAZ)", "Turkmenabat (CRZ)", "Turkmenbashy (KRW)", "Kerki (KEA)", "Istanbul (IST)", "Moscow (DME)", "Dubai (DXB)"];
+    // Обновленный список с международными рейсами
+    const locations = [
+        "Ashgabat (ASB)", "Mary (MYP)", "Dashoguz (TAZ)", "Turkmenabat (CRZ)", "Turkmenbashy (KRW)", "Kerki (KEA)",
+        "Istanbul (IST)", "Moscow (DME)", "Dubai (DXB)", "Frankfurt (FRA)", "Delhi (DEL)", "London (LHR)", 
+        "Kazan (KZN)", "Saint Petersburg (LED)", "Abu Dhabi (AUH)", "Beijing (PEK)", "Bangkok (BKK)"
+    ];
 
-    function suggest(inp, id) {
-        const s = document.getElementById(id);
-        const v = inp.value.toLowerCase();
-        s.innerHTML = "";
-        if(!v) { s.style.display="none"; return; }
-        const found = cities.filter(c => c.toLowerCase().includes(v));
-        if(found.length > 0) {
-            s.style.display="block";
-            found.forEach(c => {
-                const d = document.createElement("div");
-                d.innerText = c;
-                d.onclick = () => { inp.value = c; s.style.display="none"; };
-                s.appendChild(d);
+    function showSuggest(inp, id) {
+        const div = document.getElementById(id);
+        const val = inp.value.toLowerCase();
+        div.innerHTML = "";
+        if (!val) { div.style.display = "none"; return; }
+        const matches = locations.filter(l => l.toLowerCase().includes(val));
+        if (matches.length > 0) {
+            div.style.display = "block";
+            matches.forEach(m => {
+                const item = document.createElement("div");
+                item.innerText = m;
+                item.onclick = () => { inp.value = m; div.style.display = "none"; };
+                div.appendChild(item);
             });
         }
     }
 
-    // ИСПРАВЛЕННАЯ ЛОГИКА (Убирает ошибку 500)
+    // Исправленная логика API
     async function searchFlights() {
-        const fromFull = document.getElementById('from').value;
-        const toFull = document.getElementById('to').value;
+        const fromVal = document.getElementById('from').value;
+        const toVal = document.getElementById('to').value;
         const date = document.getElementById('date').value;
         const resDiv = document.getElementById('results');
 
-        // Вырезаем только IATA код (3 буквы) из скобок
-        const from = fromFull.match(/\((.*?)\)/) ? fromFull.match(/\((.*?)\)/)[1] : fromFull;
-        const to = toFull.match(/\((.*?)\)/) ? toFull.match(/\((.*?)\)/)[1] : toFull;
+        // Вырезаем IATA-код (например, ASB) из скобок
+        const fromCode = fromVal.match(/\((.*?)\)/) ? fromVal.match(/\((.*?)\)/)[1] : fromVal;
+        const toCode = toVal.match(/\((.*?)\)/) ? toVal.match(/\((.*?)\)/)[1] : toVal;
 
-        resDiv.innerHTML = "<p style='text-align:center'>Gözlenilýär...</p>";
+        resDiv.innerHTML = "<p style='text-align:center;'>Gözlenilýär...</p>";
 
         try {
             const response = await fetch('/api/search-live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ origin: from, destination: to, date: date })
+                body: JSON.stringify({ origin: fromCode, destination: toCode, date: date })
             });
             const data = await response.json();
             resDiv.innerHTML = "";
 
-            if(data.tickets && data.tickets.length > 0) {
+            if (data.tickets && data.tickets.length > 0) {
                 data.tickets.forEach(t => {
-                    const price = Math.round(t.price * 1.05); // Твоя наценка 5%
+                    const finalPrice = Math.round(t.price * 1.05); // Наценка 5%
                     resDiv.innerHTML += `
                         <div class="ticket">
                             <div class="ticket-info">
-                                <div><b>${from}</b></div>
-                                <div style="color:var(--tkm-gold)"><i class="fas fa-plane"></i></div>
-                                <div><b>${to}</b></div>
+                                <div style="text-align:center"><b>${fromCode}</b><br><small>Departure</small></div>
+                                <div style="color:var(--tkm-gold); font-size: 20px;"><i class="fas fa-plane"></i></div>
+                                <div style="text-align:center"><b>${toCode}</b><br><small>Arrival</small></div>
                             </div>
                             <div class="ticket-buy">
-                                <div class="price">${price} RUB</div>
-                                <button class="btn-buy">SATYN AL</button>
+                                <div class="price">${finalPrice} RUB</div>
+                                <button class="btn-buy" onclick="buyTicket('${fromCode}', '${toCode}', '${finalPrice}')">SATYN AL</button>
                             </div>
                         </div>`;
                 });
-            } else { resDiv.innerHTML = "Bilet tapylmady."; }
-        } catch(e) { resDiv.innerHTML = "Error!"; }
+            } else { resDiv.innerHTML = "<p style='text-align:center;'>Bilet tapylmady.</p>"; }
+        } catch (e) { resDiv.innerHTML = "<p style='text-align:center; color:red;'>Error connecting to server!</p>"; }
     }
 
-    // Языки и ЛК
-    function setLang(l) {
-        document.querySelectorAll('.lang').forEach(el => el.innerText = el.getAttribute('data-' + l));
-        document.getElementById('slogan').innerText = (l === 'tk') ? "Komfortly uçuş biziň bilen" : "Комфортный полет с нами";
+    function buyTicket(f, t, p) {
+        alert(`Sargyt kabul edildi!\n${f} -> ${t}\nBahasy: ${p} RUB`);
     }
 
-    function showP(id) {
+    function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
         document.getElementById(id).classList.add('active-page');
     }
 
-    function openL() {
-        const u = prompt("Login:");
-        if(u) {
-            document.getElementById('user-nav').style.display = 'block';
-            document.getElementById('login-btn').style.display = 'none';
-            document.getElementById('u-name-val').value = u;
+    function changeLang(l) {
+        document.querySelectorAll('.lang').forEach(el => el.innerText = el.getAttribute('data-' + l));
+        document.getElementById('slogan').innerText = (l === 'tk') ? "Bagtly ýollar!" : "Счастливого пути!";
+    }
+
+    function openLogin() {
+        const user = prompt("Giriş (Login):");
+        if (user) {
+            document.getElementById('nav-guest').style.display = 'none';
+            document.getElementById('nav-user').style.display = 'block';
+            document.getElementById('user-display-name').value = user;
         }
     }
-    function buyTicket(origin, destination, price) {
-    // Здесь ты можешь вставить ссылку на оплату или просто уведомление
-    alert(`Sargyt kabul edildi!\nUçuş: ${origin} -> ${destination}\nBahasy: ${price} RUB\n\nTeşekkurler!`);
-    
-    // Если хочешь перенаправить на страницу оплаты, убери комментарий ниже:
-    // window.location.href = "/payment?amount=" + price; 
-}
 </script>
 </body>
 </html>
