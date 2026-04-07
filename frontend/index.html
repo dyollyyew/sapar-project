@@ -1,98 +1,161 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tm">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Счастливого пути!</title>
+    <title>SAPAR.TM — Премиум Путешествия</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --green: #008755;
-            --dark: #1a1a1a;
+            --primary: #008755;
+            --tkm-dark: #123524;
+            --glass: rgba(255, 255, 255, 0.7);
+            --blur: saturate(180%) blur(20px);
+            --shadow: 0 20px 50px rgba(0,0,0,0.06);
             --carpet: #8b0505;
-            --gold: #d4af37;
         }
 
-        body { font-family: 'Inter', sans-serif; background: #f9f9f9; margin: 0; color: #333; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            margin: 0; 
+            color: #1a1a1a; 
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); 
+            overflow-x: hidden; 
+        }
 
-        /* Шапка */
-        header { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--green); }
-        .logo { font-size: 24px; font-weight: 900; color: var(--green); text-decoration: none; }
+        /* Мягкая стеклянная шапка */
+        header { 
+            position: fixed; top: 0; width: 100%; height: 80px;
+            background: var(--glass); backdrop-filter: var(--blur);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 8%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            box-sizing: border-box;
+        }
 
-        /* Баннер с ковром и текстом */
-        .hero { 
-            background: var(--carpet); 
-            height: 250px; 
-            /* НАДЕЖНАЯ ССЫЛКА НА КОВЕР */
-            background-image: url('https://www.transparenttextures.com/patterns/p6.png'); 
+        .header-left { display: flex; align-items: center; gap: 15px; text-decoration: none; }
+        .header-left img { height: 35px; } /* Лого Telegram */
+        .header-left b { font-size: 24px; color: var(--tkm-dark); font-weight: 800; letter-spacing: 0.5px; }
+        .header-left span { color: var(--primary); }
+
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header-right button {
+            background: rgba(0,135,85,0.08); border: none; padding: 7px 15px;
+            border-radius: 20px; color: var(--primary); font-weight: 700;
+            font-size: 12px; cursor: pointer; transition: 0.3s;
+        }
+        .header-right button:hover { background: var(--primary); color: white; }
+        .lk-icon { font-size: 24px; color: var(--tkm-dark); margin-left: 10px; cursor: pointer; }
+
+        /* Фоновый блок с текстурой */
+        .main-bg { 
+            height: 480px; margin-top: 80px; position: relative; 
+            background: var(--carpet);
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.1)), 
+                              url('https://www.transparenttextures.com/patterns/p6.png');
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: white; border-bottom: 5px solid var(--gold);
+            color: white; border-bottom: 5px solid #d4af37;
         }
-        .hero h1 { margin: 0; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .main-bg h1 { font-size: 40px; margin: 0; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .main-bg p { opacity: 0.9; font-weight: 300; margin-top: 10px; }
 
-        /* Поиск */
-        .search-container { max-width: 1000px; margin: -50px auto 40px; padding: 20px; }
-        .search-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; gap: 15px; flex-wrap: wrap; }
+        /* Парящая панель поиска */
+        .search-area { max-width: 1050px; margin: -60px auto 50px; padding: 0 20px; }
+        .search-box { 
+            background: white; padding: 40px; border-radius: 24px;
+            box-shadow: var(--shadow); display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
+            align-items: flex-end;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
         
-        .input-group { flex: 1; min-width: 200px; }
-        .input-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #666; }
-        .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        .field { display: flex; flex-direction: column; gap: 8px; }
+        .field label { font-size: 11px; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .field input { 
+            width: 100%; padding: 14px; border: 1px solid #edf2f7; border-radius: 12px;
+            font-size: 16px; outline: none; transition: 0.3s; background: #f7fafc;
+            box-sizing: border-box;
+        }
+        .field input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(0,135,85,0.05); }
+
+        .go-btn { 
+            background: var(--primary); color: white; border: none; padding: 16px;
+            border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer;
+            transition: 0.4s; text-transform: uppercase; box-shadow: 0 8px 15px rgba(0,168,107,0.15);
+        }
+        .go-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,168,107,0.25); }
+
+        /* Мягкие карточки результатов */
+        #results { max-width: 1050px; margin: 0 auto 60px; padding: 0 20px; }
+        .ticket { 
+            background: white; border-radius: 20px; margin-bottom: 20px; display: flex;
+            box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.02);
+            overflow: hidden; transition: 0.3s;
+        }
+        .ticket:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .flight-main { flex: 1; padding: 30px; display: flex; align-items: center; justify-content: space-between; }
+        .price-zone { 
+            width: 220px; background: #fafbfc; border-left: 2px dashed #edf2f7; padding: 30px; 
+            text-align: center; box-sizing: border-box;
+        }
         
-        .btn-main { background: var(--green); color: white; border: none; padding: 0 40px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; height: 45px; margin-top: 20px; }
-        .btn-main:hover { background: #006b43; transform: translateY(-2px); }
+        .buy-btn { 
+            background: #ff4757; color: white; text-decoration: none; padding: 12px;
+            border-radius: 10px; display: block; font-weight: 700; font-size: 14px;
+            margin-top: 15px; transition: 0.3s;
+        }
+        .buy-btn:hover { background: #ff2a3c; }
 
-        /* ПОЛЕЗНЫЕ БЛОКИ (ЧТОБЫ НЕ БЫЛО ПУСТО) */
-        .features { max-width: 1000px; margin: 40px auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 0 20px; }
-        .feat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-bottom: 3px solid var(--gold); }
-        .feat-card i { font-size: 30px; color: var(--green); margin-bottom: 15px; }
-
-        /* Карточка билета */
-        .ticket { background: white; border-radius: 12px; margin-bottom: 15px; display: flex; border: 1px solid #eee; overflow: hidden; }
-        .flight-info { flex: 1; padding: 20px; display: flex; align-items: center; justify-content: space-around; }
-        .price-info { width: 180px; background: #f4f4f4; padding: 20px; text-align: center; border-left: 1px dashed #ccc; }
-        .price { font-size: 22px; font-weight: bold; color: var(--dark); }
-        .btn-buy { background: #e74c3c; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; display: block; margin-top: 10px; font-size: 14px; }
+        /* Разделы преимуществ */
+        .advantages { max-width: 1050px; margin: 60px auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 0 20px; }
+        .adv-card { background: var(--glass); padding: 30px; border-radius: 20px; text-align: center; box-shadow: var(--shadow); backdrop-filter: var(--blur); border: 1px solid rgba(0,0,0,0.02); }
+        .adv-card i { font-size: 35px; color: var(--primary); margin-bottom: 20px; display: block; }
+        .adv-card h3 { margin: 0 0 10px; font-size: 18px; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="#" class="logo">SAPAR.TM</a>
-    <div><button>TKM</button> <button>PYC</button></div>
+    <a href="#" class="header-left">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram logo"> <b>SAPAR<span>.TM</span></b>
+    </a>
+    <div class="header-right">
+        <button>TKM</button>
+        <button>PYC</button>
+        <i class="fas fa-user-circle lk-icon"></i>
+    </div>
 </header>
 
-<div class="hero">
-    <h1>TKM AIRLINES — СЧАСТЛИВОГО ПУТИ!</h1>
-    <p>Iň amatly petekler şu taýda</p>
+<div class="main-bg">
+    <h1>TKM AIRLINES</h1>
+    <p>Ak mermerli şäheriň ak kanatly bedewleri</p>
 </div>
 
-<div class="search-container">
-    <div class="search-card">
-        <div class="input-group"><label>Nireden</label><input type="text" id="from" value="MOW"></div>
-        <div class="input-group"><label>Nirä</label><input type="text" id="to" value="ASB"></div>
-        <div class="input-group"><label>Sene</label><input type="date" id="date"></div>
-        <button class="btn-main" onclick="runSearch()">GÖZLEG</button>
+<div class="search-area">
+    <div class="search-box">
+        <div class="field"><label>Nireden (From)</label><input type="text" id="origin" value="MOW"></div>
+        <div class="field"><label>Nirä (To)</label><input type="text" id="destination" value="ASB"></div>
+        <div class="field"><label>Sene (Date)</label><input type="date" id="date"></div>
+        <button class="go-btn" onclick="runSearch()">Gözleg (Search)</button>
     </div>
-
-    <div id="results-list"></div>
+    <div id="results"></div>
 </div>
 
-<div class="features">
-    <div class="feat-card"><i class="fas fa-shield-alt"></i><h3>Ynamly</h3><p>Ähli tölegler goragly geçirilýär.</p></div>
-    <div class="feat-card"><i class="fas fa-bolt"></i><h3>Çalt</h3><p>Biletleri sanlyja sekuntda tapyň.</p></div>
-    <div class="feat-card"><i class="fas fa-headset"></i><h3>Goldaw</h3><p>24/7 hyzmatyňyzda.</p></div>
+<div class="advantages">
+    <div class="adv-card"><i class="fas fa-fingerprint"></i><h3>Ynamly</h3></div>
+    <div class="adv-card"><i class="fas fa-wind"></i><h3>Çalt</h3></div>
+    <div class="adv-card"><i class="fas fa-headset"></i><h3>24/7 Hyzmat</h3></div>
 </div>
 
 <script>
+    // ЛОГИКА (БЕЗ ИЗМЕНЕНИЙ)
     async function runSearch() {
-        const from = document.getElementById('from').value;
-        const to = document.getElementById('to').value;
+        const from = document.getElementById('origin').value;
+        const to = document.getElementById('destination').value;
         const date = document.getElementById('date').value;
-        const resBox = document.getElementById('results-list');
+        const resBox = document.getElementById('results');
 
         if(!from || !to || !date) return alert("Maglumatlary giriziň!");
-
-        resBox.innerHTML = '<div style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Gözlenilýär...</div>';
+        resBox.innerHTML = '<div style="text-align:center; padding:50px; color:var(--primary); font-weight:bold;"><i class="fas fa-sync fa-spin"></i> Maglumatlar gözlenilýär...</div>';
 
         try {
             const response = await fetch('/api/search-live', {
@@ -102,26 +165,24 @@
             });
             const data = await response.json();
             resBox.innerHTML = "";
-
             if(data.tickets && data.tickets.length > 0) {
                 data.tickets.forEach(t => {
+                    const d = new Date(t.departure_at);
                     resBox.innerHTML += `
                         <div class="ticket">
-                            <div class="flight-info">
-                                <div><b>${t.origin}</b></div>
-                                <div><i class="fas fa-plane" style="color:var(--green)"></i></div>
-                                <div><b>${t.destination}</b></div>
+                            <div class="flight-main">
+                                <div><b style="font-size:20px">${t.origin}</b></div>
+                                <div><i class="fas fa-plane" style="color:var(--primary); font-size:24px;"></i></div>
+                                <div><b style="font-size:20px">${t.destination}</b></div>
                             </div>
-                            <div class="price-info">
-                                <div class="price">${t.price} RUB</div>
-                                <a href="https://www.aviasales.ru${t.link}" class="btn-buy" target="_blank">SATYN AL</a>
+                            <div class="price-zone">
+                                <div style="font-size:24px; font-weight:900">${t.price.toLocaleString()} RUB</div>
+                                <a href="https://www.aviasales.ru${t.link}" class="buy-btn" target="_blank">SATYN AL</a>
                             </div>
                         </div>`;
                 });
-            } else { resBox.innerHTML = "<p>Bilet tapylmady.</p>"; }
-        } catch (e) {
-            resBox.innerHTML = "<p style='color:red'>Сервер не отвечает. Проверьте Railway.</p>";
-        }
+            } else { resBox.innerHTML = "<p style='text-align:center'>Bagyşlaň, bilet tapylmady.</p>"; }
+        } catch (e) { resBox.innerHTML = "<p style='color:red; text-align:center'>Näsazlyk ýüze çykdy. Railway statusyny barlaň.</p>"; }
     }
 </script>
 </body>
