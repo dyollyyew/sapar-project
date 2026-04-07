@@ -1,265 +1,84 @@
-<!DOCTYPE html>
-<html lang="tk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Bilet Gözlegi</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --tkm-green: #00563b; 
-            --tkm-gold: #c5a059;  
-            --light-bg: #f5f7f9;
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            background-color: var(--light-bg);
-            display: flex;
-            height: 100vh;
-            color: #333;
-        }
-
-        /* САЙДБАР */
-        .sidebar {
-            width: 260px;
-            background: var(--tkm-green);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            padding: 25px;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-        }
-
-        .brand {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 40px;
-            border-bottom: 2px solid var(--tkm-gold);
-            padding-bottom: 10px;
-        }
-
-        .nav-link {
-            display: flex; align-items: center; gap: 15px; padding: 12px;
-            color: rgba(255,255,255,0.8); cursor: pointer; border-radius: 8px;
-            transition: 0.2s; margin-bottom: 5px;
-        }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: var(--tkm-gold); }
-
-        /* ОСНОВНОЙ КОНТЕНТ */
-        .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-
-        .top-bar {
-            background: white; padding: 15px 40px; display: flex; justify-content: flex-end;
-            align-items: center; gap: 20px; border-bottom: 1px solid #ddd;
-        }
-
-        .search-hero { background: var(--tkm-green); padding: 50px 40px; color: white; text-align: center; }
-
-        .search-box {
-            max-width: 900px; margin: -30px auto 20px; background: white; padding: 20px;
-            border-radius: 12px; display: flex; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .search-box input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; outline: none; font-size: 15px;}
-        .search-box input:focus { border-color: var(--tkm-green); }
-
-        .btn-main {
-            background: #2ecc71; color: white; border: none; padding: 12px 30px;
-            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px;
-        }
-        .btn-main:hover { opacity: 0.9; }
-
-        /* БИЛЕТЫ */
-        .results-container { padding: 0 40px; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-        .ticket {
-            background: white; margin-bottom: 15px; border-radius: 12px; display: flex;
-            border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .ticket-info { flex: 1; padding: 25px; display: flex; align-items: center; justify-content: space-between; }
-        .ticket-price {
-            width: 200px; padding: 25px; background: #fcfcfc; border-left: 1px dashed #ddd;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-
-        /* НАСТРОЙКИ (ЛК) */
-        .settings-page { display: none; padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; }
-        .settings-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .settings-card h3 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .settings-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-
-        /* МОДАЛКА */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
-        }
-        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 350px; }
-    </style>
-</head>
-<body>
-
 <div class="sidebar">
     <div class="brand"><i class="fas fa-paper-plane"></i> SAPAR.TM</div>
+    <div class="nav-link active"><i class="fas fa-search"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
     
-    <div id="guestSection">
-        <div class="nav-link active" onclick="showPage('search')"><i class="fas fa-search"></i> Gözleg (Поиск)</div>
-        <div class="nav-link" onclick="openModal('login')"><i class="fas fa-sign-in-alt"></i> Giriş (Войти)</div>
+    <div id="userSection" style="display:none;">
+        <div class="nav-link" onclick="openModal('lk')"><i class="fas fa-user-circle"></i> <span class="lang" data-tk="Hasabym" data-ru="Мой профиль">Hasabym</span></div>
+        <div class="nav-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="lang" data-tk="Çykyş" data-ru="Выход">Çykyş</span></div>
     </div>
 
-    <div id="userSection" style="display:none;">
-        <div class="nav-link" onclick="showPage('search')"><i class="fas fa-search"></i> Gözleg (Поиск)</div>
-        <div class="nav-link" onclick="showPage('settings')"><i class="fas fa-cog"></i> Sazlamalar (Настройки)</div>
-        <div class="nav-link" onclick="alert('Мои заказы')"><i class="fas fa-shopping-bag"></i> Sargytlar (Заказы)</div>
-        
-        <div class="nav-link" onclick="logout()" style="margin-top: 30px; color: #ff7675;">
-            <i class="fas fa-sign-out-alt"></i> Çykyş (Выход)
-        </div>
+    <div id="guestSection">
+        <div class="nav-link" onclick="openModal('login')"><i class="fas fa-sign-in-alt"></i> <span class="lang" data-tk="Giriş" data-ru="Войти">Giriş</span></div>
     </div>
+    
+    <div class="nav-link" id="adminBtn" style="display:none;" onclick="openModal('admin')"><i class="fas fa-cog"></i> Admin</div>
 </div>
 
 <div class="main-content">
     <div class="top-bar">
-        <i class="fas fa-user-circle" style="font-size: 24px; color: var(--tkm-green); cursor: pointer;" onclick="openModal('login')"></i>
-    </div>
-
-    <div id="searchPage">
-        <div class="search-hero">
-            <h2>Hoş geldiňiz! / Добро пожаловать!</h2>
+        <div class="user-trigger" onclick="openModal('login')" style="cursor:pointer; margin-right: 15px; color: var(--tkm-green);">
+            <i class="fas fa-user-circle" style="font-size: 20px;"></i>
         </div>
-        <div class="search-box">
-            <input type="text" id="from" placeholder="Nireden (MOW)">
-            <input type="text" id="to" placeholder="Nirä (ASB)">
-            <input type="date" id="date">
-            <button class="btn-main" onclick="searchFlights()">BILET TAP</button>
-        </div>
-        <div class="results-container" id="results"></div>
-    </div>
-
-    <div id="settingsPage" class="settings-page">
-        <h2>Şahsy otag / Личные данные</h2>
-        <div class="settings-card">
-            <h3>Maglumatlar / Ваши данные</h3>
-            <label>Имя и Фамилия</label>
-            <input type="text" id="profName" placeholder="Myrat Saparow">
-            <label>Email</label>
-            <input type="email" id="profEmail" placeholder="myrat@sapar.tm">
-            <label>Телефон</label>
-            <input type="text" placeholder="+993 6X XX XX XX">
-            <button class="btn-main" onclick="saveSettings()">Ýatda sakla (Сохранить)</button>
+        <div class="lang-switcher">
+            <span onclick="setLang('tk')" style="cursor:pointer; font-weight:bold;">TKM</span> | 
+            <span onclick="setLang('ru')" style="cursor:pointer; font-weight:bold;">РУС</span>
         </div>
     </div>
-</div>
-
-<div id="mainModal" class="modal" onclick="if(event.target==this) closeModal()">
-    <div class="modal-content" id="modalBody"></div>
-</div>
+    </div>
 
 <script>
-    // 1. ТВОЯ РАБОЧАЯ ЛОГИКА СОЕДИНЕНИЯ С СЕРВЕРОМ
-    async function searchFlights() {
-        const from = document.getElementById('from').value.toUpperCase();
-        const to = document.getElementById('to').value.toUpperCase();
-        const date = document.getElementById('date').value;
-        const resDiv = document.getElementById('results');
+    // --- НОВАЯ ЛОГИКА ВХОДА И ВЫХОДА ---
+
+    function doAuth() {
+        const u = document.getElementById('u').value;
+        if (!u) return alert("Логин ýazyň!");
+
+        // Показываем секцию пользователя, скрываем гостевую
+        document.getElementById('userSection').style.display = 'block';
+        document.getElementById('guestSection').style.display = 'none';
         
-        if(!from || !to) return alert("Nireden we Nirä meýdançalaryny dolduryň!");
-        resDiv.innerHTML = "<p style='text-align:center;'>Gözlenilýär (Идет поиск)...</p>";
-
-        try {
-            const response = await fetch('/api/search-live', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ origin: from, destination: to, date: date })
-            });
-            const data = await response.json();
-            resDiv.innerHTML = "";
-
-            if(data.tickets && data.tickets.length > 0) {
-                data.tickets.forEach(t => {
-                    const price = Math.round(t.price * 1.05); // 5% комиссия
-                    
-                    // Безопасное создание HTML для стабильной работы кнопки
-                    resDiv.innerHTML += `
-                        <div class="ticket">
-                            <div class="ticket-info">
-                                <div style="text-align:center"><b>10:00</b><br><small>${t.origin}</small></div>
-                                <div style="color:var(--tkm-gold)"><i class="fas fa-plane"></i></div>
-                                <div style="text-align:center"><b>14:30</b><br><small>${t.destination}</small></div>
-                            </div>
-                            <div class="ticket-price">
-                                <div style="font-size:22px; font-weight:bold; margin-bottom:10px;">${price} RUB</div>
-                                <button class="btn-main" style="width:100%; padding:10px;" onclick="handlePurchase('${t.origin}', '${t.destination}', ${price})">SATYN AL</button>
-                            </div>
-                        </div>`;
-                });
-            } else {
-                resDiv.innerHTML = "<p style='text-align:center;'>Bilet tapylmady (Билеты не найдены).</p>";
-            }
-        } catch(e) { 
-            resDiv.innerHTML = "<p style='text-align:center; color:red;'>Ошибка соединения с API!</p>"; 
+        // Если админ
+        if(u === 'admin') {
+            document.getElementById('adminBtn').style.display = 'flex';
         }
-    }
 
-    // 2. РАБОЧАЯ КНОПКА ПОКУПКИ
-    function handlePurchase(origin, dest, price) {
-        openModal('buy', { origin, dest, price });
-    }
-
-    // 3. УПРАВЛЕНИЕ СТРАНИЦАМИ (ПОИСК / ЛК)
-    function showPage(pageId) {
-        if(pageId === 'settings') {
-            document.getElementById('searchPage').style.display = 'none';
-            document.getElementById('settingsPage').style.display = 'block';
-        } else {
-            document.getElementById('searchPage').style.display = 'block';
-            document.getElementById('settingsPage').style.display = 'none';
-        }
-    }
-
-    // 4. МОДАЛЬНЫЕ ОКНА И АВТОРИЗАЦИЯ
-    function openModal(type, data = null) {
-        const m = document.getElementById('mainModal');
-        const b = document.getElementById('modalBody');
-        m.style.display = 'flex';
-
-        if(type === 'login') {
-            b.innerHTML = `<h3>Giriş / Вход</h3>
-                <input type="text" id="loginInp" placeholder="Login" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:6px;">
-                <input type="password" placeholder="Parol" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:6px;">
-                <button class="btn-main" style="width:100%" onclick="doLogin()">Girmek</button>`;
-        } else if(type === 'buy') {
-            b.innerHTML = `<h3>Töleg (Оплата)</h3>
-                <p>Ugur: <b>${data.origin} ➔ ${data.dest}</b></p>
-                <p>Bahasy: <b style="color:var(--tkm-green); font-size:20px;">${data.price} RUB</b></p>
-                <input type="text" placeholder="Adyňyz we Familiýaňyz" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:6px;">
-                <button class="btn-main" style="width:100%" onclick="alert('Kwitansiýa taýýar! / Квитанция готова!'); closeModal()">TÖLEG ET</button>`;
-        }
-    }
-
-    function closeModal() { document.getElementById('mainModal').style.display = 'none'; }
-
-    function doLogin() {
-        const user = document.getElementById('loginInp').value;
-        if(user) {
-            document.getElementById('profName').value = user; // Заполняем имя в настройках
-            document.getElementById('guestSection').style.display = 'none';
-            document.getElementById('userSection').style.display = 'block';
-            closeModal();
-        } else {
-            alert("Logini ýazyň!");
-        }
+        closeModal();
+        console.log("Logged in as:", u);
     }
 
     function logout() {
-        document.getElementById('guestSection').style.display = 'block';
+        // Скрываем секцию пользователя, возвращаем гостевую
         document.getElementById('userSection').style.display = 'none';
-        showPage('search'); // Возвращаем на главную
+        document.getElementById('guestSection').style.display = 'block';
+        document.getElementById('adminBtn').style.display = 'none';
+        
+        // Очистка полей поиска (по желанию)
+        document.getElementById('results').innerHTML = "";
+        alert("Siz ulgamdan çykdyňyz / Вы вышли из системы"); [cite: 1, 5]
     }
 
-    function saveSettings() {
-        alert("Üýtgeşmeler ýatda saklandy! (Настройки сохранены)");
+    // Изменение иконки в top-bar в зависимости от статуса (опционально)
+    function updateTopBarIcon(isLoggedIn) {
+        const icon = document.querySelector('.user-trigger i');
+        if(isLoggedIn) {
+            icon.style.color = 'var(--tkm-gold)';
+        } else {
+            icon.style.color = 'var(--tkm-green)';
+        }
     }
 </script>
-</body>
-</html>
+
+<style>
+    /* Дополнение к стилям */
+    .top-bar {
+        display: flex;
+        align-items: center; /* Центрирование иконки и текста по вертикали */
+        justify-content: flex-end;
+    }
+    
+    .user-trigger:hover {
+        opacity: 0.7;
+        transform: scale(1.1);
+        transition: 0.2s;
+    }
+</style>
