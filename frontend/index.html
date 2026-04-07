@@ -1,152 +1,139 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="tm">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM — Премиум поиск</title>
+    <title>SAPAR.TM — Официальный поиск</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --green: #00a86b;
-            --dark: #1e293b;
+            --tkm-green: #00a86b;
+            --carpet-red: #8b0505;
             --gold: #d4af37;
-            --shadow: 0 20px 40px rgba(0,0,0,0.1);
+            --bg: #fdfdfd;
         }
 
-        body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: var(--dark); overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); overflow-x: hidden; }
 
         /* Шапка */
         header { 
-            position: fixed; top: 0; left: 0; right: 0; height: 70px;
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            position: fixed; top: 0; width: 100%; height: 70px; background: white;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 5%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 0 5%; z-index: 100; box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #333; font-weight: 800; font-size: 22px; }
+        .logo i { color: var(--tkm-green); font-size: 24px; }
+        .logo span { color: var(--tkm-green); }
+
+        .nav-right { display: flex; align-items: center; gap: 15px; padding-right: 10%; }
+        .lang { background: #f0fdf4; border: none; padding: 5px 12px; border-radius: 15px; color: var(--tkm-green); font-weight: bold; cursor: pointer; font-size: 12px; }
+        .lk-btn { font-size: 20px; color: #444; cursor: pointer; transition: 0.3s; }
+        .lk-btn:hover { color: var(--tkm-green); }
+
+        /* ГЛАВНЫЙ БЛОК (Ковер + Самолет) */
+        .hero { 
+            display: flex; height: 500px; margin-top: 70px; position: relative; 
+            background: linear-gradient(90deg, #e0f2fe 0%, #ffffff 100%); 
         }
 
-        .logo-box { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-box i { color: var(--green); font-size: 28px; }
-        .logo-box b { font-size: 22px; color: var(--dark); letter-spacing: 1px; }
-        .logo-box span { color: var(--green); }
-
-        .header-actions { display: flex; align-items: center; gap: 15px; }
-        .lang-btn { 
-            background: #f1f5f9; border: none; padding: 6px 12px; border-radius: 20px; 
-            font-size: 12px; font-weight: 700; color: var(--green); cursor: pointer; transition: 0.3s;
-        }
-        .lang-btn:hover { background: var(--green); color: white; }
-        .lk-icon { font-size: 22px; color: var(--dark); cursor: pointer; margin-left: 10px; }
-
-        /* Главный экран */
-        .hero-section { 
-            display: flex; height: 550px; margin-top: 70px; position: relative; 
-            background: white; overflow: hidden;
+        /* Полоса ковра */
+        .carpet-stripe {
+            width: 160px; height: 100%;
+            background: var(--carpet-red) url('https://www.transparenttextures.com/patterns/p6.png');
+            box-shadow: 5px 0 20px rgba(0,0,0,0.2);
+            z-index: 5;
         }
 
-        /* Вертикальный ковер слева */
-        .side-carpet {
-            width: 180px; height: 100%;
-            background: #8b0505 url('https://www.transparenttextures.com/patterns/p6.png');
-            box-shadow: inset -10px 0 30px rgba(0,0,0,0.2);
-            position: relative; z-index: 10;
+        /* Фон с самолетом */
+        .plane-area {
+            flex: 1; 
+            background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109c055?auto=format&fit=crop&w=1200');
+            background-size: cover; background-position: center;
+            position: relative; display: flex; align-items: center; padding-left: 60px;
+        }
+        .plane-area::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 50%);
         }
 
-        /* Область с самолетом */
-        .plane-bg {
-            flex: 1; background: url('https://img.freepik.com/free-photo/airplane-flying-cloudy-sky_23-2148171701.jpg?t=st=1712521191~exp=1712524791~hmac=6b930a2') center/cover;
-            position: relative; display: flex; align-items: center; padding-left: 50px;
-        }
-        .plane-bg::after { 
-            content: ''; position: absolute; inset: 0; 
-            background: linear-gradient(to right, white, transparent); 
-        }
+        .hero-text { z-index: 2; position: relative; }
+        .hero-text h1 { font-size: 42px; margin: 0; color: #1e293b; letter-spacing: 2px; }
+        .hero-text p { font-size: 18px; color: #475569; margin-top: 5px; }
 
-        /* Форма поиска поверх всего */
-        .main-search-card {
-            position: absolute; bottom: -40px; left: 230px; right: 5%;
-            background: white; padding: 35px; border-radius: 20px;
-            box-shadow: var(--shadow); display: flex; gap: 20px; align-items: flex-end; z-index: 20;
+        /* Поиск */
+        .search-container {
+            position: absolute; bottom: -45px; left: 200px; right: 5%;
+            background: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.12);
+            display: flex; gap: 20px; align-items: flex-end; z-index: 10;
         }
-
-        .input-wrap { flex: 1; }
-        .input-wrap label { display: block; font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; }
-        .input-wrap input { 
-            width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px;
-            font-size: 16px; transition: 0.3s; background: #f8fafc;
-        }
-        .input-wrap input:focus { border-color: var(--green); background: white; outline: none; }
+        .input-group { flex: 1; }
+        .input-group label { display: block; font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 14px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; background: #f8fafc; }
+        .input-group input:focus { border-color: var(--tkm-green); background: white; }
 
         .btn-search {
-            background: var(--green); color: white; border: none; padding: 0 40px;
-            border-radius: 12px; height: 50px; font-weight: 700; cursor: pointer; transition: 0.3s;
+            background: var(--tkm-green); color: white; border: none; padding: 0 45px;
+            border-radius: 12px; height: 48px; font-weight: 700; cursor: pointer; transition: 0.3s;
         }
-        .btn-search:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,168,107,0.3); }
+        .btn-search:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,168,107,0.3); }
 
-        /* Блоки преимуществ */
-        .features-row { 
-            max-width: 1100px; margin: 100px auto 50px; 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; padding: 0 20px;
-        }
-        .feature-box { 
-            background: white; padding: 40px 20px; border-radius: 20px; text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03); transition: 0.3s;
-        }
-        .feature-box:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
-        .feature-box i { font-size: 40px; color: var(--green); margin-bottom: 20px; display: block; }
-        .feature-box h3 { margin: 0 0 10px; font-size: 18px; }
-        .feature-box p { color: #64748b; font-size: 14px; margin: 0; }
+        /* Преимущества */
+        .features { max-width: 1100px; margin: 120px auto 60px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; padding: 0 20px; }
+        .f-card { background: white; padding: 40px 20px; border-radius: 25px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.02); }
+        .f-card i { font-size: 35px; color: var(--tkm-green); margin-bottom: 15px; display: block; }
+        .f-card h3 { margin: 0 0 10px; font-size: 18px; }
+        .f-card p { font-size: 14px; color: #64748b; margin: 0; }
 
-        #results-list { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+        /* Результаты */
+        #results { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="#" class="logo-box">
-        <i class="fab fa-telegram-plane"></i>
-        <b>SAPAR<span>.TM</span></b>
-    </a>
-    <div class="header-actions">
-        <button class="lang-btn">TKM</button>
-        <button class="lang-btn">RU</button>
-        <i class="fas fa-user-circle lk-icon"></i>
+    <a href="#" class="logo"><i class="fab fa-telegram-plane"></i> SAPAR<span>.TM</span></a>
+    <div class="nav-right">
+        <button class="lang">TKM</button>
+        <button class="lang">RU</button>
+        <i class="fas fa-user-circle lk-btn"></i>
     </div>
 </header>
 
-<div class="hero-section">
-    <div class="side-carpet"></div>
-    <div class="plane-bg">
-        <div style="z-index: 5; color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-            <h1 style="font-size: 48px; margin: 0;">TURKMENISTAN</h1>
-            <p style="font-size: 18px; font-weight: 300;">Iň amatly petekler — bir düwmäniň aňyrsynda</p>
+<div class="hero">
+    <div class="carpet-stripe"></div>
+    <div class="plane-area">
+        <div class="hero-text">
+            <h1>TURKMENISTAN</h1>
+            <p>Iň amatly petekler — bir düwmäniň aňyrsynda</p>
         </div>
     </div>
-
-    <div class="main-search-card">
-        <div class="input-wrap"><label>Nireden</label><input type="text" id="origin" value="MOW"></div>
-        <div class="input-wrap"><label>Nirä</label><input type="text" id="destination" value="ASB"></div>
-        <div class="input-wrap"><label>Sene</label><input type="date" id="date"></div>
+    <div class="search-container">
+        <div class="input-group"><label>Nireden</label><input type="text" id="origin" value="MOW"></div>
+        <div class="input-group"><label>Nirä</label><input type="text" id="destination" value="ASB"></div>
+        <div class="input-group"><label>Sene</label><input type="date" id="date"></div>
         <button class="btn-search" onclick="runSearch()">GÖZLEG</button>
     </div>
 </div>
 
-<div id="results-list"></div>
+<div id="results"></div>
 
-<div class="features-row">
-    <div class="feature-box"><i class="fas fa-fingerprint"></i><h3>Ynamly</h3><p>Petekleriňiz resmi taýdan hasaba alynýar.</p></div>
-    <div class="feature-box"><i class="fas fa-wind"></i><h3>Çalt</h3><p>Iň amatly nyrhlary sekuntda tapyň.</p></div>
-    <div class="feature-box"><i class="fas fa-headset"></i><h3>24/7 Hyzmat</h3><p>Soraglaryňyz üçin elmydama taýýar.</p></div>
+<div class="features">
+    <div class="f-card"><i class="fas fa-fingerprint"></i><h3>Ynamly</h3><p>Petekleriňiz resmi taýdan hasaba alynýar.</p></div>
+    <div class="f-card"><i class="fas fa-wind"></i><h3>Çalt</h3><p>Iň amatly nyrhlary sekuntda tapyň.</p></div>
+    <div class="f-card"><i class="fas fa-headset"></i><h3>24/7 Hyzmat</h3><p>Soraglaryňyz üçin elmydama taýýar.</p></div>
 </div>
 
 <script>
-    // ТВОЯ ЛОГИКА (БЕЗ ИЗМЕНЕНИЙ)
+    // Логика соединения (НЕ ТРОГАЕМ)
     async function runSearch() {
         const from = document.getElementById('origin').value;
         const to = document.getElementById('destination').value;
         const date = document.getElementById('date').value;
-        const resBox = document.getElementById('results-list');
+        const resBox = document.getElementById('results');
 
         if(!from || !to || !date) return alert("Maglumatlary giriziň!");
-        resBox.innerHTML = '<div style="text-align:center; padding:50px; color:var(--green);"><i class="fas fa-spinner fa-spin"></i> Gözlenilýär...</div>';
+        resBox.innerHTML = '<div style="text-align:center; padding:50px; color:var(--tkm-green);"><i class="fas fa-spinner fa-spin"></i> Gözlenilýär...</div>';
 
         try {
             const response = await fetch('/api/search-live', {
@@ -159,16 +146,16 @@
             if(data.tickets && data.tickets.length > 0) {
                 data.tickets.forEach(t => {
                     resBox.innerHTML += `
-                        <div style="background:white; border-radius:15px; padding:25px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 15px rgba(0,0,0,0.05); border-left:5px solid var(--green);">
-                            <div><b style="font-size:20px;">${t.origin} → ${t.destination}</b></div>
-                            <div style="text-align:right;">
-                                <div style="font-size:22px; font-weight:900;">${t.price.toLocaleString()} RUB</div>
-                                <a href="https://www.aviasales.ru${t.link}" target="_blank" style="color:white; background:#e74c3c; padding:8px 15px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; margin-top:10px;">SATYN AL</a>
+                        <div style="background:white; border-radius:20px; padding:30px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.05);">
+                            <div><b style="font-size:22px; color:var(--tkm-green)">${t.origin} → ${t.destination}</b></div>
+                            <div style="text-align:right">
+                                <div style="font-size:24px; font-weight:900;">${t.price.toLocaleString()} RUB</div>
+                                <a href="https://www.aviasales.ru${t.link}" target="_blank" style="background:#ef4444; color:white; padding:10px 20px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block; margin-top:10px;">SATYN AL</a>
                             </div>
                         </div>`;
                 });
             } else { resBox.innerHTML = "<p style='text-align:center'>Bilet tapylmady.</p>"; }
-        } catch (e) { resBox.innerHTML = "<p style='color:red; text-align:center'>Näsazlyk ýüze çykdy.</p>"; }
+        } catch (e) { resBox.innerHTML = "<p style='color:red; text-align:center'>Сервер Railway не отвечает. Проверьте лимиты.</p>"; }
     }
 </script>
 </body>
