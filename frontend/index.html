@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Аккуратный Поиск</title>
+    <title>SAPAR.TM - Professional Aggregator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
-            --tkm-red-grad: linear-gradient(180deg, #b30000 0%, #7a0000 100%);
+            --tkm-red-grad: linear-gradient(135deg, #d32f2f 0%, #8b0000 100%);
             --tkm-green: #2ecc71;
             --sidebar-w: 300px;
         }
         
         body {
             font-family: "Times New Roman", Times, serif;
-            margin: 0; display: flex; height: 100vh; background: #fdfdfd; overflow: hidden;
+            margin: 0; display: flex; height: 100vh; background: #f4f7f6; overflow: hidden;
         }
 
-        /* САЙДБАР С КРАСНЫМ ГРАДИЕНТОМ */
+        /* САЙДБАР */
         .sidebar {
             width: var(--sidebar-w);
             background: var(--tkm-red-grad);
@@ -25,220 +25,190 @@
             display: flex;
             flex-direction: column;
             padding: 30px;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
         }
 
         .menu-item { 
-            display: flex; align-items: center; gap: 15px; padding: 15px 0; 
-            cursor: pointer; transition: 0.3s; color: #f2f2f2; text-decoration: none;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; gap: 15px; padding: 18px 0; 
+            cursor: pointer; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .menu-item:hover { color: var(--tkm-green); padding-left: 10px; }
+        .menu-item:hover { color: var(--tkm-green); transform: translateX(10px); }
 
-        /* ОСНОВНОЙ КОНТЕНТ */
+        /* ОСНОВНАЯ ЧАСТЬ */
         .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
 
         header {
-            background: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #eee;
+            background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #ddd;
         }
 
-        .logo { font-size: 30px; font-weight: bold; color: #333; display: flex; align-items: center; gap: 10px; }
-        .logo i { color: var(--tkm-green); } /* Зеленый логотип */
-        .logo span { color: var(--tkm-green); }
-
-        .lang-btns button { 
-            background: none; border: 1px solid #ddd; padding: 5px 10px; cursor: pointer; 
-            font-family: inherit; font-weight: bold; margin-left: 5px; border-radius: 4px;
+        .logo { font-size: 28px; font-weight: bold; color: #333; display: flex; align-items: center; gap: 10px; }
+        .logo i { 
+            color: white; background: var(--tkm-green); padding: 8px; 
+            border-radius: 50%; font-size: 18px; /* Стиль Telegram */
         }
-        .lang-btns button.active { border-color: var(--tkm-green); color: var(--tkm-green); }
 
-        .banner { background: #f8f9fa; padding: 10px 40px; border-bottom: 1px solid #eee; }
-        .moving-text { color: #555; font-weight: bold; font-style: italic; }
+        .container { padding: 40px; max-width: 1000px; margin: 0 auto; width: 100%; }
 
-        .container { padding: 40px; max-width: 900px; margin: 0 auto; width: 100%; }
-
-        /* ФОРМА ПОИСКА */
-        .search-row {
-            background: white; padding: 25px; border-radius: 8px; border: 1px solid #eee;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: flex-end;
-        }
-        .field { flex: 1; display: flex; flex-direction: column; }
-        .field label { font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #666; }
-        .field input { padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 16px; }
-
-        .go-btn {
-            background: var(--tkm-green); color: white; border: none; padding: 12px 30px;
-            font-weight: bold; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 16px;
-        }
-        .go-btn:disabled { background: #ddd; cursor: not-allowed; }
-
-        /* БИЛЕТ */
+        /* КАРТОЧКА БИЛЕТА */
         .ticket {
-            background: white; margin-top: 20px; border: 1px solid #eee; display: flex;
-            border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            background: white; margin-top: 20px; border-radius: 12px; display: flex;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee;
         }
-        .t-main { flex: 3; padding: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .t-side { flex: 1; background: #fafafa; border-left: 1px dashed #ddd; padding: 30px; text-align: center; }
-        
-        .city-box b { font-size: 24px; }
-        .city-box span { color: #888; font-weight: bold; }
+        .t-info { flex: 2; padding: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .t-buy { flex: 1; background: #fafafa; border-left: 1px dashed #ccc; padding: 30px; text-align: center; }
 
-        /* ОКНО ЛК */
+        /* БАГАЖ */
+        .baggage-select { margin-top: 10px; font-size: 13px; color: #666; }
+        .bag-btn { border: 1px solid #ddd; padding: 4px 8px; cursor: pointer; border-radius: 4px; }
+        .bag-btn.active { background: var(--tkm-green); color: white; border-color: var(--tkm-green); }
+
+        /* КРАСНОЕ ОКНО ВХОДА */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; 
+            background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;
         }
-        .modal-content { background: white; padding: 40px; border-radius: 8px; width: 400px; position: relative; }
-        .close { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 20px; }
+        .modal-content { 
+            background: #d32f2f; color: white; padding: 40px; border-radius: 15px; 
+            width: 350px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal-content input { 
+            width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 5px; font-family: inherit;
+        }
+        .btn-login { 
+            background: var(--tkm-green); color: white; border: none; width: 100%; 
+            padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px;
+        }
+
+        /* ЛК ЗОНА */
+        .lk-screen { display: none; padding: 20px; background: white; border-radius: 10px; margin-top: 20px; border: 1px solid #ddd; }
+        .admin-row { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2 style="margin-bottom: 40px;">SAPAR.TM</h2>
-    
-    <div class="menu-item" onclick="openLK('profile')">
-        <i class="fas fa-user-circle"></i> <span id="m-profile">Meniň Profilim</span>
-    </div>
-    <div class="menu-item" onclick="openLK('tickets')">
-        <i class="fas fa-ticket-alt"></i> <span id="m-tickets">Meniň Biletlerim</span>
-    </div>
-    <div class="menu-item" onclick="openLK('login')">
-        <i class="fas fa-sign-in-alt"></i> <span id="m-login">Giriş</span>
-    </div>
+    <div style="font-size: 24px; font-weight: bold; margin-bottom: 30px;">SAPAR.TM</div>
+    <div class="menu-item" onclick="toggleView('search')"><i class="fas fa-search"></i> <span class="tk">Gözleg</span></div>
+    <div class="menu-item" onclick="openLogin()"><i class="fas fa-user"></i> <span class="tk">Giriş</span></div>
+    <div class="menu-item" onclick="toggleView('lk')"><i class="fas fa-briefcase"></i> <span class="tk">Meniň biletlerim</span></div>
 </div>
 
 <div class="main">
     <header>
-        <div class="logo"><i class="fas fa-plane"></i> SAPAR<span>.TM</span></div>
-        <div class="lang-btns">
-            <button onclick="changeLang('tk')" id="l-tk" class="active">TKM</button>
-            <button onclick="changeLang('ru')" id="l-ru">РУС</button>
-            <button onclick="changeLang('en')" id="l-en">ENG</button>
-        </div>
+        <div class="logo"><i class="fas fa-paper-plane"></i> SAPAR<span>.TM</span></div>
+        <div style="font-weight: bold; color: var(--tkm-green);">TKM | RU</div>
     </header>
 
-    <div class="banner">
-        <marquee class="moving-text" id="scroll-text">Ak ýollar size hemra bolsun! — Arzuwlaryňyza biz bilen uçun.</marquee>
+    <div class="container" id="search-view">
+        <h2 style="text-align: center; color: #444;">Ak ýollar size hemra bolsun!</h2>
+        <div style="background: white; padding: 25px; border-radius: 10px; display: flex; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <input type="text" id="from" placeholder="Nireden" style="flex:1; padding:12px; border:1px solid #ddd;">
+            <input type="text" id="to" placeholder="Nirä" style="flex:1; padding:12px; border:1px solid #ddd;">
+            <input type="date" id="date" style="flex:1; padding:12px; border:1px solid #ddd;">
+            <button onclick="doSearch()" style="background: var(--tkm-green); color:white; border:none; padding:0 30px; border-radius:5px; cursor:pointer; font-weight:bold;">GÖZLEG</button>
+        </div>
+        <div id="results"></div>
     </div>
 
-    <div class="container">
-        <div class="search-row">
-            <div class="field">
-                <label id="lbl-from">Nireden</label>
-                <input type="text" id="from" placeholder="MOW" oninput="checkInputs()">
-            </div>
-            <div class="field">
-                <label id="lbl-to">Nirä</label>
-                <input type="text" id="to" placeholder="ASB" oninput="checkInputs()">
-            </div>
-            <div class="field">
-                <label id="lbl-date">Sene</label>
-                <input type="date" id="date" oninput="checkInputs()">
-            </div>
-            <button class="go-btn" id="findBtn" onclick="doSearch()" disabled>GÖZLEG</button>
+    <div class="container" id="lk-view" style="display:none;">
+        <div id="passenger-lk" class="lk-screen">
+            <h3>Meniň biletlerim</h3>
+            <p>Sizde häzirki wagtda işjeň bilet ýok.</p>
         </div>
-        <div id="results-box"></div>
+        <div id="admin-lk" class="lk-screen">
+            <h3>Admin Paneli (Dolandyryş)</h3>
+            <div id="passenger-list">
+                <div class="admin-row"><span>Myrat S. (ASB-MOW)</span> <button style="color:red; border:none; cursor:pointer;" onclick="this.parentElement.remove()">Poz</button></div>
+                <div class="admin-row"><span>Gurban O. (ASB-IST)</span> <button style="color:red; border:none; cursor:pointer;" onclick="this.parentElement.remove()">Poz</button></div>
+            </div>
+            <button style="margin-top:20px; background:var(--tkm-green); color:white; border:none; padding:10px;">+ Täze passenger goş</button>
+        </div>
     </div>
 </div>
 
-<div id="lkModal" class="modal">
+<div id="loginModal" class="modal" onclick="if(event.target == this) this.style.display='none'">
     <div class="modal-content">
-        <span class="close" onclick="closeLK()">&times;</span>
-        <h3 id="modal-title">Hasabym</h3>
-        <div id="modal-body">
-            <p>Maglumatlar ýüklenýär...</p>
-        </div>
+        <h2>Ulgama girmek</h2>
+        <input type="text" id="u-login" placeholder="Loginiňiz">
+        <input type="password" id="u-pass" placeholder="Parolyňyz">
+        <button class="btn-login" onclick="handleLogin()">GIRIŞ</button>
+        <p style="font-size: 12px; margin-top: 15px; opacity: 0.8;">Admin: admin / admin123</p>
     </div>
 </div>
 
 <script>
-    const dictionary = {
-        tk: { from: "Nireden", to: "Nirä", date: "Sene", search: "GÖZLEG", profile: "Meniň Profilim", tickets: "Meniň Biletlerim", login: "Giriş", scroll: "Ak ýollar size hemra bolsun! — Arzuwlaryňyza biz bilen uçun.", buy: "SATYN AL", wait: "Gözlenilýär..." },
-        ru: { from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК", profile: "Мой Профиль", tickets: "Мои Билеты", login: "Войти", scroll: "Желаем вам доброго пути! — Летите к мечте вместе с нами.", buy: "КУПИТЬ", wait: "Ищем билеты..." },
-        en: { from: "From", to: "To", date: "Date", search: "SEARCH", profile: "My Profile", tickets: "My Tickets", login: "Sign In", scroll: "Have a safe flight! — Fly to your dreams with us.", buy: "BUY NOW", wait: "Searching..." }
-    };
+    function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
 
-    let curLang = 'tk';
-
-    function changeLang(l) {
-        curLang = l;
-        document.querySelectorAll('.lang-btns button').forEach(b => b.classList.remove('active'));
-        document.getElementById('l-' + l).classList.add('active');
+    function handleLogin() {
+        const u = document.getElementById('u-login').value;
+        const p = document.getElementById('u-pass').value;
+        document.getElementById('loginModal').style.display = 'none';
         
-        document.getElementById('lbl-from').innerText = dictionary[l].from;
-        document.getElementById('lbl-to').innerText = dictionary[l].to;
-        document.getElementById('lbl-date').innerText = dictionary[l].date;
-        document.getElementById('findBtn').innerText = dictionary[l].search;
-        document.getElementById('m-profile').innerText = dictionary[l].profile;
-        document.getElementById('m-tickets').innerText = dictionary[l].tickets;
-        document.getElementById('m-login').innerText = dictionary[l].login;
-        document.getElementById('scroll-text').innerText = dictionary[l].scroll;
+        if(u === 'admin' && p === 'admin123') {
+            alert('Admin hökmünde girildi!');
+            toggleView('lk');
+            document.getElementById('admin-lk').style.display = 'block';
+            document.getElementById('passenger-lk').style.display = 'none';
+        } else {
+            alert('Hoş geldiňiz!');
+            toggleView('lk');
+            document.getElementById('passenger-lk').style.display = 'block';
+            document.getElementById('admin-lk').style.display = 'none';
+        }
     }
 
-    function checkInputs() {
-        const f = document.getElementById('from').value;
-        const t = document.getElementById('to').value;
-        const d = document.getElementById('date').value;
-        document.getElementById('findBtn').disabled = !(f && t && d);
+    function toggleView(v) {
+        document.getElementById('search-view').style.display = (v === 'search' ? 'block' : 'none');
+        document.getElementById('lk-view').style.display = (v === 'lk' ? 'block' : 'none');
     }
 
     async function doSearch() {
         const from = document.getElementById('from').value.toUpperCase();
         const to = document.getElementById('to').value.toUpperCase();
         const date = document.getElementById('date').value;
-        const box = document.getElementById('results-box');
-
-        box.innerHTML = `<p style="text-align:center; padding:50px;">${dictionary[curLang].wait}</p>`;
+        const res = document.getElementById('results');
+        res.innerHTML = "Garaşyň...";
 
         try {
-            const r = await fetch('/api/search-live', {
+            const response = await fetch('/api/search-live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ origin: from, destination: to, date: date })
             });
-            const data = await r.json();
-            box.innerHTML = "";
+            const data = await response.json();
+            res.innerHTML = "";
 
             data.tickets.forEach(t => {
-                const finalPrice = Math.round(t.price * 1.05); // +5% комиссия
+                const price = Math.round(t.price * 1.05); // 5% комиссия
                 const dep = new Date(t.departure_at);
-                const depTime = dep.getHours() + ":" + String(dep.getMinutes()).padStart(2, '0');
-                
-                // Расчет времени прибытия (точка Б) - берем +3 часа 30 мин
-                const arr = new Date(dep.getTime() + (3.5 * 60 * 60 * 1000));
-                const arrTime = arr.getHours() + ":" + String(arr.getMinutes()).padStart(2, '0');
+                const arr = new Date(dep.getTime() + (4 * 60 * 60 * 1000)); // +4 часа прибытие
 
-                box.innerHTML += `
+                res.innerHTML += `
                     <div class="ticket">
-                        <div class="t-main">
-                            <div class="city-box"><b>${depTime}</b><br><span>${t.origin}</span></div>
-                            <div style="color:var(--tkm-green); font-size:20px;"><i class="fas fa-long-arrow-alt-right"></i></div>
-                            <div class="city-box"><b>${arrTime}</b><br><span>${t.destination}</span></div>
+                        <div class="t-info">
+                            <div><b>${dep.getHours()}:${String(dep.getMinutes()).padStart(2,'0')}</b><br>${t.origin}</div>
+                            <div style="text-align:center; color:var(--tkm-green);">
+                                <i class="fas fa-plane"></i><br>
+                                <div class="baggage-select">
+                                    <span class="bag-btn active">El ýüki</span>
+                                    <span class="bag-btn">+23kg</span>
+                                </div>
+                            </div>
+                            <div><b>${arr.getHours()}:${String(arr.getMinutes()).padStart(2,'0')}</b><br>${t.destination}</div>
                         </div>
-                        <div class="t-side">
-                            <div style="font-size:22px; font-weight:bold;">${finalPrice.toLocaleString()} RUB</div>
-                            <button class="go-btn" style="width:100%; margin-top:15px; padding:8px;">${dictionary[curLang].buy}</button>
+                        <div class="t-buy">
+                            <div style="font-size:24px; font-weight:bold;">${price.toLocaleString()} RUB</div>
+                            <button onclick="alert('Kwitansiýa taýýar!')" style="background:#d32f2f; color:white; border:none; width:100%; padding:10px; margin-top:10px; cursor:pointer; font-weight:bold;">SATYN AL</button>
                         </div>
                     </div>`;
             });
-        } catch(e) { box.innerHTML = "Error!"; }
+        } catch(e) { res.innerHTML = "Error!"; }
     }
-
-    // Логика Личного Кабинета
-    function openLK(type) {
-        document.getElementById('lkModal').style.display = 'flex';
-        const body = document.getElementById('modal-body');
-        if(type === 'login') {
-            body.innerHTML = `<input type="text" placeholder="Login" style="width:100%; margin-bottom:10px; padding:8px;"><input type="password" placeholder="Password" style="width:100%; padding:8px;"><button class="go-btn" style="width:100%; margin-top:15px;">OK</button>`;
-        } else if(type === 'profile') {
-            body.innerHTML = `<p><b>Ady:</b> Myrat</p><p><b>Email:</b> murad@sapar.tm</p>`;
-        } else {
-            body.innerHTML = `<p>Sizde heniz bilet ýok.</p>`;
-        }
-    }
-    function closeLK() { document.getElementById('lkModal').style.display = 'none'; }
 </script>
 </body>
 </html>
