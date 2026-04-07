@@ -3,175 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Soft Experience</title>
+    <title>SAPAR.TM - Premium Aggregator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
-            --tkm-red-grad: linear-gradient(180deg, #9b0000 0%, #5e0000 100%);
-            --tkm-green: #27ae60;
-            --soft-gray: #fcfcfc;
+            --tkm-red: linear-gradient(180deg, #a80000 0%, #600000 100%);
+            --tkm-green: #2ecc71;
+            --soft-white: #fcfcfc;
+            --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        body {
-            font-family: "Times New Roman", Times, serif;
-            margin: 0; display: flex; height: 100vh; background: #f0f2f5; overflow: hidden;
-        }
+        body { font-family: "Times New Roman", serif; margin: 0; display: flex; height: 100vh; background: #f0f2f5; overflow: hidden; }
 
-        /* САЙДБАР */
+        /* САЙДБАР С ВОЗМОЖНОСТЬЮ УМЕНЬШЕНИЯ */
         .sidebar {
-            width: 300px; background: var(--tkm-red-grad); color: white;
-            display: flex; flex-direction: column; padding: 30px; box-shadow: 5px 0 25px rgba(0,0,0,0.15);
+            width: 300px; background: var(--tkm-red); color: white;
+            display: flex; flex-direction: column; padding: 20px;
+            transition: var(--transition); position: relative; box-shadow: 5px 0 20px rgba(0,0,0,0.2);
+        }
+        .sidebar.collapsed { width: 80px; padding: 20px 10px; }
+        .sidebar.collapsed h2, .sidebar.collapsed span { display: none; }
+
+        .toggle-btn { 
+            cursor: pointer; background: rgba(255,255,255,0.1); border: none; color: white; 
+            padding: 10px; border-radius: 5px; margin-bottom: 20px; align-self: flex-end;
         }
 
         .menu-item { 
-            display: flex; align-items: center; gap: 15px; padding: 18px 0; 
-            cursor: pointer; transition: 0.4s ease; color: rgba(255,255,255,0.9);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; gap: 15px; padding: 15px; 
+            cursor: pointer; transition: 0.3s; border-radius: 10px; margin-bottom: 5px;
         }
-        .menu-item:hover { color: var(--tkm-green); transform: scale(1.02); }
+        .menu-item:hover { background: rgba(255,255,255,0.1); color: var(--tkm-green); }
 
-        /* ГЛАВНЫЙ ЭКРАН */
-        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; }
+        /* ПРОФИЛЬ ПОСЛЕ ВХОДА */
+        .user-profile-box { 
+            display: none; text-align: center; padding: 20px; background: rgba(0,0,0,0.1); border-radius: 15px; margin-bottom: 20px;
+        }
+        .profile-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--tkm-green); margin-bottom: 10px; object-fit: cover; }
+
+        /* ГЛАВНЫЙ БЛОК */
+        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        header { background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         
-        header {
-            background: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #eee;
-        }
+        .logo i { color: white; background: var(--tkm-green); padding: 8px; border-radius: 50%; font-size: 16px; margin-right: 10px;}
 
-        .logo { font-size: 26px; font-weight: bold; color: #333; display: flex; align-items: center; gap: 12px; }
-        .logo i { 
-            color: white; background: var(--tkm-green); padding: 10px; 
-            border-radius: 50%; font-size: 16px; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
-        }
-
-        /* МЯГКОЕ ВЫПЛЫВАЮЩЕЕ ОКНО (БЕЗ ГРУБОЙ АНИМАЦИИ) */
+        /* МОДАЛЬНЫЕ ОКНА */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 9999; 
-            justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.5); z-index: 9999; backdrop-filter: blur(5px); justify-content: center; align-items: center;
         }
         .modal-content { 
-            background: var(--soft-gray); padding: 40px; border-radius: 20px; 
-            width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            transform: translateY(30px); opacity: 0;
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); /* Мягкое выплывание */
+            background: var(--soft-white); padding: 35px; border-radius: 20px; width: 450px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: scale(0.9); opacity: 0; transition: var(--transition);
         }
-        .modal.active .modal-content { transform: translateY(0); opacity: 1; }
+        .modal.active .modal-content { transform: scale(1); opacity: 1; }
 
-        input { 
-            width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #e0e0e0; 
-            border-radius: 10px; font-family: inherit; font-size: 15px; outline: none; background: #fff;
-        }
-        input:focus { border-color: var(--tkm-green); box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { background: var(--tkm-green); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        /* КРАСИВОЕ ПРИВЕТСТВИЕ ПОСЛЕ ВХОДА */
-        .welcome-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.95); z-index: 10000;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; animation: fadeIn 0.8s ease;
-        }
-        .welcome-overlay i { font-size: 80px; color: var(--tkm-green); margin-bottom: 20px; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* КАРТОЧКА БИЛЕТА */
-        .container { padding: 40px; max-width: 950px; margin: 0 auto; }
-        .ticket {
-            background: white; border-radius: 15px; margin-top: 20px; display: flex;
-            border: 1px solid #eee; overflow: hidden; transition: 0.3s;
-        }
-        .ticket:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        .t-info { flex: 3; padding: 30px; display: flex; justify-content: space-around; align-items: center; }
-        .t-price { flex: 1; background: #fcfcfc; border-left: 1px dashed #ddd; padding: 30px; text-align: center; }
-
-        .btn-main { 
-            background: var(--tkm-green); color: white; border: none; padding: 14px 28px; 
-            border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%;
-        }
-        .btn-main:hover { filter: brightness(1.1); }
+        /* СПИСОК АДМИНА */
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .admin-table td { padding: 10px; border-bottom: 1px solid #eee; }
+        .badge-red { background: #ff4757; color: white; padding: 2px 8px; border-radius: 4px; cursor: pointer; border:none;}
+        .badge-prem { background: #ffa500; color: white; padding: 2px 8px; border-radius: 4px; cursor: pointer; border:none;}
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2 style="margin-bottom: 50px;">SAPAR.TM</h2>
-    <div class="menu-item" onclick="location.reload()"><i class="fas fa-plane-departure"></i> Gözleg</div>
-    <div class="menu-item" onclick="openModal('user-login')"><i class="fas fa-user-circle"></i> Passenger Giriş</div>
-    <div class="menu-item" onclick="openModal('admin-login')"><i class="fas fa-shield-alt"></i> Admin Panel</div>
+<div class="sidebar" id="sidebar">
+    <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <h2 id="side-title">SAPAR.TM</h2>
+
+    <div id="userBox" class="user-profile-box">
+        <img src="https://via.placeholder.com/60" class="profile-img" alt="User">
+        <div id="userName" style="font-weight: bold;">Myrat Saparow</div>
+        <div style="font-size: 12px; opacity: 0.7;">Passenger</div>
+    </div>
+
+    <div class="menu-item" onclick="location.reload()"><i class="fas fa-plane"></i> <span class="lang-txt" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
+    <div class="menu-item" id="loginMenuItem" onclick="openModal('login')"><i class="fas fa-sign-in-alt"></i> <span class="lang-txt" data-tk="Giriş" data-ru="Вход">Giriş</span></div>
+    
+    <div id="userMenu" style="display:none;">
+        <div class="menu-item" onclick="openModal('lk')"><i class="fas fa-id-card"></i> <span class="lang-txt" data-tk="Hasabym" data-ru="Мой Кабинет">Hasabym</span></div>
+        <div class="menu-item" onclick="alert('Täze ugur sahypasy')"><i class="fas fa-plus-circle"></i> <span class="lang-txt" data-tk="Täze ugur" data-ru="Новый маршрут">Täze ugur</span></div>
+    </div>
 </div>
 
 <div class="main">
     <header>
-        <div class="logo"><i class="fas fa-paper-plane"></i> SAPAR<span>.TM</span></div>
-        <div style="font-weight: bold; color: #777;">RU | TKM | EN</div>
+        <div style="font-size: 22px; font-weight: bold;"><i class="fas fa-paper-plane"></i> SAPAR.TM</div>
+        <div>
+            <button onclick="setLang('tk')" style="cursor:pointer; border:none; background:none; font-weight:bold;">TKM</button> | 
+            <button onclick="setLang('ru')" style="cursor:pointer; border:none; background:none; font-weight:bold;">РУС</button>
+        </div>
     </header>
 
-    <div class="container">
-        <div style="background: white; padding: 30px; border-radius: 20px; display: flex; gap: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
-            <input type="text" id="from" placeholder="Nireden" style="flex:1;">
-            <input type="text" id="to" placeholder="Nirä" style="flex:1;">
-            <input type="date" id="date" style="flex:1;">
-            <button onclick="doSearch()" class="btn-main" style="width: auto;">GÖZLEG</button>
+    <div style="padding: 40px; max-width: 900px; margin: 0 auto;">
+        <div style="background: white; padding: 30px; border-radius: 15px; display: flex; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <input type="text" id="from" placeholder="Nireden">
+            <input type="text" id="to" placeholder="Nirä">
+            <input type="date" id="date">
+            <button onclick="doSearch()" class="btn" style="width: auto; padding: 0 40px;">GÖZLEG</button>
         </div>
         <div id="results"></div>
     </div>
 </div>
 
-<div id="mainModal" class="modal" onclick="if(event.target==this) closeModal()">
-    <div class="modal-content" id="modalArea">
-        </div>
-</div>
-
-<div id="welcomeScreen" class="welcome-overlay">
-    <i class="fas fa-check-circle"></i>
-    <h1 id="welcomeTitle">Hoş geldiňiz!</h1>
-    <p id="welcomeSub">Siziň hasabyňyz işjeňleşdirildi.</p>
+<div id="modal" class="modal" onclick="if(event.target==this) closeModal()">
+    <div class="modal-content" id="modalBody"></div>
 </div>
 
 <script>
-    function openModal(type) {
-        const modal = document.getElementById('mainModal');
-        const area = document.getElementById('modalArea');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('active'), 10);
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
-        if(type === 'user-login') {
-            area.innerHTML = `<h3>Passenger Girişi</h3>
-                <p style="color:#888; font-size:14px;">Şahsy hasabyňyza giriň</p>
-                <input type="text" id="u_log" placeholder="E-mail ýa-da ID">
-                <input type="password" id="u_pass" placeholder="Parol">
-                <button class="btn-main" onclick="successLogin('Passenger')">Giriş</button>`;
-        } 
-        else if(type === 'admin-login') {
-            area.innerHTML = `<h3 style="color:#d32f2f">Admin Dolandyryş</h3>
-                <p style="color:#888; font-size:14px;">Sistemanu dolandyrmak üçin giriň</p>
-                <input type="text" id="a_log" placeholder="Admin Login">
-                <input type="password" id="a_pass" placeholder="Admin Parol">
-                <button class="btn-main" style="background:#333" onclick="successLogin('Admin')">Giriş</button>`;
+    function setLang(l) {
+        document.querySelectorAll('.lang-txt').forEach(el => {
+            el.innerText = el.getAttribute('data-' + l);
+        });
+    }
+
+    function openModal(type) {
+        const m = document.getElementById('modal');
+        const b = document.getElementById('modalBody');
+        m.style.display = 'flex';
+        setTimeout(() => m.classList.add('active'), 10);
+
+        if(type === 'login') {
+            b.innerHTML = `<h3>Giriş</h3>
+                <input type="text" id="l" placeholder="Login">
+                <input type="password" id="p" placeholder="Parol">
+                <button class="btn" onclick="handleLogin()">GIR</button>`;
+        } else if(type === 'lk') {
+            b.innerHTML = `<h3>Şahsy Otagym</h3>
+                <div style="text-align:center"><img src="https://via.placeholder.com/80" class="profile-img"><br><button>Suraty üýtget</button></div>
+                <p><b>Biletlerim:</b> ASB-MOW (12.04.2026)</p>
+                <input type="password" placeholder="Täze parol">
+                <button class="btn" onclick="closeModal()">Ýatda sakla</button>`;
+        } else if(type === 'admin') {
+            b.innerHTML = `<h3>Ulanyjylar sanawy</h3>
+                <table class="admin-table">
+                    <tr><td>Myrat (m_sapar)</td><td><button class="badge-red">Poz</button> <button class="badge-red" style="background:black">Ban</button> <button class="badge-prem">Prem</button></td></tr>
+                    <tr><td>Admin (root)</td><td>[Siz]</td></tr>
+                </table>`;
         }
     }
 
     function closeModal() {
-        const modal = document.getElementById('mainModal');
-        modal.classList.remove('active');
-        setTimeout(() => modal.style.display = 'none', 400);
+        const m = document.getElementById('modal');
+        m.classList.remove('active');
+        setTimeout(() => m.style.display = 'none', 400);
     }
 
-    function successLogin(role) {
+    function handleLogin() {
+        const l = document.getElementById('l').value;
+        const p = document.getElementById('p').value;
         closeModal();
-        const screen = document.getElementById('welcomeScreen');
-        document.getElementById('welcomeTitle').innerText = (role === 'Admin') ? "Admin Hoş Geldiňiz!" : "Hoş Geldiňiz!";
-        screen.style.display = 'flex';
-        setTimeout(() => { screen.style.display = 'none'; }, 2500);
+
+        if(l === 'admin' && p === 'admin123') {
+            openModal('admin');
+        } else {
+            document.getElementById('userBox').style.display = 'block';
+            document.getElementById('userMenu').style.display = 'block';
+            document.getElementById('loginMenuItem').style.display = 'none';
+            document.getElementById('userName').innerText = l;
+        }
     }
 
     async function doSearch() {
         const from = document.getElementById('from').value.toUpperCase();
         const to = document.getElementById('to').value.toUpperCase();
         const res = document.getElementById('results');
-        if(!from || !to) return;
-
-        res.innerHTML = "<p style='text-align:center; padding:50px; color:#999;'>Garaşyň...</p>";
+        res.innerHTML = "Gözlenilýär...";
 
         try {
             const r = await fetch('/api/search-live', {
@@ -183,22 +185,12 @@
             res.innerHTML = "";
 
             data.tickets.forEach(t => {
-                const price = Math.round(t.price * 1.05);
-                res.innerHTML += `
-                    <div class="ticket">
-                        <div class="t-info">
-                            <div style="text-align:center;"><b>12:00</b><br><small>${t.origin}</small></div>
-                            <div style="color:var(--tkm-green);"><i class="fas fa-plane"></i></div>
-                            <div style="text-align:center;"><b>16:30</b><br><small>${t.destination}</small></div>
-                        </div>
-                        <div class="t-price">
-                            <div style="font-size:22px; font-weight:bold;">${price.toLocaleString()} RUB</div>
-                            <small style="color:#888;">Bagajly</small>
-                            <button class="btn-main" style="margin-top:10px;" onclick="successLogin('Passenger')">SATYN AL</button>
-                        </div>
-                    </div>`;
+                res.innerHTML += `<div style="background:white; padding:20px; border-radius:10px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee;">
+                    <div><b>${t.origin} → ${t.destination}</b><br><small>Bagtly ýollar!</small></div>
+                    <div style="text-align:right"><b>${Math.round(t.price * 1.05)} RUB</b><br><button class="btn" style="padding:5px 15px;">AL</button></div>
+                </div>`;
             });
-        } catch(e) { res.innerHTML = "Error!"; }
+        } catch(e) { res.innerHTML = "API error"; }
     }
 </script>
 </body>
