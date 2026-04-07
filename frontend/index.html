@@ -9,11 +9,6 @@
         :root { --tkm-green: #00563b; --tkm-gold: #c5a059; --bg: #f5f7f9; }
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; transition: 0.3s; }
         
-        /* Темная тема */
-        body.dark-mode { --bg: #121212; background: var(--bg); color: #e0e0e0; }
-        body.dark-mode .content-card, body.dark-mode .nav-menu, body.dark-mode .top-bar { background: #1e1e1e; border-color: #333; color: white; }
-        body.dark-mode .search-box, body.dark-mode .ticket { background: #1e1e1e; border-color: #333; }
-
         /* Sidebar */
         .sidebar { width: 260px; background: var(--tkm-green); color: white; padding: 25px; display: flex; flex-direction: column; z-index: 10; }
         .brand { font-size: 24px; font-weight: bold; margin-bottom: 40px; border-bottom: 2px solid var(--tkm-gold); padding-bottom: 10px; }
@@ -27,13 +22,13 @@
         .active-page { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Search Section */
-        .hero { background: var(--tkm-green); color: white; padding: 60px 20px; text-align: center; }
-        .search-container { max-width: 1000px; margin: -40px auto 30px; width: 95%; }
-        .search-box { background: white; padding: 25px; border-radius: 15px; display: flex; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .search-box input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        /* Модальные окна */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-card { background: white; padding: 30px; border-radius: 20px; width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-card input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; }
 
-        /* Dashboard Layout (ЛК как на скриншотах) */
+        /* Dashboard Layout */
         .dashboard-layout { display: flex; gap: 25px; padding: 40px; max-width: 1200px; margin: 0 auto; }
         .nav-menu { width: 220px; background: white; border-radius: 15px; padding: 10px; height: fit-content; border: 1px solid #eee; }
         .nav-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; display: flex; align-items: center; gap: 10px; color: #555; transition: 0.2s; margin-bottom: 5px; }
@@ -41,46 +36,68 @@
         .nav-item.active { background: var(--tkm-green); color: white; }
         .content-card { flex: 1; background: white; border-radius: 15px; padding: 30px; border: 1px solid #eee; min-height: 400px; }
 
-        /* UI Elements */
-        .btn-primary { background: var(--tkm-green); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .section-title { font-size: 22px; font-weight: bold; margin-bottom: 20px; color: var(--tkm-green); }
-        .toggle-group { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
-        
-        /* Tickets */
+        /* Tickets & Search */
+        .hero { background: var(--tkm-green); color: white; padding: 60px 20px; text-align: center; }
+        .search-box { background: white; padding: 25px; border-radius: 15px; display: flex; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: -40px auto 30px; max-width: 900px; }
         .ticket { background: white; margin: 15px 0; border-radius: 12px; display: flex; border: 1px solid #eee; overflow: hidden; }
         .ticket-info { flex: 1; padding: 20px; display: flex; justify-content: space-around; align-items: center; }
         .ticket-buy { width: 180px; padding: 20px; background: #fafafa; border-left: 1px dashed #ccc; text-align: center; }
-        .price { font-size: 20px; font-weight: bold; color: var(--tkm-green); }
+        .btn-primary { background: var(--tkm-green); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
+<div id="login-modal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>Hoş geldiňiz!</h3>
+        <p>Ulgama girmek üçin adyňyzy ýazyň:</p>
+        <input type="text" id="login-input" placeholder="Adyňyz">
+        <div class="modal-btns">
+            <button class="btn-primary" onclick="confirmLogin()">Girmek</button>
+            <button class="btn-primary" style="background:#ccc;" onclick="closeM('login-modal')">Bes et</button>
+        </div>
+    </div>
+</div>
+
+<div id="logout-modal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>Çykyş</h3>
+        <p>Siz dogrudan hem hasabyňyzdan çykmak isleýärsiňizmi?</p>
+        <div class="modal-btns">
+            <button class="btn-primary" style="background:#e74c3c;" onclick="confirmLogout()">Hawa, çyk</button>
+            <button class="btn-primary" style="background:#ccc;" onclick="closeM('logout-modal')">Yza dön</button>
+        </div>
+    </div>
+</div>
+
 <div class="sidebar">
     <div class="brand">SAPAR.TM</div>
     <div class="nav-link active" onclick="showP('search-p')"><i class="fas fa-search"></i> Gözleg</div>
-    <div id="auth-links" style="display: none;">
-        <div class="nav-link" onclick="showP('account-p')"><i class="fas fa-user-circle"></i> Şahsy otag</div>
-    </div>
-    <div class="nav-link" id="login-nav" onclick="userLogin()"><i class="fas fa-sign-in-alt"></i> <span>Giriş</span></div>
 </div>
 
 <div class="main">
     <div class="top-bar">
-        <div id="user-display" style="font-weight: bold; color: var(--tkm-green);"></div>
-        <div style="cursor:pointer;"><span onclick="setLang('tk')">TKM</span> | <span onclick="setLang('ru')">RU</span></div>
+        <div id="auth-zone">
+            <div id="login-btn-nav" class="btn-primary" style="padding: 8px 20px;" onclick="openM('login-modal')">Giriş</div>
+            <div id="user-profile-zone" style="display: none; align-items: center; gap: 15px;">
+                <b onclick="showP('account-p')" style="cursor:pointer; color: var(--tkm-green);">
+                    <i class="fas fa-user-circle"></i> <span id="display-user-name"></span>
+                </b>
+                <span onclick="openM('logout-modal')" style="color: #e74c3c; cursor:pointer; font-size: 14px;">Çykyş</span>
+            </div>
+        </div>
+        <div style="margin-left: 20px;">TKM | RU</div>
     </div>
 
     <div id="search-p" class="page active-page">
-        <div class="hero"><h1>Bagtly ýollar!</h1><p>Premium travel experience</p></div>
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="from" placeholder="Nireden (ASB)">
-                <input type="text" id="to" placeholder="Nirä (IST)">
-                <input type="date" id="date">
-                <button class="btn-primary" onclick="searchFlights()">GÖZLEG</button>
-            </div>
-            <div id="results" style="margin-top: 20px;"></div>
+        <div class="hero"><h1>Komfortly uçuş biziň bilen</h1></div>
+        <div class="search-box">
+            <input type="text" id="from" placeholder="Ashgabat (ASB)">
+            <input type="text" id="to" placeholder="Kazan (KZN)">
+            <input type="date" id="date">
+            <button class="btn-primary" onclick="searchFlights()">TAP</button>
         </div>
+        <div id="results" style="max-width: 900px; margin: 0 auto; padding: 20px;"></div>
     </div>
 
     <div id="account-p" class="page">
@@ -88,36 +105,20 @@
             <div class="nav-menu">
                 <div class="nav-item active" onclick="switchTab('tab-orders', this)"><i class="fas fa-shopping-bag"></i> Sargytlarym</div>
                 <div class="nav-item" onclick="switchTab('tab-docs', this)"><i class="fas fa-id-card"></i> Resminamalar</div>
-                <div class="nav-item" onclick="switchTab('tab-notify', this)"><i class="fas fa-bell"></i> Bildirişler</div>
                 <div class="nav-item" onclick="switchTab('tab-settings', this)"><i class="fas fa-cog"></i> Sazlamalar</div>
-                <div class="nav-item" style="color: #e74c3c; margin-top: 20px;" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> Çykyş</div>
             </div>
-
             <div class="content-card">
                 <div id="tab-orders" class="account-tab">
-                    <div class="section-title">Meniň sargytlarym</div>
+                    <h2>Meniň sargytlarym</h2>
                     <div id="orders-list">Sargyt tapylmady.</div>
                 </div>
-
                 <div id="tab-docs" class="account-tab" style="display:none;">
-                    <div class="section-title">Taze resminama goşmak</div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <input type="text" id="doc-surname" placeholder="Familiýasy" style="padding:10px; border-radius:5px; border:1px solid #ddd;">
-                        <input type="text" id="doc-name" placeholder="Ady" style="padding:10px; border-radius:5px; border:1px solid #ddd;">
-                    </div>
-                    <input type="text" id="doc-number" placeholder="Pasport seriýasy (I-AS 123456)" style="width:96%; margin-top:15px; padding:10px; border-radius:5px; border:1px solid #ddd;">
-                    <button class="btn-primary" style="margin-top:20px;" onclick="saveDoc()">Ýatda sakla</button>
-                </div>
-
-                <div id="tab-settings" class="account-tab" style="display:none;">
-                    <div class="section-title">Sazlamalar</div>
-                    <div class="toggle-group">
-                        <span>Garaňky tema (Dark Mode)</span>
-                        <input type="checkbox" onchange="document.body.classList.toggle('dark-mode')">
-                    </div>
-                    <div class="toggle-group">
-                        <span>Pul birligi</span>
-                        <select style="padding:5px;"><option>RUB</option><option>TMT</option><option>USD</option></select>
+                    <h2>Resminamalar</h2>
+                    <div style="display: grid; gap: 10px;">
+                        <input type="text" id="doc-surname" placeholder="Familiýasy (Surname)">
+                        <input type="text" id="doc-name" placeholder="Ady (Name)">
+                        <input type="text" id="doc-pass" placeholder="Pasport seriýasy (I-AS 123456)">
+                        <button class="btn-primary" onclick="saveDoc()">Ýatda sakla</button>
                     </div>
                 </div>
             </div>
@@ -127,15 +128,14 @@
 
 <script>
     let myOrders = [];
-    let savedPassport = null;
+    let savedUser = null;
 
-    // Соединение с твоим API (Логика не тронута)
+    // ОРИГИНАЛЬНАЯ ЛОГИКА СОЕДИНЕНИЯ (БЕЗ ИЗМЕНЕНИЙ)
     async function searchFlights() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
         const date = document.getElementById('date').value;
         const resDiv = document.getElementById('results');
-
         resDiv.innerHTML = "Gözlenilýär...";
 
         try {
@@ -146,58 +146,49 @@
             });
             const data = await response.json();
             resDiv.innerHTML = "";
-
             if(data.tickets) {
                 data.tickets.forEach(t => {
                     resDiv.innerHTML += `
                         <div class="ticket">
                             <div class="ticket-info"><b>${from}</b> <i class="fas fa-plane"></i> <b>${to}</b></div>
                             <div class="ticket-buy">
-                                <div class="price">${t.price} RUB</div>
-                                <button class="btn-primary" onclick="bookFlight('${from}','${to}','${t.price}')">SATYN AL</button>
+                                <div style="font-weight:bold; color:var(--tkm-green)">${t.price} RUB</div>
+                                <button class="btn-primary" style="width:100%; margin-top:10px" onclick="bookFlight('${from}','${to}','${t.price}')">SATYN AL</button>
                             </div>
                         </div>`;
                 });
-            }
-        } catch(e) { resDiv.innerHTML = "Error connecting to server."; }
+            } else { resDiv.innerHTML = "Bilet tapylmady."; }
+        } catch(e) { resDiv.innerHTML = "Error!"; console.error(e); }
     }
 
-    function bookFlight(f, t, p) {
-        const name = savedPassport ? `${savedPassport.name} ${savedPassport.surname}` : prompt("Yolagçynyň ady:");
-        if(name) {
-            myOrders.push({ f, t, p, name, id: 'SAP'+Math.floor(Math.random()*999) });
-            renderOrders();
-            alert("Sargyt kabul edildi! 'Şahsy otag' bölüminde görüp bilersiňiz.");
+    // ЛОГИКА АККАУНТА
+    function openM(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeM(id) { document.getElementById(id).style.display = 'none'; }
+
+    function confirmLogin() {
+        const name = document.getElementById('login-input').value;
+        if(name.trim()) {
+            savedUser = { name: name };
+            document.getElementById('display-user-name').innerText = name;
+            document.getElementById('login-btn-nav').style.display = 'none';
+            document.getElementById('user-profile-zone').style.display = 'flex';
+            closeM('login-modal');
         }
+    }
+
+    function confirmLogout() { location.reload(); }
+
+    function bookFlight(f, t, p) {
+        if(!savedUser) { openM('login-modal'); return; }
+        const order = { f, t, p, id: 'SAP'+Math.floor(Math.random()*999) };
+        myOrders.push(order);
+        alert(`Sargyt kabul edildi!\n${f} -> ${t}\nBahasy: ${p} RUB`);
+        renderOrders();
     }
 
     function renderOrders() {
         const list = document.getElementById('orders-list');
-        list.innerHTML = myOrders.map(o => `
-            <div style="border-bottom:1px solid #eee; padding:10px 0;">
-                <b>${o.f} ➔ ${o.t}</b> | ${o.name} <br>
-                <span style="color:var(--tkm-green)">${o.p} RUB</span> (Tassyklanyldy)
-            </div>
-        `).join('');
-    }
-
-    function saveDoc() {
-        savedPassport = {
-            surname: document.getElementById('doc-surname').value,
-            name: document.getElementById('doc-name').value,
-            num: document.getElementById('doc-number').value
-        };
-        alert("Resminama ýatda saklanyldy!");
-    }
-
-    function userLogin() {
-        const user = prompt("Ulanyjy adyňyz:");
-        if(user) {
-            document.getElementById('user-display').innerText = user;
-            document.getElementById('auth-links').style.display = 'block';
-            document.getElementById('login-nav').style.display = 'none';
-            showP('account-p');
-        }
+        list.innerHTML = myOrders.map(o => `<div style="padding:10px; border-bottom:1px solid #eee;"><b>${o.f} - ${o.t}</b>: ${o.p} RUB</div>`).join('');
     }
 
     function showP(id) {
@@ -205,9 +196,9 @@
         document.getElementById(id).classList.add('active-page');
     }
 
-    function switchTab(tabId, el) {
+    function switchTab(id, el) {
         document.querySelectorAll('.account-tab').forEach(t => t.style.display = 'none');
-        document.getElementById(tabId).style.display = 'block';
+        document.getElementById(id).style.display = 'block';
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
     }
