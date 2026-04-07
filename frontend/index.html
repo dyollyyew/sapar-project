@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tm">
+<html lang="tk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,225 +8,181 @@
     
     <style>
         :root {
-            --primary: #2ecc71; /* Основной зеленый */
-            --primary-dark: #27ae60;
-            --gold: #d4af37;
+            --primary: #2ecc71;
             --dark: #1a1a1a;
             --bg: #f4f7f6;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            /* Установлен шрифт Times New Roman */
+            font-family: "Times New Roman", Times, serif;
             margin: 0;
             padding: 0;
+            background-color: var(--bg);
             color: #333;
-            /* КОВЕР НА ВЕСЬ ФОН */
-            background-image: linear-gradient(rgba(244, 247, 246, 0.92), rgba(244, 247, 246, 0.92)), 
-                              url('kover-gushly-gel-253x366-ruchnaja-rabota.jpg');
-            background-size: cover;
-            background-attachment: fixed; /* Ковер стоит, сайт скроллится */
         }
 
-        /* ШАПКА */
         header {
-            background: #ffffff;
-            padding: 15px 10%;
+            background: #fff;
+            padding: 15px 8%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: relative;
-            z-index: 100;
         }
 
-        /* НОВЫЙ ЛОГОТИП В СТИЛЕ ТЕЛЕГРАМ */
-        .logo-container {
+        /* Логотип с простым самолетиком */
+        .logo {
             display: flex;
             align-items: center;
+            gap: 10px;
             text-decoration: none;
-            gap: 12px;
-        }
-
-        .telegram-icon {
-            width: 45px;
-            height: 45px;
-            background-color: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 22px;
-            box-shadow: 0 3px 6px rgba(46, 204, 113, 0.3);
-        }
-
-        .logo-text {
-            font-size: 26px;
-            font-weight: 900;
+            font-size: 28px;
+            font-weight: bold;
             color: var(--dark);
         }
-        .logo-text span { color: var(--primary); }
+        .logo i { color: var(--primary); font-size: 24px; }
+        .logo span { color: var(--primary); }
+
+        /* Переключатель языков */
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+        }
+        .lang-btn {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: inherit;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .lang-btn:hover { background: #eee; }
 
         .main-content {
-            max-width: 1100px;
-            margin: 30px auto 50px;
+            max-width: 1000px;
+            margin: 40px auto;
             padding: 0 20px;
         }
 
-        /* ПАНЕЛЬ ПОИСКА */
         .search-panel {
-            background: #ffffff;
+            background: #fff;
             padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
             align-items: flex-end;
-            margin-bottom: 30px;
             border: 1px solid #eee;
         }
 
-        .input-group { flex: 1; min-width: 220px; display: flex; flex-direction: column; }
-        .input-group label { 
-            font-size: 11px; 
-            font-weight: 800; 
-            color: #888; 
-            margin-bottom: 8px; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .input-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+        .input-group label { font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #666; }
         .input-group input { 
-            padding: 14px 18px; 
-            border: 2px solid #eee; 
-            border-radius: 12px; 
-            font-size: 16px; 
-            font-weight: 600; 
-            outline: none; 
-            transition: 0.2s;
-            box-sizing: border-box;
+            padding: 12px; border: 1px solid #ccc; border-radius: 8px; 
+            font-size: 16px; font-family: inherit;
         }
-        .input-group input:focus { border-color: var(--primary); background: #fff; }
 
         .btn-search {
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 0 45px;
-            border-radius: 12px; 
-            font-weight: 800; 
-            height: 52px; 
-            cursor: pointer; 
-            transition: 0.2s;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 40px;
+            border-radius: 8px;
+            font-weight: bold;
+            height: 45px;
+            cursor: pointer;
             font-size: 16px;
-            text-transform: uppercase;
+            font-family: inherit;
         }
-        .btn-search:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); }
+        .btn-search:hover { background: #27ae60; }
 
-        /* ПОЛНЫЕ ДАННЫЕ БИЛЕТА */
+        /* Билет с полной информацией */
         .ticket {
-            background: #ffffff;
-            border-radius: 18px;
-            margin-top: 25px;
+            background: #fff;
+            border-radius: 12px;
+            margin-top: 20px;
             display: flex;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             border: 1px solid #eee;
             overflow: hidden;
-            transition: 0.3s;
         }
-        .ticket:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
-
-        .flight-info { flex: 1; padding: 30px; display: flex; align-items: center; gap: 20px; }
+        .flight-info { flex: 1; padding: 25px; display: flex; align-items: center; justify-content: space-between; }
+        .time-box { text-align: center; }
+        .time { font-size: 28px; font-weight: bold; }
+        .city-code { font-size: 16px; font-weight: bold; color: #888; }
         
-        /* Детализация времени и рейса */
-        .time-block { text-align: center; min-width: 80px; }
-        .time { font-size: 32px; font-weight: 900; color: var(--dark); line-height: 1; }
-        .date { font-size: 13px; color: #888; margin-top: 4px; font-weight: 600; }
-        .city-code { font-size: 16px; font-weight: 800; color: #555; margin-top: 2px; text-transform: uppercase; }
+        .path { flex: 1; text-align: center; position: relative; margin: 0 20px; }
+        .line { width: 100%; height: 1px; background: #ddd; position: relative; margin-top: 10px; }
+        .line i { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); color: var(--primary); background: #fff; padding: 0 10px; }
 
-        .path-block { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .dur-text { font-size: 12px; color: #aaa; font-weight: 600; margin-bottom: 5px; }
-        .plane-line { width: 100%; height: 2px; background: #eee; position: relative; }
-        .plane-line i { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); color: var(--primary); background: #fff; padding: 0 10px; font-size: 20px; }
-        .stops { font-size: 11px; color: var(--primary); font-weight: 700; margin-top: 5px; text-transform: uppercase; }
-
-        .price-box { 
-            width: 260px; 
-            background: #fafafa; 
-            border-left: 2px dashed #eee; 
-            padding: 30px; 
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .price { font-size: 28px; font-weight: 900; color: var(--dark); margin-bottom: 15px; }
+        .price-box { width: 220px; background: #fafafa; border-left: 1px solid #eee; padding: 25px; text-align: center; }
+        .price { font-size: 24px; font-weight: bold; margin-bottom: 15px; }
         .buy-btn { 
-            background: #ff4757; 
-            color: white; 
-            text-decoration: none; 
-            padding: 14px 25px; 
-            border-radius: 12px; 
-            font-weight: 800; 
-            display: inline-block;
-            font-size: 16px;
-            transition: 0.2s;
-            width: 100%;
-            box-sizing: border-box;
+            background: #ff4757; color: white; text-decoration: none; padding: 12px; 
+            border-radius: 8px; font-weight: bold; display: block; 
         }
-        .buy-btn:hover { background: #ee3545; }
 
-        .status { text-align: center; padding: 60px; color: #888; font-size: 18px; font-weight: 600; }
+        .status { text-align: center; padding: 40px; color: #888; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="#" class="logo-container">
-        <div class="telegram-icon">
-            <i class="fas fa-paper-plane"></i>
-        </div>
-        <div class="logo-text">SAPAR<span>.TM</span></div>
+    <a href="#" class="logo">
+        <i class="fas fa-plane"></i> SAPAR<span>.TM</span>
     </a>
-    <div style="font-weight: 900; color: var(--primary); font-size: 20px;">TKM</div>
+    <div class="lang-switcher">
+        <button class="lang-btn" onclick="setLang('tk')">TKM</button>
+        <button class="lang-btn" onclick="setLang('ru')">РУС</button>
+        <button class="lang-btn" onclick="setLang('en')">ENG</button>
+    </div>
 </header>
 
 <div class="main-content">
     <div class="search-panel">
         <div class="input-group">
-            <label>Nireden (Mysal: ASB)</label>
-            <input type="text" id="from" value="MOW" maxlength="3">
+            <label id="lbl-from">Nireden</label>
+            <input type="text" id="from" value="MOW">
         </div>
         <div class="input-group">
-            <label>Nirä (Mysal: MOW)</label>
-            <input type="text" id="to" value="ASB" maxlength="3">
+            <label id="lbl-to">Nirä</label>
+            <input type="text" id="to" value="ASB">
         </div>
         <div class="input-group">
-            <label>Uçuş senesi</label>
+            <label id="lbl-date">Sene</label>
             <input type="date" id="date">
         </div>
-        <button class="btn-search" onclick="searchFlights()">GÖZLEG</button>
+        <button class="btn-search" id="btn-text" onclick="searchFlights()">GÖZLEG</button>
     </div>
-
-    <div id="results-container">
-        </div>
+    <div id="results-container"></div>
 </div>
 
 <script>
-    // ВСЯ ЛОГИКА И СОЕДИНЕНИЕ ОСТАЛИСЬ ПРЕЖНИМИ
+    const translations = {
+        tk: { from: "Nireden", to: "Nirä", date: "Sene", btn: "GÖZLEG", loading: "Gözlenilýär...", buy: "SATYN AL", notfound: "Bilet tapylmady" },
+        ru: { from: "Откуда", to: "Куда", date: "Дата", btn: "ПОИСК", loading: "Поиск...", buy: "КУПИТЬ", notfound: "Билеты не найдены" },
+        en: { from: "From", to: "To", date: "Date", btn: "SEARCH", loading: "Searching...", buy: "BUY NOW", notfound: "No tickets found" }
+    };
+
+    let currentLang = 'tk';
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.getElementById('lbl-from').innerText = translations[lang].from;
+        document.getElementById('lbl-to').innerText = translations[lang].to;
+        document.getElementById('lbl-date').innerText = translations[lang].date;
+        document.getElementById('btn-text').innerText = translations[lang].btn;
+    }
+
     async function searchFlights() {
         const from = document.getElementById('from').value.toUpperCase();
         const to = document.getElementById('to').value.toUpperCase();
         const date = document.getElementById('date').value;
         const container = document.getElementById('results-container');
 
-        if (!from || !to || !date) {
-            alert("Sarpasly dost, ähli öýjükleri dolduryň!");
-            return;
-        }
-
-        container.innerHTML = '<div class="status"><i class="fas fa-spinner fa-spin"></i> Biletler gözlenilýär, garaşyň...</div>';
+        container.innerHTML = `<div class="status">${translations[currentLang].loading}</div>`;
 
         try {
             const response = await fetch('/api/search-live', {
@@ -241,49 +197,26 @@
             if (data.tickets && data.tickets.length > 0) {
                 data.tickets.forEach(t => {
                     const depAt = new Date(t.departure_at);
-                    
-                    // Форматирование даты
-                    const depDate = depAt.toLocaleDateString('tm-TM', { day: '2-digit', month: 'short' });
                     const depTime = depAt.getHours() + ':' + String(depAt.getMinutes()).padStart(2, '0');
 
                     container.innerHTML += `
                         <div class="ticket">
                             <div class="flight-info">
-                                <div class="time-block">
-                                    <div class="time">${depTime}</div>
-                                    <div class="date">${depDate}</div>
-                                    <div class="city-code">${t.origin}</div>
-                                </div>
-                                
-                                <div class="path-block">
-                                    <div class="dur-text">Gönümel uçuş</div>
-                                    <div class="plane-line">
-                                        <i class="fas fa-plane"></i>
-                                    </div>
-                                    <div class="stops">Duralgasyz</div>
-                                </div>
-                                
-                                <div class="time-block">
-                                    <div class="time">--:--</div>
-                                    <div class="date">Garaşylýar</div>
-                                    <div class="city-code">${t.destination}</div>
-                                </div>
+                                <div class="time-box"><div class="time">${depTime}</div><div class="city-code">${t.origin}</div></div>
+                                <div class="path"><div class="line"><i class="fas fa-plane"></i></div></div>
+                                <div class="time-box"><div class="time">--:--</div><div class="city-code">${t.destination}</div></div>
                             </div>
-                            
                             <div class="price-box">
-                                <div class="price">${t.price.toLocaleString('ru-RU')} RUB</div>
-                                <a href="https://www.aviasales.ru${t.link}" class="buy-btn" target="_blank">SATYN AL</a>
+                                <div class="price">${t.price.toLocaleString()} RUB</div>
+                                <a href="https://www.aviasales.ru${t.link}" class="buy-btn" target="_blank">${translations[currentLang].buy}</a>
                             </div>
                         </div>`;
                 });
             } else {
-                container.innerHTML = '<div class="status">Bagyşlaň, bu senede bilet tapylmady.</div>';
+                container.innerHTML = `<div class="status">${translations[currentLang].notfound}</div>`;
             }
-        } catch (e) {
-            container.innerHTML = '<div class="status" style="color:red;">Сервер не отвечает. Проверьте подключение к API на Vercel.</div>';
-        }
+        } catch (e) { container.innerHTML = '<div class="status">Error!</div>'; }
     }
 </script>
-
 </body>
 </html>
