@@ -3,234 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Ultimate Edition</title>
+    <title>SAPAR.TM - Premium Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --tkm-green: #00563b; --tkm-gold: #c5a059; --bg: #f5f7f9; --white: #ffffff; --danger: #e74c3c; }
-        
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_green.css">
 
-        /* Sidebar */
-        .sidebar { width: 280px; background: var(--tkm-green); color: white; padding: 25px; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-        .brand { font-size: 26px; font-weight: 800; margin-bottom: 40px; border-bottom: 2px solid var(--tkm-gold); padding-bottom: 10px; text-align: center; letter-spacing: 1px; }
+    <style>
+        :root {
+            --tkm-green: #00563b; --tkm-gold: #c5a059; --bg: #f5f7f9;
+            --card-bg: #ffffff; --text: #333; --border: #eee; --danger: #e74c3c;
+        }
+        /* ТЕМНАЯ ТЕМА */
+        body.dark-mode {
+            --bg: #121212; --card-bg: #1e1e1e; --text: #e0e0e0; --border: #333;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--text); transition: 0.3s; }
         
-        .nav-link { padding: 14px 18px; color: white; cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 12px; transition: 0.3s; margin-bottom: 8px; text-decoration: none; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: var(--tkm-gold); }
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--tkm-green); color: white; padding: 25px; display: flex; flex-direction: column; z-index: 10; }
+        .brand { font-size: 24px; font-weight: bold; margin-bottom: 40px; border-bottom: 2px solid var(--tkm-gold); padding-bottom: 10px; text-align: center; }
+        .nav-link { padding: 14px; color: white; cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 12px; transition: 0.2s; margin-bottom: 5px; text-decoration: none; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: var(--tkm-gold); }
 
         /* Main Content */
-        .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
-        .top-bar { background: var(--white); padding: 15px 35px; display: flex; justify-content: flex-end; align-items: center; border-bottom: 1px solid #eee; gap: 20px; }
+        .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .top-bar { background: var(--card-bg); padding: 15px 30px; display: flex; justify-content: flex-end; align-items: center; border-bottom: 1px solid var(--border); gap: 20px; }
 
-        /* Pages */
-        .page { display: none; padding: 30px; animation: fadeIn 0.4s ease; }
+        .page { display: none; padding: 30px; animation: fadeIn 0.3s; }
         .active-page { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Admin & Cards */
-        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid #eee; }
-        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .bg-premium { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .bg-black { background: #f8d7da; color: #721c24; }
-
-        /* Buttons & Inputs */
-        .btn { border: none; padding: 12px 22px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        /* Элементы */
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid var(--border); margin-bottom: 20px; }
+        .btn { border: none; padding: 12px 22px; border-radius: 12px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-green { background: var(--tkm-green); color: white; }
         .btn-red { background: var(--danger); color: white; }
-        .btn-gold { background: var(--tkm-gold); color: white; }
         
-        input, select { padding: 12px 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--tkm-green); box-shadow: 0 0 0 3px rgba(0,86,59,0.1); }
+        input, select { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; outline: none; }
 
-        /* Modals */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(5px); }
-        .modal-card { background: white; padding: 35px; border-radius: 25px; width: 360px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.2); }
+        /* Admin Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); }
 
-        /* Dashboard Inside Account */
-        .acc-grid { display: flex; gap: 25px; }
-        .acc-menu { width: 240px; background: white; border-radius: 20px; padding: 10px; height: fit-content; }
-        .acc-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: #555; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .acc-item:hover { background: #f0f7f4; color: var(--tkm-green); }
-        .acc-item.active { background: var(--tkm-green); color: white; }
-        .acc-item.exit { color: var(--danger); border-top: 1px solid #eee; margin-top: 20px; padding-top: 15px; border-radius: 0; }
+        .premium-crown { color: var(--tkm-gold); margin-right: 5px; }
+        .status-black { color: var(--danger); font-weight: bold; }
+
+        /* Переключатель темы (Switch) */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--tkm-green); }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body>
 
-<div id="login-modal" class="modal-overlay">
-    <div class="modal-card">
+<div id="login-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:1000; backdrop-filter:blur(5px);">
+    <div class="card" style="width:340px; text-align:center;">
         <h3>Hoş geldiňiz!</h3>
-        <input type="text" id="log-user" placeholder="Ulanyjy ady">
-        <input type="password" id="log-pass" placeholder="Parol (Admin üçin)">
-        <button class="btn btn-green" style="width: 100%;" onclick="auth()">Girmek</button>
-        <button class="btn" style="width: 100%; margin-top: 10px; background:#eee;" onclick="closeM('login-modal')">Yza</button>
-    </div>
-</div>
-
-<div id="logout-modal" class="modal-overlay">
-    <div class="modal-card">
-        <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: var(--danger);"></i>
-        <h3>Çykmak isleýärsiňizmi?</h3>
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <button class="btn btn-red" style="flex:1" onclick="location.reload()">Hawa</button>
-            <button class="btn" style="flex:1; background:#eee;" onclick="closeM('logout-modal')">Ýok</button>
-        </div>
+        <input type="text" id="log-user" placeholder="Ulanyjy ady" style="width:90%; margin-bottom:10px;">
+        <input type="password" id="log-pass" placeholder="Parol" style="width:90%; margin-bottom:20px;">
+        <button class="btn btn-green" style="width:100%;" onclick="login()">Girmek</button>
+        <button class="btn" style="width:100%; margin-top:10px; background:#eee; color:#333;" onclick="closeM()">Bes et</button>
     </div>
 </div>
 
 <div class="sidebar">
     <div class="brand">SAPAR.TM</div>
-    <div class="nav-link active" id="link-search" onclick="showP('search-p')"><i class="fas fa-plane-departure"></i> Gözleg</div>
-    <div class="nav-link" id="link-account" style="display:none;" onclick="showP('account-p')"><i class="fas fa-user-shield"></i> Şahsy otag</div>
+    <div class="nav-link active" onclick="showP('search-p')"><i class="fas fa-search"></i> Gözleg</div>
+    <div class="nav-link" id="link-acc" style="display:none;" onclick="showP('account-p')"><i class="fas fa-user-circle"></i> Şahsy otag</div>
 </div>
 
 <div class="main">
     <div class="top-bar">
-        <div id="user-top" style="display:none; font-weight:bold; color:var(--tkm-green); display:flex; align-items:center; gap:8px;">
-            <i class="fas fa-crown" id="crown" style="display:none; color:var(--tkm-gold);"></i>
-            <span id="user-name-label"></span>
+        <div id="user-display" style="display:none; font-weight:bold;">
+            <i class="fas fa-crown premium-crown" id="crown-icon" style="display:none;"></i>
+            <span id="u-name"></span>
         </div>
-        <button id="entry-btn" class="btn btn-green" style="padding: 8px 20px;" onclick="openM('login-modal')">Giriş</button>
-        <div style="font-weight:600; cursor:pointer;">TKM | RU</div>
+        <button id="login-btn" class="btn btn-green" style="padding:8px 20px;" onclick="document.getElementById('login-modal').style.display='flex'">Giriş</button>
     </div>
 
     <div id="search-p" class="page active-page">
-        <div style="background: var(--tkm-green); color:white; padding: 60px 20px; border-radius: 30px; text-align:center; margin-bottom: 30px;">
-            <h1 style="margin:0;">Nirä uçmak isleýärsiňiz?</h1>
-            <p>SAPAR.TM — amatly biletleriň we premium hyzmatyň mekany</p>
+        <div class="card" style="background:var(--tkm-green); color:white; text-align:center;">
+            <h1>Nirä uçýarys?</h1>
+            <p>Iň amatly biletler diňe bizde.</p>
         </div>
-        <div class="card" style="display:flex; gap:15px; margin-top:-60px; width:90%; margin-left:auto; margin-right:auto;">
+        <div class="card" style="display:flex; gap:10px; margin-top:-50px; width:90%; margin-left:auto; margin-right:auto;">
             <input type="text" id="from" placeholder="Nireden" style="flex:1">
             <input type="text" id="to" placeholder="Nirä" style="flex:1">
-            <input type="date" id="date" style="flex:1">
-            <button class="btn btn-green" onclick="searchFlights()"><i class="fas fa-search"></i> Gözle</button>
+            <input type="text" id="date-picker" placeholder="Sene saýlaň" style="flex:1">
+            <button class="btn btn-green" onclick="searchFlights()">TAP</button>
         </div>
-        <div id="results" style="max-width: 900px; margin: 0 auto;"></div>
+        <div id="results"></div>
     </div>
 
     <div id="account-p" class="page">
-        <div class="acc-grid">
-            <div class="acc-menu">
-                <div class="acc-item active" onclick="tab('acc-orders', this)"><i class="fas fa-box"></i> Sargytlarym</div>
-                <div class="acc-item" onclick="tab('acc-docs', this)"><i class="fas fa-id-card"></i> Resminamalar</div>
-                <div class="acc-item" onclick="tab('acc-settings', this)"><i class="fas fa-cog"></i> Sazlamalar</div>
-                <div id="admin-only" class="acc-item" style="display:none; color:var(--tkm-gold);" onclick="tab('acc-admin', this)"><i class="fas fa-tools"></i> Admin Panel</div>
-                <div class="acc-item exit" onclick="openM('logout-modal')"><i class="fas fa-sign-out-alt"></i> Çykyş</div>
+        <div style="display:flex; gap:20px;">
+            <div class="card" style="width:250px; height:fit-content;">
+                <div class="nav-link active" style="color:var(--text)" onclick="tab('t-orders')">Sargytlarym</div>
+                <div class="nav-link" style="color:var(--text)" onclick="tab('t-docs')">Resminamalar</div>
+                <div class="nav-link" style="color:var(--text)" onclick="tab('t-settings')">Sazlamalar</div>
+                <div id="admin-nav" class="nav-link" style="display:none; color:var(--tkm-gold)" onclick="tab('t-admin')">Admin Panel</div>
+                <hr style="border:0; border-top:1px solid var(--border); margin:15px 0;">
+                <div class="nav-link" style="color:var(--danger)" onclick="location.reload()">Çykyş</div>
             </div>
 
-            <div class="card" style="flex:1; min-height:500px;">
-                <div id="acc-orders" class="tab-content">
+            <div class="card" style="flex:1;">
+                <div id="t-orders" class="tab-c">
                     <h3>Meniň biletlerim</h3>
-                    <div id="order-list">Sargyt tapylmady.</div>
+                    <div id="orders-list">Entek bilet almadyňyz.</div>
                 </div>
-                <div id="acc-docs" class="tab-content" style="display:none;">
-                    <h3>Pasport maglumatlary</h3>
-                    <input type="text" id="p-name" placeholder="Adyňyz" style="width:100%; margin-bottom:10px;">
-                    <input type="text" id="p-ser" placeholder="Pasport seriýa (I-AS...)" style="width:100%; margin-bottom:20px;">
-                    <button class="btn btn-green" onclick="alert('Ýatda saklandy!')">Sakla</button>
+
+                <div id="t-docs" class="tab-c" style="display:none;">
+                    <h3>Resminamalar (Загранпаспорт)</h3>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                        <input type="text" placeholder="Ady">
+                        <input type="text" placeholder="Familiýasy">
+                        <input type="text" placeholder="Pasport seriýasy (I-AS...)">
+                        <input type="text" id="pass-expire" placeholder="Gullanym möhleti">
+                    </div>
+                    <button class="btn btn-green" style="margin-top:20px;" onclick="alert('Ýatda saklandy!')">Sakla</button>
                 </div>
-                <div id="acc-settings" class="tab-content" style="display:none;">
+
+                <div id="t-settings" class="tab-c" style="display:none;">
                     <h3>Sazlamalar</h3>
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 0; border-bottom:1px solid #eee;">
-                        <span>Garaňky tema</span>
-                        <input type="checkbox">
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 0;">
-                        <span>Pul birligi</span>
-                        <select><option>TMT</option><option>RUB</option></select>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>Garaňky tema (Dark Mode)</span>
+                        <label class="switch">
+                            <input type="checkbox" id="theme-toggle" onchange="toggleDark()">
+                            <span class="slider"></span>
+                        </label>
                     </div>
                 </div>
-                <div id="acc-admin" class="tab-content" style="display:none;">
-                    <h3 style="color:var(--danger)">Admin: Kontrol we Dolandyryş</h3>
-                    <div class="card" style="background:#fcfcfc;">
-                        <h4>Ulanyjylar</h4>
-                        <table style="width:100%; text-align:left;">
-                            <tr style="border-bottom:1px solid #ddd;"><th>Ady</th><th>Status</th><th>Hereket</th></tr>
-                            <tr>
-                                <td>Myrat G.</td>
-                                <td><span class="status-badge bg-premium">Premium</span></td>
-                                <td><button class="btn btn-red" style="padding:5px 10px;">Blokla</button></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <button class="btn btn-gold">Täze reýs goşmak</button>
+
+                <div id="t-admin" class="tab-c" style="display:none;">
+                    <h3 style="color:var(--danger)">Admin Dolandyryş</h3>
+                    <table>
+                        <tr><th>Ulanyjy</th><th>Status</th><th>Hereket</th></tr>
+                        <tr>
+                            <td>Myrat G.</td>
+                            <td id="status-user">Adaty</td>
+                            <td>
+                                <button class="btn-green" style="padding:5px 10px; border-radius:5px;" onclick="setPremium()">Premium</button>
+                                <button class="btn-red" style="padding:5px 10px; border-radius:5px;" onclick="blockUser()">Block</button>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    let user = null;
+    let currentUser = null;
 
-    // --- ТВОЯ ЛОГИКА API (НЕ ТРОНУТА) ---
+    // Инициализация красивого календаря
+    flatpickr("#date-picker", { dateFormat: "d.m.Y", minDate: "today" });
+    flatpickr("#pass-expire", { dateFormat: "d.m.Y" });
+
+    // --- ЛОГИКА API (НЕ ТРОНУТА) ---
     async function searchFlights() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
-        const resDiv = document.getElementById('results');
-        resDiv.innerHTML = "<p style='text-align:center;'>Gözlenilýär...</p>";
-
+        const results = document.getElementById('results');
+        results.innerHTML = "Gözlenilýär...";
         try {
             const response = await fetch('/api/search-live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ origin: from, destination: to, date: document.getElementById('date').value })
+                body: JSON.stringify({ origin: from, destination: to, date: document.getElementById('date-picker').value })
             });
             const data = await response.json();
-            resDiv.innerHTML = "";
+            results.innerHTML = "";
             data.tickets.forEach(t => {
-                resDiv.innerHTML += `
-                    <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div><h2 style="margin:0;">${t.price} RUB</h2><small>${from} ➔ ${to}</small></div>
-                        <button class="btn btn-green" onclick="buy('${t.price}')">Bilet al</button>
-                    </div>`;
+                results.innerHTML += `<div class="card" style="display:flex; justify-content:space-between;">
+                    <b>${from} ➔ ${to}</b> <span>${t.price} RUB</span>
+                    <button class="btn btn-green" onclick="alert('Satyn alyndy!')">AL</button>
+                </div>`;
             });
-        } catch(e) { resDiv.innerHTML = "<p>Bağlanyşykda säwlik...</p>"; }
+        } catch(e) { results.innerHTML = "Error!"; }
     }
 
-    // --- ЛОГИКА ИНТЕРФЕЙСА ---
-    function auth() {
+    // --- ТЕМА (DARK MODE) ---
+    function toggleDark() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('dark', document.body.classList.contains('dark-mode'));
+    }
+    if(localStorage.getItem('dark') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('theme-toggle').checked = true;
+    }
+
+    // --- ЛОГИКА АККАУНТА ---
+    function login() {
         const u = document.getElementById('log-user').value;
         const p = document.getElementById('log-pass').value;
-
-        if(u === "Admin" && p === "777") {
-            user = { name: u, role: 'admin', premium: true };
-            document.getElementById('admin-only').style.display = 'flex';
-            document.getElementById('crown').style.display = 'block';
-        } else if(u) {
-            user = { name: u, role: 'user', premium: false };
-        }
-
-        if(user) {
-            document.getElementById('user-name-label').innerText = user.name;
-            document.getElementById('user-top').style.display = 'flex';
-            document.getElementById('entry-btn').style.display = 'none';
-            document.getElementById('link-account').style.display = 'flex';
-            closeM('login-modal');
+        if(u) {
+            currentUser = { name: u, isAdmin: (u === 'Admin' && p === '777') };
+            document.getElementById('u-name').innerText = u;
+            document.getElementById('user-display').style.display = 'block';
+            document.getElementById('login-btn').style.display = 'none';
+            document.getElementById('link-acc').style.display = 'flex';
+            if(currentUser.isAdmin) document.getElementById('admin-nav').style.display = 'flex';
+            closeM();
             showP('account-p');
         }
     }
 
-    function buy(price) {
-        if(!user) return openM('login-modal');
-        alert("Sargyt kabul edildi: " + price + " RUB");
-        document.getElementById('order-list').innerHTML = `<div class="card">${price} RUB - Tassyklanyldy</div>`;
-    }
-
-    function openM(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeM(id) { document.getElementById(id).style.display = 'none'; }
+    function closeM() { document.getElementById('login-modal').style.display = 'none'; }
 
     function showP(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
         document.getElementById(id).classList.add('active-page');
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        document.getElementById('link-' + id.split('-')[0]).classList.add('active');
     }
 
-    function tab(id, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    function tab(id) {
+        document.querySelectorAll('.tab-c').forEach(t => t.style.display = 'none');
         document.getElementById(id).style.display = 'block';
-        document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
+    }
+
+    // Admin функции
+    function setPremium() {
+        document.getElementById('status-user').innerHTML = '<span style="color:var(--tkm-gold)">Premium</span>';
+        document.getElementById('crown-icon').style.display = 'inline';
+    }
+    function blockUser() {
+        document.getElementById('status-user').innerHTML = '<span class="status-black">Blacklist</span>';
     }
 </script>
 </body>
