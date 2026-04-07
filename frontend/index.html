@@ -3,116 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Admin Panel</title>
+    <title>SAPAR.TM - Bilet Gözlegi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --tkm-green: #008751; --gold: #d4af37; --sidebar-w: 300px; }
+        :root { 
+            --tkm-red-grad: linear-gradient(180deg, #a80000 0%, #660000 100%);
+            --tkm-green: #2ecc71;
+            --sidebar-w: 300px;
+        }
         
         body {
             font-family: "Times New Roman", Times, serif;
-            margin: 0; display: flex; height: 100vh; overflow: hidden; background: #f0f2f5;
+            margin: 0; display: flex; height: 100vh; background: #fdfdfd;
         }
 
-        /* ЛЕВАЯ ВЕРТИКАЛЬНАЯ ПАНЕЛЬ */
+        /* КРАСНЫЙ ГРАДИЕНТ БОКОВОЙ ПАНЕЛИ */
         .sidebar {
             width: var(--sidebar-w);
-            background: #1a1a1a;
+            background: var(--tkm-red-grad);
             color: white;
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-            z-index: 1000;
+            padding: 25px;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+            z-index: 10;
         }
 
-        .admin-login {
-            background: #222; padding: 15px; border-radius: 8px; margin-top: auto; border: 1px solid #333;
-        }
-        .admin-login input {
-            width: 100%; padding: 8px; margin: 5px 0; background: #000; border: 1px solid #444; color: white; font-family: inherit;
-        }
+        .sidebar h2 { border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
 
-        /* ОСНОВНОЙ КОНТЕНТ */
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; }
+        .menu-section { margin-bottom: 30px; }
+        .menu-section h4 { color: #ff9999; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        .menu-item { 
+            display: flex; align-items: center; gap: 10px; padding: 10px 0; 
+            cursor: pointer; transition: 0.3s; color: #eee; text-decoration: none;
+        }
+        .menu-item:hover { color: white; padding-left: 5px; }
+
+        /* ОСНОВНАЯ ЧАСТЬ */
+        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
 
         header {
-            background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--tkm-green);
+            background: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #eee;
         }
 
-        /* АНИМАЦИЯ САМОЛЕТА TKM */
-        .plane-line {
-            height: 30px; background: #eee; overflow: hidden; position: relative; border-bottom: 1px solid #ddd;
-        }
-        .flying-plane {
-            position: absolute; left: -100px; animation: fly 15s linear infinite; color: var(--tkm-green); font-weight: bold;
-        }
-        @keyframes fly { from { left: -150px; } to { left: 100%; } }
+        .logo-box { font-size: 28px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .logo-box i { color: #a80000; }
 
-        /* БИЛЕТЫ */
-        .content { padding: 30px; }
+        /* САМОЛЕТ */
+        .sky-line { background: #f0f0f0; height: 35px; position: relative; overflow: hidden; border-bottom: 1px solid #ddd; }
+        .plane-anim { 
+            position: absolute; white-space: nowrap; font-weight: bold; color: #666;
+            animation: fly 12s linear infinite; top: 8px;
+        }
+        @keyframes fly { from { left: -200px; } to { left: 100%; } }
+
+        /* ФОРМА */
+        .container { padding: 40px; max-width: 900px; }
+        .search-card {
+            background: white; padding: 30px; border-radius: 12px; border: 1px solid #eee;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: flex-end;
+        }
+        .input-group { flex: 1; display: flex; flex-direction: column; }
+        .input-group label { font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+        .input-group input { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 16px; }
+
+        /* КНОПКА С АВТО-БЛОКИРОВКОЙ */
+        .btn-search {
+            background: var(--tkm-green); color: white; border: none; padding: 13px 30px;
+            font-weight: bold; border-radius: 6px; cursor: pointer; font-family: inherit;
+        }
+        .btn-search:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* БИЛЕТ */
         .ticket {
-            background: white; margin-bottom: 20px; display: flex; border-radius: 4px; border: 1px solid #ccc;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: white; margin-top: 20px; border: 1px solid #eee; display: flex;
+            border-radius: 8px; overflow: hidden; transition: 0.3s;
         }
-        .ticket-info { flex: 3; padding: 20px; display: flex; justify-content: space-around; align-items: center; }
-        .price-zone { 
-            flex: 1; background: #f9f9f9; border-left: 1px dashed #ccc; padding: 20px; text-align: center; 
-        }
+        .ticket:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .ticket-left { flex: 3; padding: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .ticket-right { flex: 1; background: #fafafa; border-left: 1px dashed #ddd; padding: 25px; text-align: center; }
 
-        .btn-buy { 
-            background: var(--tkm-green); color: white; text-decoration: none; padding: 10px 20px; 
-            display: block; margin-top: 10px; font-weight: bold;
-        }
-
-        .commission-label { font-size: 12px; color: #888; margin-top: 5px; }
+        .admin-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; font-size: 14px; }
+        .admin-box input { width: 100%; margin: 5px 0; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 5px; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2 style="color: var(--tkm-green)">SAPAR.TM</h2>
-    <p>Uçuş dolandyryş paneli</p>
-    <hr style="width:100%; border: 0.5px solid #333">
+    <h2>SAPAR.TM</h2>
     
-    <nav>
-        <p><i class="fas fa-search"></i> Gözleg</p>
-        <p><i class="fas fa-history"></i> Sargytlar</p>
-        <p><i class="fas fa-file-invoice"></i> Kwitansiýalar</p>
-    </nav>
+    <div class="menu-section">
+        <h4>Passenger Area</h4>
+        <a href="#" class="menu-item"><i class="fas fa-user"></i> My Profile</a>
+        <a href="#" class="menu-item"><i class="fas fa-ticket-alt"></i> My Tickets</a>
+    </div>
 
-    <div class="admin-login" id="adminSection">
-        <h4 style="margin:0 0 10px 0">Admin Login</h4>
-        <input type="text" placeholder="Login" id="admUser">
-        <input type="password" placeholder="Parol" id="admPass">
-        <button onclick="adminAuth()" style="width:100%; background:var(--tkm-green); border:none; color:white; padding:5px; cursor:pointer">GIRIŞ</button>
+    <div class="menu-section">
+        <h4>Admin Panel</h4>
+        <div class="admin-box">
+            <input type="text" placeholder="Login" id="admL">
+            <input type="password" placeholder="Password" id="admP">
+            <button onclick="checkAdmin()" style="width:100%; cursor:pointer; background:#fff; border:none; margin-top:5px; font-weight:bold; height:25px;">Login</button>
+        </div>
     </div>
 </div>
 
-<div class="main-wrapper">
+<div class="main">
     <header>
-        <div style="font-size: 24px; font-weight: bold;">
-            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/3/3e/Turkmenistan_Airlines_logo.svg/1200px-Turkmenistan_Airlines_logo.svg.png" height="30" style="vertical-align: middle;">
-            TURKMENISTAN AIRLINES
-        </div>
+        <div class="logo-box"><i class="fas fa-paper-plane"></i> SAPAR<span>.TM</span></div>
         <div>
-            <button onclick="setLang('tk')">TKM</button>
-            <button onclick="setLang('ru')">РУС</button>
+            <span style="cursor:pointer; font-weight:bold; color:#a80000" onclick="setLng('tk')">TKM</span> | 
+            <span style="cursor:pointer; font-weight:bold;" onclick="setLng('ru')">РУС</span>
         </div>
     </header>
 
-    <div class="plane-line">
-        <div class="flying-plane">
-            <i class="fas fa-plane"></i> TKM AIRLINES — СЧАСТЛИВОГО ПУТИ!
-        </div>
+    <div class="sky-line">
+        <div class="plane-anim"><i class="fas fa-plane"></i> Turkmenistan Airlines — Bagtly ýollar dileýäris!</div>
     </div>
 
-    <div class="content">
-        <div class="search-form" style="background:white; padding:20px; display:flex; gap:10px; border:1px solid #ccc; margin-bottom:20px;">
-            <input type="text" id="from" value="MOW" style="padding:10px; flex:1">
-            <input type="text" id="to" value="ASB" style="padding:10px; flex:1">
-            <input type="date" id="date" style="padding:10px; flex:1">
-            <button onclick="searchFlights()" style="background:var(--tkm-green); color:white; border:none; padding:0 30px; cursor:pointer">GÖZLEG</button>
+    <div class="container">
+        <div class="search-card">
+            <div class="input-group">
+                <label>Nireden</label>
+                <input type="text" id="from" placeholder="MOW" oninput="validateForm()">
+            </div>
+            <div class="input-group">
+                <label>Nirä</label>
+                <input type="text" id="to" placeholder="ASB" oninput="validateForm()">
+            </div>
+            <div class="input-group">
+                <label>Sene</label>
+                <input type="date" id="date" oninput="validateForm()">
+            </div>
+            <button class="btn-search" id="searchBtn" onclick="runSearch()" disabled>GÖZLEG</button>
         </div>
 
         <div id="results"></div>
@@ -120,13 +144,24 @@
 </div>
 
 <script>
-    async function searchFlights() {
+    // Проверка заполнения полей
+    function validateForm() {
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
+        const date = document.getElementById('date').value;
+        const btn = document.getElementById('searchBtn');
+        
+        // Кнопка включится только если все 3 поля заполнены
+        btn.disabled = !(from && to && date);
+    }
+
+    async function runSearch() {
         const from = document.getElementById('from').value.toUpperCase();
         const to = document.getElementById('to').value.toUpperCase();
         const date = document.getElementById('date').value;
         const resDiv = document.getElementById('results');
 
-        resDiv.innerHTML = "Garaşyň...";
+        resDiv.innerHTML = "<div style='text-align:center; padding:30px;'>Gözlenilýär...</div>";
 
         try {
             const response = await fetch('/api/search-live', {
@@ -138,45 +173,30 @@
             resDiv.innerHTML = "";
 
             data.tickets.forEach(t => {
-                // РАСЧЕТ КОМИССИИ 5%
-                const originalPrice = t.price;
-                const margin = originalPrice * 0.05;
-                const totalPrice = Math.round(originalPrice + margin);
-
-                // ВРЕМЯ (Примерный расчет прибытия +4 часа если нет в API)
-                const depTime = new Date(t.departure_at);
-                const arrTime = new Date(depTime.getTime() + (4 * 60 * 60 * 1000)); 
+                const priceWithComm = Math.round(t.price * 1.05); // +5%
+                const d = new Date(t.departure_at);
+                const time = d.getHours() + ":" + String(d.getMinutes()).padStart(2,'0');
 
                 resDiv.innerHTML += `
                     <div class="ticket">
-                        <div class="ticket-info">
-                            <div><b>${depTime.getHours()}:${String(depTime.getMinutes()).padStart(2,'0')}</b><br>${t.origin}</div>
-                            <div style="color:var(--tkm-green)"><i class="fas fa-plane"></i><br><small>Gönümel</small></div>
-                            <div><b>${arrTime.getHours()}:${String(arrTime.getMinutes()).padStart(2,'0')}</b><br>${t.destination}</div>
+                        <div class="ticket-left">
+                            <div><b>${time}</b><br><small>${t.origin}</small></div>
+                            <div style="color:#a80000"><i class="fas fa-long-arrow-alt-right"></i></div>
+                            <div><b>--:--</b><br><small>${t.destination}</small></div>
                         </div>
-                        <div class="price-zone">
-                            <div style="font-size:22px; font-weight:bold">${totalPrice.toLocaleString()} RUB</div>
-                            <div class="commission-label">+5% hyzmat tölegi goşuldy</div>
-                            <a href="#" onclick="generateReceipt('${t.origin}','${t.destination}','${totalPrice}')" class="btn-buy">SATYN AL</a>
+                        <div class="ticket-right">
+                            <div style="font-size:20px; font-weight:bold;">${priceWithComm.toLocaleString()} RUB</div>
+                            <button onclick="alert('Receipt created!')" style="background:#a80000; color:white; border:none; width:100%; padding:8px; margin-top:10px; cursor:pointer; font-weight:bold;">BUY</button>
                         </div>
                     </div>`;
             });
         } catch(e) { resDiv.innerHTML = "Error!"; }
     }
 
-    function generateReceipt(o, d, p) {
-        alert("Маршрутная квитанция сформирована!\nМаршрут: " + o + " -> " + d + "\nИтого к оплате: " + p + " RUB\nКомиссия 5% включена.");
-    }
-
-    function adminAuth() {
-        const u = document.getElementById('admUser').value;
-        const p = document.getElementById('admPass').value;
-        if(u === "admin" && p === "sapar123") {
-            alert("LKP-e hoş geldiňiz, Admin!");
-            document.getElementById('adminSection').innerHTML = "<h4 style='color:var(--tkm-green)'>Admin: Online</h4><p>Sargytlar: 12</p>";
-        } else {
-            alert("Ýalňyş login ýa-da parol!");
-        }
+    function checkAdmin() {
+        const p = document.getElementById('admP').value;
+        if(p === "admin123") alert("Welcome, Admin!");
+        else alert("Wrong password!");
     }
 </script>
 </body>
