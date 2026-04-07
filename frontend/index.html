@@ -4,140 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAPAR.TM - Bilet Gözlegi</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f4f7f6;
-        margin: 0;
-        padding: 0;
-        color: #333;
-    }
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+        header { background: #fff; padding: 15px 10%; display: flex; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { font-size: 28px; font-weight: 900; color: #1a1a1a; text-decoration: none; }
+        .logo span { color: #2ecc71; }
 
-    header {
-        background: #ffffff;
-        padding: 20px 10%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
+        /* ТВОЙ КОВЕР ТУТ */
+        .hero {
+            width: 100%; height: 320px;
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), 
+                        url('kover-gushly-gel-253x366-ruchnaja-rabota.jpg');
+            background-size: cover; background-position: center;
+            border-bottom: 5px solid #d4af37; display: flex; align-items: center; justify-content: center;
+        }
+        .hero::after { content: "Bagtly ýollar!"; color: white; font-size: 42px; font-weight: 900; text-shadow: 0 4px 15px rgba(0,0,0,0.6); }
 
-    .logo { font-size: 28px; font-weight: 900; color: #1a1a1a; text-decoration: none; }
-    .logo span { color: #2ecc71; }
+        .main-content { max-width: 1100px; margin: -50px auto 50px; padding: 0 20px; }
 
-    /* БЛОК С КОВРОМ */
-    .hero {
-        width: 100%;
-        height: 300px;
-        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
-                    url('kover-gushly-gel-253x366-ruchnaja-rabota.jpg');
-        background-size: cover;
-        background-position: center;
-        border-bottom: 5px solid #d4af37;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .hero::after {
-        content: "Bagtly ýollar!";
-        color: white;
-        font-size: 40px;
-        font-weight: 900;
-        text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    }
-
-    .main-content {
-        max-width: 1100px;
-        margin: -50px auto 50px;
-        padding: 0 20px;
-    }
-
-    /* ФОРМА ПОИСКА */
-    .search-panel {
-        background: #ffffff;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-        align-items: flex-end;
-    }
-
-    .input-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
-    .input-group label { 
-        font-size: 12px; 
-        font-weight: 700; 
-        color: #888; 
-        margin-bottom: 8px; 
-        text-transform: uppercase;
-    }
-    .input-group input { 
-        padding: 12px 15px; 
-        border: 2px solid #eee; 
-        border-radius: 10px; 
-        font-size: 16px; 
-        outline: none;
-    }
-    .input-group input:focus { border-color: #2ecc71; }
-
-    .btn-search {
-        background: #2ecc71; 
-        color: white; 
-        border: none; 
-        padding: 0 40px;
-        border-radius: 10px; 
-        font-weight: 700; 
-        height: 48px; 
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    /* БИЛЕТ */
-    .ticket {
-        background: white;
-        border-radius: 15px;
-        margin-top: 20px;
-        display: flex;
-        overflow: hidden;
-        border: 1px solid #eee;
-    }
-    .flight-info { flex: 1; padding: 30px; display: flex; align-items: center; justify-content: space-between; }
-    .price-box { width: 220px; background: #fafafa; border-left: 2px dashed #eee; padding: 30px; text-align: center; }
-    .buy-btn { background: #ff4757; color: white; text-decoration: none; padding: 10px; border-radius: 8px; display: block; font-weight: 700; }
-</style>
+        /* КРАСИВАЯ ПАНЕЛЬ ПОИСКА */
+        .search-panel {
+            background: #fff; padding: 30px; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15); display: flex; gap: 15px; align-items: flex-end;
+        }
+        .input-group { flex: 1; display: flex; flex-direction: column; }
+        .input-group label { font-size: 12px; font-weight: 800; color: #888; margin-bottom: 8px; text-transform: uppercase; }
+        .input-group input { padding: 12px 15px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; outline: none; }
+        .input-group input:focus { border-color: #2ecc71; }
+        .btn-search { background: #2ecc71; color: white; border: none; padding: 0 40px; border-radius: 10px; font-weight: 700; height: 48px; cursor: pointer; font-size: 16px; }
+        
+        .ticket { background: white; border-radius: 15px; margin-top: 20px; display: flex; border: 1px solid #eee; overflow: hidden; }
+        .flight-info { flex: 1; padding: 30px; display: flex; align-items: center; justify-content: space-between; }
+        .price-box { width: 220px; background: #fafafa; border-left: 2px dashed #eee; padding: 30px; text-align: center; }
+        .price { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+        .buy-btn { background: #ff4757; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; display: inline-block; font-weight: 700; }
+    </style>
 </head>
 <body>
 
 <header>
-    <a href="/" class="logo">SAPAR<span>.TM</span></a>
+    <a href="#" class="logo">SAPAR<span>.TM</span></a>
 </header>
 
-<div class="carpet-section"></div>
+<div class="hero"></div>
 
-<div class="main-container">
+<div class="main-content">
     <div class="search-panel">
-        <div class="input-box"><label>Nireden</label><input type="text" id="origin" value="MOW"></div>
-        <div class="input-box"><label>Nirä</label><input type="text" id="destination" value="ASB"></div>
-        <div class="input-box"><label>Sene</label><input type="date" id="date"></div>
-        <button class="btn-go" onclick="searchFlights()">GÖZLEG</button>
+        <div class="input-group">
+            <label>Nireden</label>
+            <input type="text" id="from" value="MOW">
+        </div>
+        <div class="input-group">
+            <label>Nirä</label>
+            <input type="text" id="to" value="ASB">
+        </div>
+        <div class="input-group">
+            <label>Sene</label>
+            <input type="date" id="date">
+        </div>
+        <button class="btn-search" onclick="search()">GÖZLEG</button>
     </div>
     <div id="results"></div>
 </div>
 
 <script>
-    /* --- ЛОГИКА (НЕ ИЗМЕНЕНА) --- */
-    async function searchFlights() {
-        const from = document.getElementById('origin').value;
-        const to = document.getElementById('destination').value;
+    async function search() {
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
         const date = document.getElementById('date').value;
-        const resDiv = document.getElementById('results');
-
-        if(!from || !to || !date) return alert("Dolduryň!");
-        resDiv.innerHTML = '<div class="status-text"><i class="fas fa-spinner fa-spin"></i> Biletler gözlenilýär...</div>';
-
+        const res = document.getElementById('results');
+        
+        res.innerHTML = "<p style='text-align:center; padding:20px;'>Gözlenilýär...</p>";
+        
         try {
             const response = await fetch('/api/search-live', {
                 method: 'POST',
@@ -145,26 +83,24 @@
                 body: JSON.stringify({ origin: from, destination: to, date: date })
             });
             const data = await response.json();
-            resDiv.innerHTML = "";
-            if (data.tickets && data.tickets.length > 0) {
-                data.tickets.forEach(t => {
-                    const d = new Date(t.departure_at);
-                    resDiv.innerHTML += `
-                        <div class="ticket-card">
-                            <div class="flight-info">
-                                <div><div class="time">${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}</div><div class="city-code">${t.origin}</div></div>
-                                <div class="plane-divider"><i class="fas fa-plane"></i></div>
-                                <div><div class="time">--:--</div><div class="city-code">${t.destination}</div></div>
-                            </div>
-                            <div class="price-zone">
-                                <div class="price">${t.price.toLocaleString()} RUB</div>
-                                <a href="https://www.aviasales.ru${t.link}" class="buy-btn" target="_blank">SATYN AL</a>
-                            </div>
-                        </div>`;
-                });
-            } else { resDiv.innerHTML = '<div class="status-text">Bagyşlaň, bilet tapylmady.</div>'; }
-        } catch (e) { resDiv.innerHTML = '<div class="status-text" style="color:red;">Näsazlyk ýüze çykdy.</div>'; }
+            res.innerHTML = "";
+            data.tickets.forEach(t => {
+                res.innerHTML += `
+                    <div class="ticket">
+                        <div class="flight-info">
+                            <div><b>${t.origin}</b></div>
+                            <div style="color:#2ecc71">✈</div>
+                            <div><b>${t.destination}</b></div>
+                        </div>
+                        <div class="price-box">
+                            <div class="price">${t.price} RUB</div>
+                            <a href="https://aviasales.ru${t.link}" class="buy-btn">SATYN AL</a>
+                        </div>
+                    </div>`;
+            });
+        } catch(e) { res.innerHTML = "Error!"; }
     }
 </script>
+
 </body>
 </html>
