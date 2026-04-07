@@ -3,137 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM — Официальный поиск</title>
+    <title>SAPAR.TM - Счастливого пути!</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --tkm-green: #00a86b;
-            --carpet-red: #8b0505;
+            --green: #008755;
+            --dark: #1a1a1a;
+            --carpet: #8b0505;
             --gold: #d4af37;
-            --bg: #fdfdfd;
         }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: #f9f9f9; margin: 0; color: #333; }
 
         /* Шапка */
-        header { 
-            position: fixed; top: 0; width: 100%; height: 70px; background: white;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 5%; z-index: 100; box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-        }
-        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #333; font-weight: 800; font-size: 22px; }
-        .logo i { color: var(--tkm-green); font-size: 24px; }
-        .logo span { color: var(--tkm-green); }
+        header { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--green); }
+        .logo { font-size: 24px; font-weight: 900; color: var(--green); text-decoration: none; }
 
-        .nav-right { display: flex; align-items: center; gap: 15px; padding-right: 10%; }
-        .lang { background: #f0fdf4; border: none; padding: 5px 12px; border-radius: 15px; color: var(--tkm-green); font-weight: bold; cursor: pointer; font-size: 12px; }
-        .lk-btn { font-size: 20px; color: #444; cursor: pointer; transition: 0.3s; }
-        .lk-btn:hover { color: var(--tkm-green); }
-
-        /* ГЛАВНЫЙ БЛОК (Ковер + Самолет) */
+        /* Баннер с ковром и текстом */
         .hero { 
-            display: flex; height: 500px; margin-top: 70px; position: relative; 
-            background: linear-gradient(90deg, #e0f2fe 0%, #ffffff 100%); 
+            background: var(--carpet); 
+            height: 250px; 
+            /* НАДЕЖНАЯ ССЫЛКА НА КОВЕР */
+            background-image: url('https://www.transparenttextures.com/patterns/p6.png'); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; border-bottom: 5px solid var(--gold);
         }
-
-        /* Полоса ковра */
-        .carpet-stripe {
-            width: 160px; height: 100%;
-            background: var(--carpet-red) url('https://www.transparenttextures.com/patterns/p6.png');
-            box-shadow: 5px 0 20px rgba(0,0,0,0.2);
-            z-index: 5;
-        }
-
-        /* Фон с самолетом */
-        .plane-area {
-            flex: 1; 
-            background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109c055?auto=format&fit=crop&w=1200');
-            background-size: cover; background-position: center;
-            position: relative; display: flex; align-items: center; padding-left: 60px;
-        }
-        .plane-area::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 50%);
-        }
-
-        .hero-text { z-index: 2; position: relative; }
-        .hero-text h1 { font-size: 42px; margin: 0; color: #1e293b; letter-spacing: 2px; }
-        .hero-text p { font-size: 18px; color: #475569; margin-top: 5px; }
+        .hero h1 { margin: 0; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
 
         /* Поиск */
-        .search-container {
-            position: absolute; bottom: -45px; left: 200px; right: 5%;
-            background: white; padding: 30px; border-radius: 20px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.12);
-            display: flex; gap: 20px; align-items: flex-end; z-index: 10;
-        }
-        .input-group { flex: 1; }
-        .input-group label { display: block; font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; }
-        .input-group input { width: 100%; padding: 14px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; background: #f8fafc; }
-        .input-group input:focus { border-color: var(--tkm-green); background: white; }
+        .search-container { max-width: 1000px; margin: -50px auto 40px; padding: 20px; }
+        .search-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; gap: 15px; flex-wrap: wrap; }
+        
+        .input-group { flex: 1; min-width: 200px; }
+        .input-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #666; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        
+        .btn-main { background: var(--green); color: white; border: none; padding: 0 40px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; height: 45px; margin-top: 20px; }
+        .btn-main:hover { background: #006b43; transform: translateY(-2px); }
 
-        .btn-search {
-            background: var(--tkm-green); color: white; border: none; padding: 0 45px;
-            border-radius: 12px; height: 48px; font-weight: 700; cursor: pointer; transition: 0.3s;
-        }
-        .btn-search:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,168,107,0.3); }
+        /* ПОЛЕЗНЫЕ БЛОКИ (ЧТОБЫ НЕ БЫЛО ПУСТО) */
+        .features { max-width: 1000px; margin: 40px auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 0 20px; }
+        .feat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-bottom: 3px solid var(--gold); }
+        .feat-card i { font-size: 30px; color: var(--green); margin-bottom: 15px; }
 
-        /* Преимущества */
-        .features { max-width: 1100px; margin: 120px auto 60px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; padding: 0 20px; }
-        .f-card { background: white; padding: 40px 20px; border-radius: 25px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.02); }
-        .f-card i { font-size: 35px; color: var(--tkm-green); margin-bottom: 15px; display: block; }
-        .f-card h3 { margin: 0 0 10px; font-size: 18px; }
-        .f-card p { font-size: 14px; color: #64748b; margin: 0; }
-
-        /* Результаты */
-        #results { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        /* Карточка билета */
+        .ticket { background: white; border-radius: 12px; margin-bottom: 15px; display: flex; border: 1px solid #eee; overflow: hidden; }
+        .flight-info { flex: 1; padding: 20px; display: flex; align-items: center; justify-content: space-around; }
+        .price-info { width: 180px; background: #f4f4f4; padding: 20px; text-align: center; border-left: 1px dashed #ccc; }
+        .price { font-size: 22px; font-weight: bold; color: var(--dark); }
+        .btn-buy { background: #e74c3c; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; display: block; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="#" class="logo"><i class="fab fa-telegram-plane"></i> SAPAR<span>.TM</span></a>
-    <div class="nav-right">
-        <button class="lang">TKM</button>
-        <button class="lang">RU</button>
-        <i class="fas fa-user-circle lk-btn"></i>
-    </div>
+    <a href="#" class="logo">SAPAR.TM</a>
+    <div><button>TKM</button> <button>PYC</button></div>
 </header>
 
 <div class="hero">
-    <div class="carpet-stripe"></div>
-    <div class="plane-area">
-        <div class="hero-text">
-            <h1>TURKMENISTAN</h1>
-            <p>Iň amatly petekler — bir düwmäniň aňyrsynda</p>
-        </div>
-    </div>
-    <div class="search-container">
-        <div class="input-group"><label>Nireden</label><input type="text" id="origin" value="MOW"></div>
-        <div class="input-group"><label>Nirä</label><input type="text" id="destination" value="ASB"></div>
-        <div class="input-group"><label>Sene</label><input type="date" id="date"></div>
-        <button class="btn-search" onclick="runSearch()">GÖZLEG</button>
-    </div>
+    <h1>TKM AIRLINES — СЧАСТЛИВОГО ПУТИ!</h1>
+    <p>Iň amatly petekler şu taýda</p>
 </div>
 
-<div id="results"></div>
+<div class="search-container">
+    <div class="search-card">
+        <div class="input-group"><label>Nireden</label><input type="text" id="from" value="MOW"></div>
+        <div class="input-group"><label>Nirä</label><input type="text" id="to" value="ASB"></div>
+        <div class="input-group"><label>Sene</label><input type="date" id="date"></div>
+        <button class="btn-main" onclick="runSearch()">GÖZLEG</button>
+    </div>
+
+    <div id="results-list"></div>
+</div>
 
 <div class="features">
-    <div class="f-card"><i class="fas fa-fingerprint"></i><h3>Ynamly</h3><p>Petekleriňiz resmi taýdan hasaba alynýar.</p></div>
-    <div class="f-card"><i class="fas fa-wind"></i><h3>Çalt</h3><p>Iň amatly nyrhlary sekuntda tapyň.</p></div>
-    <div class="f-card"><i class="fas fa-headset"></i><h3>24/7 Hyzmat</h3><p>Soraglaryňyz üçin elmydama taýýar.</p></div>
+    <div class="feat-card"><i class="fas fa-shield-alt"></i><h3>Ynamly</h3><p>Ähli tölegler goragly geçirilýär.</p></div>
+    <div class="feat-card"><i class="fas fa-bolt"></i><h3>Çalt</h3><p>Biletleri sanlyja sekuntda tapyň.</p></div>
+    <div class="feat-card"><i class="fas fa-headset"></i><h3>Goldaw</h3><p>24/7 hyzmatyňyzda.</p></div>
 </div>
 
 <script>
-    // Логика соединения (НЕ ТРОГАЕМ)
     async function runSearch() {
-        const from = document.getElementById('origin').value;
-        const to = document.getElementById('destination').value;
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
         const date = document.getElementById('date').value;
-        const resBox = document.getElementById('results');
+        const resBox = document.getElementById('results-list');
 
         if(!from || !to || !date) return alert("Maglumatlary giriziň!");
-        resBox.innerHTML = '<div style="text-align:center; padding:50px; color:var(--tkm-green);"><i class="fas fa-spinner fa-spin"></i> Gözlenilýär...</div>';
+
+        resBox.innerHTML = '<div style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Gözlenilýär...</div>';
 
         try {
             const response = await fetch('/api/search-live', {
@@ -143,19 +102,26 @@
             });
             const data = await response.json();
             resBox.innerHTML = "";
+
             if(data.tickets && data.tickets.length > 0) {
                 data.tickets.forEach(t => {
                     resBox.innerHTML += `
-                        <div style="background:white; border-radius:20px; padding:30px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.05);">
-                            <div><b style="font-size:22px; color:var(--tkm-green)">${t.origin} → ${t.destination}</b></div>
-                            <div style="text-align:right">
-                                <div style="font-size:24px; font-weight:900;">${t.price.toLocaleString()} RUB</div>
-                                <a href="https://www.aviasales.ru${t.link}" target="_blank" style="background:#ef4444; color:white; padding:10px 20px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block; margin-top:10px;">SATYN AL</a>
+                        <div class="ticket">
+                            <div class="flight-info">
+                                <div><b>${t.origin}</b></div>
+                                <div><i class="fas fa-plane" style="color:var(--green)"></i></div>
+                                <div><b>${t.destination}</b></div>
+                            </div>
+                            <div class="price-info">
+                                <div class="price">${t.price} RUB</div>
+                                <a href="https://www.aviasales.ru${t.link}" class="btn-buy" target="_blank">SATYN AL</a>
                             </div>
                         </div>`;
                 });
-            } else { resBox.innerHTML = "<p style='text-align:center'>Bilet tapylmady.</p>"; }
-        } catch (e) { resBox.innerHTML = "<p style='color:red; text-align:center'>Сервер Railway не отвечает. Проверьте лимиты.</p>"; }
+            } else { resBox.innerHTML = "<p>Bilet tapylmady.</p>"; }
+        } catch (e) {
+            resBox.innerHTML = "<p style='color:red'>Сервер не отвечает. Проверьте Railway.</p>";
+        }
     }
 </script>
 </body>
