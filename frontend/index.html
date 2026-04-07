@@ -1,43 +1,56 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Advanced Account</title>
+    <title>SAPAR.TM - Premium Travel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --tkm-green: #00563b; --tkm-gold: #c5a059; --bg: #f5f7f9; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; transition: 0.3s; }
+        
+        /* Темная тема */
+        body.dark-mode { --bg: #121212; background: var(--bg); color: #e0e0e0; }
+        body.dark-mode .content-card, body.dark-mode .nav-menu, body.dark-mode .top-bar { background: #1e1e1e; border-color: #333; color: white; }
+        body.dark-mode .search-box, body.dark-mode .ticket { background: #1e1e1e; border-color: #333; }
 
         /* Sidebar */
-        .sidebar { width: 260px; background: var(--tkm-green); color: white; padding: 25px; display: flex; flex-direction: column; }
+        .sidebar { width: 260px; background: var(--tkm-green); color: white; padding: 25px; display: flex; flex-direction: column; z-index: 10; }
         .brand { font-size: 24px; font-weight: bold; margin-bottom: 40px; border-bottom: 2px solid var(--tkm-gold); padding-bottom: 10px; }
         .nav-link { padding: 15px; color: white; cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 8px; transition: 0.3s; margin-bottom: 5px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: var(--tkm-gold); }
 
-        /* Content Areas */
-        .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-        .page { display: none; padding: 40px; animation: fadeIn 0.3s; }
+        /* Main Content */
+        .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
+        .top-bar { background: white; padding: 15px 30px; display: flex; justify-content: flex-end; gap: 20px; border-bottom: 1px solid #ddd; align-items: center; }
+        .page { display: none; animation: fadeIn 0.3s; }
         .active-page { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Forms & Inputs */
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 600px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 12px; font-weight: bold; color: #777; margin-bottom: 8px; }
-        .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; outline: none; box-sizing: border-box; }
+        /* Search Section */
+        .hero { background: var(--tkm-green); color: white; padding: 60px 20px; text-align: center; }
+        .search-container { max-width: 1000px; margin: -40px auto 30px; width: 95%; }
+        .search-box { background: white; padding: 25px; border-radius: 15px; display: flex; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .search-box input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
 
-        .btn-primary { background: var(--tkm-green); color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
-        .btn-logout { color: #ff7675; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        /* Dashboard Layout (ЛК как на скриншотах) */
+        .dashboard-layout { display: flex; gap: 25px; padding: 40px; max-width: 1200px; margin: 0 auto; }
+        .nav-menu { width: 220px; background: white; border-radius: 15px; padding: 10px; height: fit-content; border: 1px solid #eee; }
+        .nav-item { padding: 12px 15px; cursor: pointer; border-radius: 10px; display: flex; align-items: center; gap: 10px; color: #555; transition: 0.2s; margin-bottom: 5px; }
+        .nav-item:hover { background: #f0f7f4; color: var(--tkm-green); }
+        .nav-item.active { background: var(--tkm-green); color: white; }
+        .content-card { flex: 1; background: white; border-radius: 15px; padding: 30px; border: 1px solid #eee; min-height: 400px; }
 
-        /* Search Styles from your screenshots */
-        .search-box { background: white; padding: 30px; border-radius: 20px; display: flex; gap: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.12); margin-top: -50px; }
-        .hero { background: var(--tkm-green); color: white; padding: 80px 20px; text-align: center; }
+        /* UI Elements */
+        .btn-primary { background: var(--tkm-green); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .section-title { font-size: 22px; font-weight: bold; margin-bottom: 20px; color: var(--tkm-green); }
+        .toggle-group { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
         
-        .ticket { background: white; margin: 15px 0; border-radius: 15px; display: flex; border: 1px solid #eee; overflow: hidden; }
-        .ticket-info { flex: 1; padding: 25px; display: flex; justify-content: space-around; align-items: center; }
-        .ticket-buy { width: 180px; padding: 25px; background: #fafafa; border-left: 1px dashed #ccc; text-align: center; }
-        .price { font-size: 22px; font-weight: bold; color: var(--tkm-green); }
+        /* Tickets */
+        .ticket { background: white; margin: 15px 0; border-radius: 12px; display: flex; border: 1px solid #eee; overflow: hidden; }
+        .ticket-info { flex: 1; padding: 20px; display: flex; justify-content: space-around; align-items: center; }
+        .ticket-buy { width: 180px; padding: 20px; background: #fafafa; border-left: 1px dashed #ccc; text-align: center; }
+        .price { font-size: 20px; font-weight: bold; color: var(--tkm-green); }
     </style>
 </head>
 <body>
@@ -45,132 +58,158 @@
 <div class="sidebar">
     <div class="brand">SAPAR.TM</div>
     <div class="nav-link active" onclick="showP('search-p')"><i class="fas fa-search"></i> Gözleg</div>
-    
     <div id="auth-links" style="display: none;">
-        <div class="nav-link" onclick="showP('orders-p')"><i class="fas fa-ticket-alt"></i> Sargytlarym</div>
-        <div class="nav-link" onclick="showP('settings-p')"><i class="fas fa-cog"></i> Sazlamalar</div>
+        <div class="nav-link" onclick="showP('account-p')"><i class="fas fa-user-circle"></i> Şahsy otag</div>
     </div>
-
-    <div class="nav-link" id="login-nav" onclick="userLogin()"><i class="fas fa-user-circle"></i> <span>Giriş</span></div>
-    
-    <div class="nav-link btn-logout" id="logout-nav" style="display: none;" onclick="userLogout()">
-        <i class="fas fa-sign-out-alt"></i> Çykyş
-    </div>
+    <div class="nav-link" id="login-nav" onclick="userLogin()"><i class="fas fa-sign-in-alt"></i> <span>Giriş</span></div>
 </div>
 
 <div class="main">
+    <div class="top-bar">
+        <div id="user-display" style="font-weight: bold; color: var(--tkm-green);"></div>
+        <div style="cursor:pointer;"><span onclick="setLang('tk')">TKM</span> | <span onclick="setLang('ru')">RU</span></div>
+    </div>
+
     <div id="search-p" class="page active-page">
-        <div class="hero"><h1>Bagtly ýollar!</h1></div>
-        <div style="max-width: 1000px; margin: 0 auto; width: 95%;">
+        <div class="hero"><h1>Bagtly ýollar!</h1><p>Premium travel experience</p></div>
+        <div class="search-container">
             <div class="search-box">
-                <input type="text" id="from" placeholder="Nireden" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:10px;">
-                <input type="text" id="to" placeholder="Nirä" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:10px;">
+                <input type="text" id="from" placeholder="Nireden (ASB)">
+                <input type="text" id="to" placeholder="Nirä (IST)">
+                <input type="date" id="date">
                 <button class="btn-primary" onclick="searchFlights()">GÖZLEG</button>
             </div>
-            <div id="results" style="margin-top: 30px;"></div>
+            <div id="results" style="margin-top: 20px;"></div>
         </div>
     </div>
 
-    <div id="orders-p" class="page">
-        <h2>Meniň sargytlarym</h2>
-        <div id="orders-list">Sargyt tapylmady.</div>
-    </div>
+    <div id="account-p" class="page">
+        <div class="dashboard-layout">
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="switchTab('tab-orders', this)"><i class="fas fa-shopping-bag"></i> Sargytlarym</div>
+                <div class="nav-item" onclick="switchTab('tab-docs', this)"><i class="fas fa-id-card"></i> Resminamalar</div>
+                <div class="nav-item" onclick="switchTab('tab-notify', this)"><i class="fas fa-bell"></i> Bildirişler</div>
+                <div class="nav-item" onclick="switchTab('tab-settings', this)"><i class="fas fa-cog"></i> Sazlamalar</div>
+                <div class="nav-item" style="color: #e74c3c; margin-top: 20px;" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> Çykyş</div>
+            </div>
 
-    <div id="settings-p" class="page">
-        <h2>Sazlamalar</h2>
-        <div class="card">
-            <div class="input-group">
-                <label>Doly adyňyz (Загранпаспорт боюнча)</label>
-                <input type="text" id="set-name" placeholder="ANNA MURATOW">
+            <div class="content-card">
+                <div id="tab-orders" class="account-tab">
+                    <div class="section-title">Meniň sargytlarym</div>
+                    <div id="orders-list">Sargyt tapylmady.</div>
+                </div>
+
+                <div id="tab-docs" class="account-tab" style="display:none;">
+                    <div class="section-title">Taze resminama goşmak</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <input type="text" id="doc-surname" placeholder="Familiýasy" style="padding:10px; border-radius:5px; border:1px solid #ddd;">
+                        <input type="text" id="doc-name" placeholder="Ady" style="padding:10px; border-radius:5px; border:1px solid #ddd;">
+                    </div>
+                    <input type="text" id="doc-number" placeholder="Pasport seriýasy (I-AS 123456)" style="width:96%; margin-top:15px; padding:10px; border-radius:5px; border:1px solid #ddd;">
+                    <button class="btn-primary" style="margin-top:20px;" onclick="saveDoc()">Ýatda sakla</button>
+                </div>
+
+                <div id="tab-settings" class="account-tab" style="display:none;">
+                    <div class="section-title">Sazlamalar</div>
+                    <div class="toggle-group">
+                        <span>Garaňky tema (Dark Mode)</span>
+                        <input type="checkbox" onchange="document.body.classList.toggle('dark-mode')">
+                    </div>
+                    <div class="toggle-group">
+                        <span>Pul birligi</span>
+                        <select style="padding:5px;"><option>RUB</option><option>TMT</option><option>USD</option></select>
+                    </div>
+                </div>
             </div>
-            <div class="input-group">
-                <label>Загранпаспорт серия (I-AS 123456)</label>
-                <input type="text" id="set-pass" placeholder="I-AS 123456">
-            </div>
-            <button class="btn-primary" onclick="saveSettings()">Ýatda sakla</button>
         </div>
     </div>
 </div>
 
 <script>
-    let currentUser = null;
-    let userData = { name: "", passport: "" };
     let myOrders = [];
+    let savedPassport = null;
 
-    // Логика Входа
-    function userLogin() {
-        const u = prompt("Ulanyjy adyňyz:");
-        if(u) {
-            currentUser = u;
-            document.querySelector('#login-nav span').innerText = u;
-            document.getElementById('auth-links').style.display = 'block';
-            document.getElementById('logout-nav').style.display = 'flex';
-            document.getElementById('login-nav').onclick = null; // Отключаем повторный промпт
-        }
-    }
-
-    // Логика Выхода
-    function userLogout() {
-        if(confirm("Hasapdan çykmak isleýärsiňizmi?")) {
-            location.reload(); 
-        }
-    }
-
-    // Сохранение настроек
-    function saveSettings() {
-        userData.name = document.getElementById('set-name').value.toUpperCase();
-        userData.passport = document.getElementById('set-pass').value.toUpperCase();
-        alert("Maglumatlar saklandy! İndi bilet alanyňyzda awtomatik doldurylar.");
-    }
-
-    // Поиск (упрощенная имитация для примера)
+    // Соединение с твоим API (Логика не тронута)
     async function searchFlights() {
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
+        const date = document.getElementById('date').value;
         const resDiv = document.getElementById('results');
-        
-        resDiv.innerHTML = `
-            <div class="ticket">
-                <div class="ticket-info">
-                    <b>${from || 'ASB'}</b> <i class="fas fa-plane"></i> <b>${to || 'IST'}</b>
-                </div>
-                <div class="ticket-buy">
-                    <div class="price">32500 RUB</div>
-                    <button class="btn-primary" style="width:100%; margin-top:10px;" onclick="quickBuy('${from}','${to}', 32500)">SATYN AL</button>
-                </div>
-            </div>`;
+
+        resDiv.innerHTML = "Gözlenilýär...";
+
+        try {
+            const response = await fetch('/api/search-live', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ origin: from, destination: to, date: date })
+            });
+            const data = await response.json();
+            resDiv.innerHTML = "";
+
+            if(data.tickets) {
+                data.tickets.forEach(t => {
+                    resDiv.innerHTML += `
+                        <div class="ticket">
+                            <div class="ticket-info"><b>${from}</b> <i class="fas fa-plane"></i> <b>${to}</b></div>
+                            <div class="ticket-buy">
+                                <div class="price">${t.price} RUB</div>
+                                <button class="btn-primary" onclick="bookFlight('${from}','${to}','${t.price}')">SATYN AL</button>
+                            </div>
+                        </div>`;
+                });
+            }
+        } catch(e) { resDiv.innerHTML = "Error connecting to server."; }
     }
 
-    function quickBuy(f, t, p) {
-        if(!currentUser) { alert("Sargyt etmek üçin ulgama giriň!"); return; }
-        
-        // Автоподстановка из настроек
-        const name = userData.name || prompt("Yolagçynyň ady (Загран):");
-        const pass = userData.passport || prompt("Pasport seriýasy (I-AS...):");
-
-        if(name && pass) {
-            const order = { f, t, p, name, pass, id: 'SAP'+Math.floor(Math.random()*999) };
-            myOrders.push(order);
+    function bookFlight(f, t, p) {
+        const name = savedPassport ? `${savedPassport.name} ${savedPassport.surname}` : prompt("Yolagçynyň ady:");
+        if(name) {
+            myOrders.push({ f, t, p, name, id: 'SAP'+Math.floor(Math.random()*999) });
             renderOrders();
-            alert(`Sargyt kabul edildi!\nYolagçy: ${name}\nBilet "Sargytlarym" bölümine goşuldy.`);
+            alert("Sargyt kabul edildi! 'Şahsy otag' bölüminde görüp bilersiňiz.");
         }
     }
 
     function renderOrders() {
         const list = document.getElementById('orders-list');
         list.innerHTML = myOrders.map(o => `
-            <div style="background:white; padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-                <div><b>${o.f} -> ${o.t}</b><br><small>${o.name} | ${o.pass}</small></div>
-                <b style="color:var(--tkm-green)">${o.p} RUB</b>
+            <div style="border-bottom:1px solid #eee; padding:10px 0;">
+                <b>${o.f} ➔ ${o.t}</b> | ${o.name} <br>
+                <span style="color:var(--tkm-green)">${o.p} RUB</span> (Tassyklanyldy)
             </div>
         `).join('');
+    }
+
+    function saveDoc() {
+        savedPassport = {
+            surname: document.getElementById('doc-surname').value,
+            name: document.getElementById('doc-name').value,
+            num: document.getElementById('doc-number').value
+        };
+        alert("Resminama ýatda saklanyldy!");
+    }
+
+    function userLogin() {
+        const user = prompt("Ulanyjy adyňyz:");
+        if(user) {
+            document.getElementById('user-display').innerText = user;
+            document.getElementById('auth-links').style.display = 'block';
+            document.getElementById('login-nav').style.display = 'none';
+            showP('account-p');
+        }
     }
 
     function showP(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
         document.getElementById(id).classList.add('active-page');
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+    }
+
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.account-tab').forEach(t => t.style.display = 'none');
+        document.getElementById(tabId).style.display = 'block';
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
     }
 </script>
 </body>
