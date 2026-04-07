@@ -3,307 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Turkmenistan Airlines Style</title>
+    <title>SAPAR.TM - Аккуратный Поиск</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --tkm-green: #00563b; /* Фирменный зеленый */
-            --tkm-gold: #c5a059;  /* Золотистый акцент */
-            --light-bg: #f5f7f9;
+        :root { 
+            --tkm-red-grad: linear-gradient(180deg, #b30000 0%, #7a0000 100%);
+            --tkm-green: #2ecc71;
+            --sidebar-w: 300px;
         }
-
+        
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            background-color: var(--light-bg);
-            display: flex;
-            height: 100vh;
+            font-family: "Times New Roman", Times, serif;
+            margin: 0; display: flex; height: 100vh; background: #fdfdfd; overflow: hidden;
         }
 
-        /* САЙДБАР */
+        /* САЙДБАР С КРАСНЫМ ГРАДИЕНТОМ */
         .sidebar {
-            width: 280px;
-            background: var(--tkm-green);
+            width: var(--sidebar-w);
+            background: var(--tkm-red-grad);
             color: white;
             display: flex;
             flex-direction: column;
-            padding: 25px;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
         }
 
-        .brand {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 40px;
-            border-bottom: 2px solid var(--tkm-gold);
-            padding-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .menu-item { 
+            display: flex; align-items: center; gap: 15px; padding: 15px 0; 
+            cursor: pointer; transition: 0.3s; color: #f2f2f2; text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: 0.3s;
-            cursor: pointer;
-            margin-bottom: 5px;
-        }
-        .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: var(--tkm-gold);
-        }
-        .nav-link.active {
-            background: var(--tkm-gold);
-            color: var(--tkm-green);
-            font-weight: 600;
-        }
+        .menu-item:hover { color: var(--tkm-green); padding-left: 10px; }
 
         /* ОСНОВНОЙ КОНТЕНТ */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            position: relative;
+        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+
+        header {
+            background: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #eee;
         }
 
-        .top-bar {
-            background: white;
-            padding: 15px 40px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 20px;
-            border-bottom: 1px solid #ddd;
-        }
+        .logo { font-size: 30px; font-weight: bold; color: #333; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--tkm-green); } /* Зеленый логотип */
+        .logo span { color: var(--tkm-green); }
 
-        .search-hero {
-            background: var(--tkm-green);
-            height: 200px;
-            padding: 40px;
-            color: white;
+        .lang-btns button { 
+            background: none; border: 1px solid #ddd; padding: 5px 10px; cursor: pointer; 
+            font-family: inherit; font-weight: bold; margin-left: 5px; border-radius: 4px;
         }
+        .lang-btns button.active { border-color: var(--tkm-green); color: var(--tkm-green); }
 
-        .search-box {
-            max-width: 1000px;
-            margin: -60px auto 0;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            display: flex;
-            gap: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .banner { background: #f8f9fa; padding: 10px 40px; border-bottom: 1px solid #eee; }
+        .moving-text { color: #555; font-weight: bold; font-style: italic; }
+
+        .container { padding: 40px; max-width: 900px; margin: 0 auto; width: 100%; }
+
+        /* ФОРМА ПОИСКА */
+        .search-row {
+            background: white; padding: 25px; border-radius: 8px; border: 1px solid #eee;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: flex-end;
         }
+        .field { flex: 1; display: flex; flex-direction: column; }
+        .field label { font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #666; }
+        .field input { padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 16px; }
 
-        .search-box input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
-            outline: none;
+        .go-btn {
+            background: var(--tkm-green); color: white; border: none; padding: 12px 30px;
+            font-weight: bold; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 16px;
         }
-        .search-box input:focus { border-color: var(--tkm-green); }
+        .go-btn:disabled { background: #ddd; cursor: not-allowed; }
 
-        .btn-find {
-            background: var(--tkm-green);
-            color: white;
-            border: none;
-            padding: 0 40px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-find:hover { background: #00402b; transform: translateY(-2px); }
-
-        /* КАРТОЧКА БИЛЕТА */
+        /* БИЛЕТ */
         .ticket {
-            background: white;
-            margin: 20px auto;
-            max-width: 900px;
-            border-radius: 12px;
-            display: flex;
-            overflow: hidden;
-            border: 1px solid #eee;
-            transition: 0.3s;
+            background: white; margin-top: 20px; border: 1px solid #eee; display: flex;
+            border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
-        .ticket:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .t-main { flex: 3; padding: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .t-side { flex: 1; background: #fafafa; border-left: 1px dashed #ddd; padding: 30px; text-align: center; }
+        
+        .city-box b { font-size: 24px; }
+        .city-box span { color: #888; font-weight: bold; }
 
-        .ticket-price-side {
-            width: 220px;
-            padding: 30px;
-            background: #fcfcfc;
-            border-right: 1px dashed #ddd;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        /* ОКНО ЛК */
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; 
         }
-
-        .price { font-size: 26px; font-weight: bold; color: var(--tkm-green); margin-bottom: 15px; }
-
-        .btn-buy {
-            background: var(--tkm-gold);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .ticket-info-side {
-            flex: 1;
-            padding: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-        }
-
-        .route-line {
-            flex: 1;
-            height: 1px;
-            background: #ddd;
-            margin: 0 20px;
-            position: relative;
-            text-align: center;
-        }
-        .route-line i {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            color: var(--tkm-gold);
-        }
-
-        /* МОДАЛКА */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
-        }
-        .modal-content {
-            background: white; padding: 40px; border-radius: 15px; width: 400px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
+        .modal-content { background: white; padding: 40px; border-radius: 8px; width: 400px; position: relative; }
+        .close { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 20px; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="brand"><i class="fas fa-paper-plane"></i> SAPAR.TM</div>
-    <div class="nav-link active"><i class="fas fa-search"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
-    <div class="nav-link" onclick="openModal('login')"><i class="fas fa-user"></i> <span class="lang" data-tk="Giriş" data-ru="Личный кабинет">Giriş</span></div>
-    <div class="nav-link" id="adminBtn" style="display:none;" onclick="openModal('admin')"><i class="fas fa-cog"></i> Admin</div>
+    <h2 style="margin-bottom: 40px;">SAPAR.TM</h2>
+    
+    <div class="menu-item" onclick="openLK('profile')">
+        <i class="fas fa-user-circle"></i> <span id="m-profile">Meniň Profilim</span>
+    </div>
+    <div class="menu-item" onclick="openLK('tickets')">
+        <i class="fas fa-ticket-alt"></i> <span id="m-tickets">Meniň Biletlerim</span>
+    </div>
+    <div class="menu-item" onclick="openLK('login')">
+        <i class="fas fa-sign-in-alt"></i> <span id="m-login">Giriş</span>
+    </div>
 </div>
 
-<div class="main-content">
-    <div class="top-bar">
-        <span onclick="setLang('tk')" style="cursor:pointer; font-weight:bold;">TKM</span>
-        <span onclick="setLang('ru')" style="cursor:pointer; font-weight:bold;">РУС</span>
-    </div>
-
-    <div class="search-hero">
-        <h1>Hoş geldiňiz! / Добро пожаловать!</h1>
-        <p>Лучшие цены на авиабилеты Туркменистана</p>
-    </div>
-
-    <div class="search-box">
-        <input type="text" id="from" placeholder="Nireden (Откуда)">
-        <input type="text" id="to" placeholder="Nirä (Куда)">
-        <input type="date" id="date">
-        <button class="btn-find" onclick="searchFlights()">BILET TAP</button>
-    </div>
-
-    <div id="results">
+<div class="main">
+    <header>
+        <div class="logo"><i class="fas fa-plane"></i> SAPAR<span>.TM</span></div>
+        <div class="lang-btns">
+            <button onclick="changeLang('tk')" id="l-tk" class="active">TKM</button>
+            <button onclick="changeLang('ru')" id="l-ru">РУС</button>
+            <button onclick="changeLang('en')" id="l-en">ENG</button>
         </div>
+    </header>
+
+    <div class="banner">
+        <marquee class="moving-text" id="scroll-text">Ak ýollar size hemra bolsun! — Arzuwlaryňyza biz bilen uçun.</marquee>
+    </div>
+
+    <div class="container">
+        <div class="search-row">
+            <div class="field">
+                <label id="lbl-from">Nireden</label>
+                <input type="text" id="from" placeholder="MOW" oninput="checkInputs()">
+            </div>
+            <div class="field">
+                <label id="lbl-to">Nirä</label>
+                <input type="text" id="to" placeholder="ASB" oninput="checkInputs()">
+            </div>
+            <div class="field">
+                <label id="lbl-date">Sene</label>
+                <input type="date" id="date" oninput="checkInputs()">
+            </div>
+            <button class="go-btn" id="findBtn" onclick="doSearch()" disabled>GÖZLEG</button>
+        </div>
+        <div id="results-box"></div>
+    </div>
 </div>
 
-<div id="mainModal" class="modal" onclick="if(event.target==this) closeModal()">
-    <div class="modal-content" id="modalBody"></div>
+<div id="lkModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeLK()">&times;</span>
+        <h3 id="modal-title">Hasabym</h3>
+        <div id="modal-body">
+            <p>Maglumatlar ýüklenýär...</p>
+        </div>
+    </div>
 </div>
 
 <script>
-    // --- ТВОЯ ЛОГИКА (НЕ ТРОГАЕМ) ---
-    async function searchFlights() {
+    const dictionary = {
+        tk: { from: "Nireden", to: "Nirä", date: "Sene", search: "GÖZLEG", profile: "Meniň Profilim", tickets: "Meniň Biletlerim", login: "Giriş", scroll: "Ak ýollar size hemra bolsun! — Arzuwlaryňyza biz bilen uçun.", buy: "SATYN AL", wait: "Gözlenilýär..." },
+        ru: { from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК", profile: "Мой Профиль", tickets: "Мои Билеты", login: "Войти", scroll: "Желаем вам доброго пути! — Летите к мечте вместе с нами.", buy: "КУПИТЬ", wait: "Ищем билеты..." },
+        en: { from: "From", to: "To", date: "Date", search: "SEARCH", profile: "My Profile", tickets: "My Tickets", login: "Sign In", scroll: "Have a safe flight! — Fly to your dreams with us.", buy: "BUY NOW", wait: "Searching..." }
+    };
+
+    let curLang = 'tk';
+
+    function changeLang(l) {
+        curLang = l;
+        document.querySelectorAll('.lang-btns button').forEach(b => b.classList.remove('active'));
+        document.getElementById('l-' + l).classList.add('active');
+        
+        document.getElementById('lbl-from').innerText = dictionary[l].from;
+        document.getElementById('lbl-to').innerText = dictionary[l].to;
+        document.getElementById('lbl-date').innerText = dictionary[l].date;
+        document.getElementById('findBtn').innerText = dictionary[l].search;
+        document.getElementById('m-profile').innerText = dictionary[l].profile;
+        document.getElementById('m-tickets').innerText = dictionary[l].tickets;
+        document.getElementById('m-login').innerText = dictionary[l].login;
+        document.getElementById('scroll-text').innerText = dictionary[l].scroll;
+    }
+
+    function checkInputs() {
+        const f = document.getElementById('from').value;
+        const t = document.getElementById('to').value;
+        const d = document.getElementById('date').value;
+        document.getElementById('findBtn').disabled = !(f && t && d);
+    }
+
+    async function doSearch() {
         const from = document.getElementById('from').value.toUpperCase();
         const to = document.getElementById('to').value.toUpperCase();
         const date = document.getElementById('date').value;
-        const resDiv = document.getElementById('results');
+        const box = document.getElementById('results-box');
 
-        resDiv.innerHTML = "<p style='text-align:center; margin-top:50px;'>Gözlenilýär...</p>";
+        box.innerHTML = `<p style="text-align:center; padding:50px;">${dictionary[curLang].wait}</p>`;
 
         try {
-            const response = await fetch('/api/search-live', {
+            const r = await fetch('/api/search-live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ origin: from, destination: to, date: date })
             });
-
-            const data = await response.json();
-            resDiv.innerHTML = "";
+            const data = await r.json();
+            box.innerHTML = "";
 
             data.tickets.forEach(t => {
-                const price = Math.round(t.price * 1.05); // Наценка 5%
-                resDiv.innerHTML += `
+                const finalPrice = Math.round(t.price * 1.05); // +5% комиссия
+                const dep = new Date(t.departure_at);
+                const depTime = dep.getHours() + ":" + String(dep.getMinutes()).padStart(2, '0');
+                
+                // Расчет времени прибытия (точка Б) - берем +3 часа 30 мин
+                const arr = new Date(dep.getTime() + (3.5 * 60 * 60 * 1000));
+                const arrTime = arr.getHours() + ":" + String(arr.getMinutes()).padStart(2, '0');
+
+                box.innerHTML += `
                     <div class="ticket">
-                        <div class="ticket-price-side">
-                            <div class="price">${price.toLocaleString()} RUB</div>
-                            <button class="btn-buy" onclick="openModal('buy', ${price})">SATYN AL</button>
+                        <div class="t-main">
+                            <div class="city-box"><b>${depTime}</b><br><span>${t.origin}</span></div>
+                            <div style="color:var(--tkm-green); font-size:20px;"><i class="fas fa-long-arrow-alt-right"></i></div>
+                            <div class="city-box"><b>${arrTime}</b><br><span>${t.destination}</span></div>
                         </div>
-                        <div class="ticket-info-side">
-                            <div style="text-align:center">
-                                <div style="font-size:24px; font-weight:bold;">12:00</div>
-                                <div style="color:#777">${t.origin}</div>
-                            </div>
-                            <div class="route-line">
-                                <span style="font-size:11px; color:#999;">3h 30m</span>
-                                <i class="fas fa-plane"></i>
-                            </div>
-                            <div style="text-align:center">
-                                <div style="font-size:24px; font-weight:bold;">15:30</div>
-                                <div style="color:#777">${t.destination}</div>
-                            </div>
+                        <div class="t-side">
+                            <div style="font-size:22px; font-weight:bold;">${finalPrice.toLocaleString()} RUB</div>
+                            <button class="go-btn" style="width:100%; margin-top:15px; padding:8px;">${dictionary[curLang].buy}</button>
                         </div>
                     </div>`;
             });
-        } catch (e) {
-            resDiv.innerHTML = "<p style='text-align:center;'>Ошибка соединения с сервером.</p>";
-        }
+        } catch(e) { box.innerHTML = "Error!"; }
     }
 
-    // --- ИНТЕРФЕЙС ---
-    function setLang(l) {
-        document.querySelectorAll('.lang').forEach(el => el.innerText = el.getAttribute('data-' + l));
-    }
-
-    function openModal(type, data) {
-        const m = document.getElementById('mainModal');
-        const b = document.getElementById('modalBody');
-        m.style.display = 'flex';
-
+    // Логика Личного Кабинета
+    function openLK(type) {
+        document.getElementById('lkModal').style.display = 'flex';
+        const body = document.getElementById('modal-body');
         if(type === 'login') {
-            b.innerHTML = `<h3>Giriş / Вход</h3>
-                <input type="text" id="u" placeholder="Login" style="width:100%; padding:10px; margin-bottom:10px;">
-                <input type="password" id="p" placeholder="Parol" style="width:100%; padding:10px; margin-bottom:10px;">
-                <button class="btn-buy" style="width:100%" onclick="doAuth()">Giriş</button>`;
-        } else if(type === 'buy') {
-            b.innerHTML = `<h3>Maglumatlary dolduryň</h3>
-                <input type="text" placeholder="Adyňyz" style="width:100%; padding:10px; margin-bottom:10px;">
-                <p>Bahasy: <b>${data} RUB</b></p>
-                <button class="btn-buy" style="width:100%" onclick="closeModal(); alert('Tölendi!')">TÖLEMEK</button>`;
+            body.innerHTML = `<input type="text" placeholder="Login" style="width:100%; margin-bottom:10px; padding:8px;"><input type="password" placeholder="Password" style="width:100%; padding:8px;"><button class="go-btn" style="width:100%; margin-top:15px;">OK</button>`;
+        } else if(type === 'profile') {
+            body.innerHTML = `<p><b>Ady:</b> Myrat</p><p><b>Email:</b> murad@sapar.tm</p>`;
+        } else {
+            body.innerHTML = `<p>Sizde heniz bilet ýok.</p>`;
         }
     }
-
-    function closeModal() { document.getElementById('mainModal').style.display = 'none'; }
-
-    function doAuth() {
-        const u = document.getElementById('u').value;
-        if(u === 'admin') document.getElementById('adminBtn').style.display = 'flex';
-        closeModal();
-    }
+    function closeLK() { document.getElementById('lkModal').style.display = 'none'; }
 </script>
 </body>
 </html>
