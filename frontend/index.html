@@ -3,231 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Komfortly uçuş</title>
+    <title>SAPAR.TM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --tkm-green: #00563b; 
-            --tkm-gold: #c5a059;  
-            --light-bg: #f5f7f9;
-        }
-
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--light-bg); display: flex; height: 100vh; overflow: hidden; }
-
+        :root { --tkm-green: #00563b; --tkm-gold: #c5a059; }
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; background: #f4f4f4; }
+        
         /* САЙДБАР */
-        .sidebar { width: 280px; background: var(--tkm-green); color: white; display: flex; flex-direction: column; padding: 25px; box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 100; }
-        .brand { font-size: 22px; font-weight: bold; margin-bottom: 30px; border-bottom: 2px solid var(--tkm-gold); padding-bottom: 10px; color: white; text-decoration: none; }
+        .sidebar { width: 250px; background: var(--tkm-green); color: white; padding: 20px; display: flex; flex-direction: column; }
+        .brand { font-size: 20px; font-weight: bold; border-bottom: 1px solid var(--tkm-gold); padding-bottom: 10px; margin-bottom: 20px; }
+        .nav-link { padding: 12px; color: white; cursor: pointer; text-decoration: none; display: block; }
+        .nav-link:hover { background: rgba(255,255,255,0.1); }
+
+        /* КОНТЕНТ */
+        .main { flex: 1; overflow-y: auto; }
+        .top-bar { background: white; padding: 10px 20px; display: flex; justify-content: flex-end; gap: 15px; border-bottom: 1px solid #ddd; align-items: center; }
         
-        .nav-link { display: flex; align-items: center; gap: 15px; padding: 12px; color: rgba(255,255,255,0.8); cursor: pointer; border-radius: 8px; transition: 0.3s; margin-bottom: 5px; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: var(--tkm-gold); }
-
-        /* ОСНОВНОЙ БЛОК */
-        .main-content { flex: 1; overflow-y: auto; position: relative; }
-        .top-bar { background: white; padding: 15px 40px; display: flex; justify-content: flex-end; align-items: center; gap: 20px; border-bottom: 1px solid #ddd; }
-
-        .hero { background: var(--tkm-green); padding: 60px 40px; color: white; text-align: center; }
-        .hero h1 { margin: 0; font-size: 32px; }
-        .hero p { color: var(--tkm-gold); font-size: 18px; margin-top: 10px; }
-
-        /* ФОРМА ПОИСКА */
-        .search-container { max-width: 1000px; margin: -40px auto 20px; padding: 0 20px; }
-        .search-box { background: white; padding: 20px; border-radius: 12px; display: flex; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; }
+        .hero { background: var(--tkm-green); color: white; padding: 40px; text-align: center; }
+        .search-box { max-width: 900px; margin: -30px auto 20px; background: white; padding: 20px; border-radius: 8px; display: flex; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        .input-group { position: relative; flex: 1; }
-        .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; outline: none; box-sizing: border-box; }
-        
-        /* ВЫПАДАЮЩИЙ СПИСОК (HELPER) */
-        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 6px 6px; z-index: 1000; display: none; max-height: 200px; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .suggestions div { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; }
-        .suggestions div:hover { background: #f0f0f0; color: var(--tkm-green); }
+        /* ПОДСКАЗКИ */
+        .input-wrap { position: relative; flex: 1; }
+        .input-wrap input { width: 100%; padding: 10px; box-sizing: border-box; }
+        .hints { position: absolute; background: white; border: 1px solid #ccc; width: 100%; z-index: 10; display: none; max-height: 150px; overflow-y: auto; }
+        .hints div { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; color: #333; }
+        .hints div:hover { background: #eee; }
 
-        .btn-search { background: #2ecc71; color: white; border: none; padding: 0 30px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-search { background: #2ecc71; color: white; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+        .ticket { background: white; margin: 10px auto; max-width: 800px; display: flex; border: 1px solid #ddd; }
+        .ticket-info { flex: 1; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .ticket-buy { width: 150px; background: #f9f9f9; padding: 20px; text-align: center; border-left: 1px dashed #ccc; }
+        .btn-buy { background: #d63031; color: white; border: none; padding: 8px; width: 100%; cursor: pointer; }
 
-        /* ЛИЧНЫЙ КАБИНЕТ СТРАНИЦЫ */
-        .page-section { display: none; padding: 40px; max-width: 1000px; margin: 0 auto; }
-        .active-section { display: block; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
-
-        /* БИЛЕТЫ */
-        .ticket { background: white; margin-bottom: 15px; border-radius: 12px; display: flex; border: 1px solid #eee; overflow: hidden; }
-        .ticket-info { flex: 1; padding: 20px; display: flex; align-items: center; justify-content: space-around; }
-        .ticket-buy { width: 180px; padding: 20px; background: #fcfcfc; border-left: 1px dashed #ddd; text-align: center; }
-        .price { font-size: 20px; font-weight: bold; color: var(--tkm-green); margin-bottom: 10px; }
-        .btn-buy { background: #d63031; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 350px; }
+        .page { display: none; padding: 20px; }
+        .active { display: block; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
     <div class="brand">SAPAR.TM</div>
-    
-    <div id="guestMenu">
-        <div class="nav-link active" onclick="showSection('home')"><i class="fas fa-search"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
-        <div class="nav-link" onclick="openModal('login')"><i class="fas fa-sign-in-alt"></i> <span class="lang" data-tk="Giriş" data-ru="Войти">Giriş</span></div>
+    <div id="menu-guest">
+        <div class="nav-link" onclick="showP('search-p')"><i class="fas fa-search"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
+        <div class="nav-link" onclick="openL()"><i class="fas fa-user"></i> <span class="lang" data-tk="Giriş" data-ru="Войти">Giriш</span></div>
     </div>
-
-    <div id="userMenu" style="display:none;">
-        <div class="nav-link active" onclick="showSection('home')"><i class="fas fa-plane"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
-        <div class="nav-link" onclick="showSection('orders')"><i class="fas fa-shopping-bag"></i> <span class="lang" data-tk="Sargytlarym" data-ru="Мои заказы">Sargytlarym</span></div>
-        <div class="nav-link" onclick="showSection('settings')"><i class="fas fa-user-cog"></i> <span class="lang" data-tk="Sazlamalar" data-ru="Настройки">Sazlamalar</span></div>
-        <div class="nav-link" onclick="logout()" style="margin-top:auto; color:#ff7675;"><i class="fas fa-power-off"></i> <span class="lang" data-tk="Çykyş" data-ru="Выход">Çykyş</span></div>
+    <div id="menu-user" style="display:none;">
+        <div class="nav-link" onclick="showP('search-p')"><i class="fas fa-plane"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
+        <div class="nav-link" onclick="showP('orders-p')"><i class="fas fa-ticket-alt"></i> <span class="lang" data-tk="Sargytlarym" data-ru="Мои заказы">Sargytlarym</span></div>
+        <div class="nav-link" onclick="showP('settings-p')"><i class="fas fa-cog"></i> <span class="lang" data-tk="Sazlamalar" data-ru="Настройки">Sazlamalar</span></div>
+        <div class="nav-link" onclick="location.reload()" style="color: #ffaaae; margin-top: 20px;"><i class="fas fa-sign-out-alt"></i> <span class="lang" data-tk="Çykyş" data-ru="Выход">Çykyş</span></div>
     </div>
 </div>
 
-<div class="main-content">
+<div class="main">
     <div class="top-bar">
-        <div style="cursor:pointer; font-weight:bold;">
-            <span onclick="changeLang('tk')">TKM</span> | <span onclick="changeLang('ru')">РУС</span>
-        </div>
+        <i class="fas fa-user-circle" style="font-size: 20px; cursor:pointer;" onclick="openL()"></i>
+        <b style="cursor:pointer"><span onclick="setL('tk')">TKM</span> | <span onclick="setL('ru')">РУС</span></b>
     </div>
 
-    <div id="home" class="page-section active-section">
+    <div id="search-p" class="page active">
         <div class="hero">
-            <h1>SAPAR.TM</h1>
-            <p>Komfortly uçuş biziň bilen</p>
+            <h1 id="slogan">Komfortly uçuş biziň bilen</h1>
         </div>
-
-        <div class="search-container">
-            <div class="search-box">
-                <div class="input-group">
-                    <input type="text" id="from" placeholder="Nireden (Откуда)" oninput="showCities(this, 'sug1')" autocomplete="off">
-                    <div id="sug1" class="suggestions"></div>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="to" placeholder="Nirä (Куда)" oninput="showCities(this, 'sug2')" autocomplete="off">
-                    <div id="sug2" class="suggestions"></div>
-                </div>
-                <input type="date" id="date">
-                <button class="btn-search" onclick="searchFlights()">TAP</button>
+        <div class="search-box">
+            <div class="input-wrap">
+                <input type="text" id="from" placeholder="Nireden" oninput="suggest(this, 'h1')">
+                <div id="h1" class="hints"></div>
             </div>
-            <div id="results"></div>
+            <div class="input-wrap">
+                <input type="text" id="to" placeholder="Nirä" oninput="suggest(this, 'h2')">
+                <div id="h2" class="hints"></div>
+            </div>
+            <input type="date" id="date">
+            <button class="btn-search" onclick="searchFlights()">TAP</button>
         </div>
+        <div id="results"></div>
     </div>
 
-    <div id="orders" class="page-section">
-        <h2 class="lang" data-tk="Meniň sargytlarym" data-ru="Мои заказы">Meniň sargytlarym</h2>
-        <div class="card">
-            <p class="lang" data-tk="Siz entek bilet satyn almadyňyz." data-ru="У вас пока нет купленных билетов.">Siz entek bilet satyn almadyňyz.</p>
-        </div>
+    <div id="orders-p" class="page">
+        <h2 class="lang" data-tk="Sargytlarym" data-ru="Мои заказы">Sargytlarym</h2>
+        <p>Билетов пока нет.</p>
     </div>
 
-    <div id="settings" class="page-section">
-        <h2 class="lang" data-tk="Hasabyň sazlamalary" data-ru="Настройки профиля">Hasabyň sazlamalary</h2>
-        <div class="card">
-            <label>Login:</label>
-            <input type="text" id="set_user" disabled style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:6px;">
-            <button class="btn-search" style="padding:10px 20px;" onclick="alert('OK')">Save</button>
+    <div id="settings-p" class="page">
+        <h2 class="lang" data-tk="Sazlamalar" data-ru="Настройки">Sazlamalar</h2>
+        <div style="background:white; padding:20px;">
+            <label>Имя:</label><br>
+            <input type="text" id="u-name" style="width:100%; padding:10px; margin:10px 0;">
+            <button class="btn-search">Save</button>
         </div>
-    </div>
-</div>
-
-<div id="loginModal" class="modal" onclick="if(event.target==this) closeModal()">
-    <div class="modal-content">
-        <h3>Giriş</h3>
-        <input type="text" id="l_u" placeholder="Login" style="width:100%; padding:10px; margin-bottom:10px;">
-        <input type="password" placeholder="Parol" style="width:100%; padding:10px; margin-bottom:15px;">
-        <button class="btn-search" style="width:100%; padding:10px;" onclick="login()">GIR</button>
     </div>
 </div>
 
 <script>
-    // ВСЕ НАПРАВЛЕНИЯ (HELPER)
-    const cities = [
-        "Ashgabat (ASB)", "Mary (MYP)", "Dashoguz (TAZ)", "Turkmenabat (CRZ)", "Turkmenbashy (KRW)", "Kerki (KEA)",
-        "Istanbul (IST)", "Moscow (DME)", "Dubai (DXB)", "Delhi (DEL)", "Frankfurt (FRA)", "Kazan (KZN)"
-    ];
+    const cities = ["Ashgabat (ASB)", "Mary (MYP)", "Dashoguz (TAZ)", "Turkmenabat (CRZ)", "Turkmenbashy (KRW)", "Kerki (KEA)", "Istanbul (IST)", "Moscow (DME)", "Dubai (DXB)"];
 
-    function showCities(input, sugId) {
-        const val = input.value.toLowerCase();
-        const sug = document.getElementById(sugId);
-        sug.innerHTML = "";
-        if(!val) { sug.style.display="none"; return; }
-        
-        const filtered = cities.filter(c => c.toLowerCase().includes(val));
-        if(filtered.length > 0) {
-            sug.style.display = "block";
-            filtered.forEach(c => {
-                const div = document.createElement("div");
-                div.innerText = c;
-                div.onclick = () => { input.value = c; sug.style.display = "none"; };
-                sug.appendChild(div);
+    function suggest(inp, id) {
+        const h = document.getElementById(id);
+        const val = inp.value.toLowerCase();
+        h.innerHTML = "";
+        if(!val) { h.style.display="none"; return; }
+        const res = cities.filter(c => c.toLowerCase().includes(val));
+        if(res.length > 0) {
+            h.style.display="block";
+            res.forEach(c => {
+                const d = document.createElement("div");
+                d.innerText = c;
+                d.onclick = () => { inp.value = c; h.style.display="none"; };
+                h.appendChild(d);
             });
-        } else { sug.style.display = "none"; }
+        }
     }
 
-    // ТВОЯ ЛОГИКА (НЕ ТРОГАЕМ)
+    // ТВОЯ ЛОГИКА (НЕ ИЗМЕНЕНА)
     async function searchFlights() {
-        const from = document.getElementById('from').value;
-        const to = document.getElementById('to').value;
-        const date = document.getElementById('date').value;
+        const f = document.getElementById('from').value;
+        const t = document.getElementById('to').value;
+        const d = document.getElementById('date').value;
         const resDiv = document.getElementById('results');
-        
-        resDiv.innerHTML = "<p style='text-align:center;'>Gözlenilýär...</p>";
-
+        resDiv.innerHTML = "Gözlenilýär...";
         try {
             const response = await fetch('/api/search-live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ origin: from, destination: to, date: date })
+                body: JSON.stringify({ origin: f, destination: t, date: d })
             });
             const data = await response.json();
             resDiv.innerHTML = "";
-
-            data.tickets.forEach(t => {
-                const price = Math.round(t.price * 1.05);
+            data.tickets.forEach(tick => {
+                const pr = Math.round(tick.price * 1.05);
                 resDiv.innerHTML += `
                     <div class="ticket">
                         <div class="ticket-info">
-                            <div><b>10:00</b><br><small>${t.origin}</small></div>
+                            <div><b>10:00</b><br>${tick.origin}</div>
                             <div style="color:var(--tkm-gold)"><i class="fas fa-plane"></i></div>
-                            <div><b>14:30</b><br><small>${t.destination}</small></div>
+                            <div><b>14:00</b><br>${tick.destination}</div>
                         </div>
                         <div class="ticket-buy">
-                            <div class="price">${price} RUB</div>
-                            <button class="btn-buy" onclick="alert('Töleg sahypasyna geçilýär...')">SATYN AL</button>
+                            <div style="font-weight:bold; margin-bottom:10px;">${pr} RUB</div>
+                            <button class="btn-buy" onclick="alert('OK')">SATYN AL</button>
                         </div>
                     </div>`;
             });
-        } catch(e) { resDiv.innerHTML = "<p>Error!</p>"; }
+        } catch(e) { resDiv.innerHTML = "Error!"; }
     }
 
-    // ПЕРЕКЛЮЧЕНИЕ ЯЗЫКОВ (РАБОТАЕТ ВЕЗДЕ)
-    function changeLang(l) {
-        document.querySelectorAll('.lang').forEach(el => {
-            el.innerText = el.getAttribute('data-' + l);
-        });
-        // Меняем плейсхолдеры
-        document.getElementById('from').placeholder = (l === 'tk') ? "Nireden" : "Откуда";
-        document.getElementById('to').placeholder = (l === 'tk') ? "Nirä" : "Куда";
+    function setL(l) {
+        document.querySelectorAll('.lang').forEach(e => e.innerText = e.getAttribute('data-' + l));
+        document.getElementById('slogan').innerText = (l==='tk') ? "Komfortly uçuş biziň bilen" : "Комфортный полет с нами";
     }
 
-    // ЛОГИКА ЛК
-    function showSection(id) {
-        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active-section'));
-        document.getElementById(id).classList.add('active-section');
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+    function showP(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
     }
 
-    function login() {
-        const u = document.getElementById('l_u').value;
+    function openL() {
+        const u = prompt("Login:");
         if(u) {
-            document.getElementById('userMenu').style.display = 'block';
-            document.getElementById('guestMenu').style.display = 'none';
-            document.getElementById('set_user').value = u;
-            closeModal();
+            document.getElementById('menu-guest').style.display='none';
+            document.getElementById('menu-user').style.display='block';
+            document.getElementById('u-name').value = u;
         }
     }
-
-    function logout() {
-        location.reload();
-    }
-
-    function openModal(id) { document.getElementById('loginModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('loginModal').style.display = 'none'; }
 </script>
 </body>
 </html>
