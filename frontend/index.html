@@ -6,195 +6,129 @@
     <title>SAPAR.TM - Bilet Gözlegi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-    /* ЦВЕТОВАЯ ПАЛИТРА */
     :root {
-        --primary: #2ecc71; /* Сочный зеленый */
-        --dark-red: #7b0000; /* Глубокий бордовый */
-        --gold: #d4af37; /* Благородное золото */
-        --bg: #f8fafb;
-        --white: #ffffff;
+        --primary: #2ecc71;
+        --dark-red: #800000;
+        --gold: #d4af37;
+        --bg: #f5f7fa;
     }
 
     body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         background-color: var(--bg);
         margin: 0;
-        color: #2c3e50;
+        color: #333;
     }
 
     header {
-        background: var(--white);
-        padding: 20px 10%;
+        background: #ffffff;
+        padding: 15px 10%;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid #edf2f7;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    .logo { 
-        font-size: 28px; 
-        font-weight: 900; 
-        color: #1a1a1a; 
-        text-decoration: none; 
-        letter-spacing: -1px;
-    }
+    .logo { font-size: 26px; font-weight: 800; color: #1a1a1a; text-decoration: none; }
     .logo span { color: var(--primary); }
 
-    /* ОБНОВЛЕННЫЙ БЛОК С КОВРОМ */
+    /* Исправленный бордовый фон */
     .hero {
         width: 100%;
-        height: 300px;
-        background: linear-gradient(135deg, #8b0000 0%, #5d0000 100%);
+        height: 250px;
+        background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+        border-bottom: 4px solid var(--gold);
         position: relative;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Добавляем паттерн орнамента поверх фона */
-    .hero::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background-image: url('https://www.transparenttextures.com/patterns/p6.png'); /* Текстура ткани */
-        opacity: 0.3;
-    }
-
-    /* Золотая линия снизу */
-    .hero::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 5px;
-        background: linear-gradient(90deg, transparent, var(--gold), transparent);
     }
 
     .main-content {
-        max-width: 1100px;
-        margin: -100px auto 50px;
+        max-width: 1000px;
+        margin: -70px auto 50px;
         padding: 0 20px;
-        position: relative;
-        z-index: 10;
     }
 
-    /* ПАНЕЛЬ ПОИСКА */
+    /* Стильная белая панель */
     .search-panel {
-        background: var(--white);
-        padding: 40px;
-        border-radius: 24px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         display: flex;
-        gap: 20px;
+        gap: 15px;
         flex-wrap: wrap;
         align-items: flex-end;
     }
 
-    .input-group { flex: 1; min-width: 180px; }
+    .input-group { flex: 1; min-width: 200px; }
     .input-group label { 
         display: block; 
-        font-size: 12px; 
-        font-weight: 800; 
-        color: #a0aec0; 
-        margin-bottom: 10px; 
+        font-size: 11px; 
+        font-weight: 700; 
+        color: #888; 
+        margin-bottom: 8px; 
         text-transform: uppercase; 
-        letter-spacing: 1px;
     }
+
     .input-group input { 
         width: 100%; 
-        padding: 15px 20px; 
-        border: 2px solid #edf2f7; 
-        border-radius: 16px; 
+        padding: 12px 15px; 
+        border: 1px solid #e0e0e0; 
+        border-radius: 10px; 
         font-size: 16px; 
-        font-weight: 600;
-        transition: all 0.3s ease;
-        background: #fdfdfd;
-    }
-    .input-group input:focus { 
-        border-color: var(--primary); 
-        background: #fff;
-        box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.1);
         outline: none;
+        box-sizing: border-box; /* Чтобы поля не вылезали за края */
     }
 
     .btn-search {
         background: var(--primary); 
-        color: var(--white); 
+        color: white; 
         border: none; 
-        padding: 0 50px;
-        border-radius: 16px; 
-        font-weight: 800; 
-        font-size: 16px;
-        height: 54px; 
+        padding: 0 35px;
+        border-radius: 10px; 
+        font-weight: 700; 
+        height: 45px; 
         cursor: pointer; 
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    .btn-search:hover { 
-        transform: translateY(-3px); 
-        box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
-        filter: brightness(1.1);
-    }
-
-    /* КАРТОЧКА БИЛЕТА */
-    .ticket {
-        background: var(--white); 
-        border-radius: 20px; 
-        margin-top: 25px; 
-        display: flex;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        border: 1px solid #f0f0f0;
-        overflow: hidden;
-        animation: slideUp 0.5s ease;
-    }
-
-    @keyframes slideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .flight-info { flex: 1; padding: 35px; display: flex; align-items: center; justify-content: space-between; }
-    .price-box { 
-        width: 260px; 
-        background: #fcfdfe; 
-        border-left: 2px dashed #eee; 
-        padding: 35px; 
-        text-align: center; 
-        display: flex; 
-        flex-direction: column; 
-        justify-content: center;
-    }
-
-    .time { font-size: 32px; font-weight: 800; color: #1a202c; margin-bottom: 5px; }
-    .city { font-size: 15px; color: #718096; font-weight: 700; text-transform: uppercase; }
-    
-    .plane-path { flex: 1; height: 2px; background: #e2e8f0; margin: 0 30px; position: relative; }
-    .plane-path i { 
-        position: absolute; top: -12px; left: 50%; 
-        transform: translateX(-50%); 
-        color: var(--primary); 
-        background: var(--white); 
-        padding: 0 15px;
-        font-size: 20px;
-    }
-
-    .price { font-size: 28px; font-weight: 900; color: #1a1a1a; margin-bottom: 15px; }
-    .buy-btn { 
-        background: #ff4757; 
-        color: var(--white); 
-        text-decoration: none; 
-        padding: 15px; 
-        border-radius: 12px; 
-        font-weight: 800; 
-        display: block; 
-        font-size: 15px;
         transition: 0.3s;
     }
-    .buy-btn:hover { background: #ff2a3b; transform: scale(1.02); }
 
-    .status { text-align: center; padding: 60px; color: #718096; font-size: 18px; font-weight: 600; }
+    .btn-search:hover { background: #27ae60; transform: translateY(-2px); }
+
+    /* Карточка билета */
+    .ticket {
+        background: white; 
+        border-radius: 15px; 
+        margin-top: 20px; 
+        display: flex;
+        border: 1px solid #eee; 
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    }
+
+    .flight-info { flex: 1; padding: 25px; display: flex; align-items: center; justify-content: space-between; }
+    .price-box { 
+        width: 220px; 
+        background: #fafafa; 
+        border-left: 1px dashed #ddd; 
+        padding: 25px; 
+        text-align: center;
+    }
+
+    .time { font-size: 24px; font-weight: 800; }
+    .city { font-size: 13px; color: #999; font-weight: 600; }
+    
+    .plane-path { flex: 1; height: 1px; background: #ddd; margin: 0 20px; position: relative; }
+    .plane-path i { position: absolute; top: -10px; left: 50%; color: var(--primary); background: white; padding: 0 5px; }
+
+    .price { font-size: 22px; font-weight: 900; margin-bottom: 10px; color: #222; }
+    .buy-btn { 
+        background: #ff5e5e; 
+        color: white; 
+        text-decoration: none; 
+        padding: 10px; 
+        border-radius: 8px; 
+        font-weight: 700; 
+        display: block;
+    }
 </style>
 </head>
 <body>
