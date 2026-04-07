@@ -3,167 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM</title>
+    <title>SAPAR.TM - Komfortly uçuş</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --tkm-green: #00563b; --tkm-gold: #c5a059; }
-        body { font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; background: #f4f4f4; }
-        
-        /* САЙДБАР */
-        .sidebar { width: 250px; background: var(--tkm-green); color: white; padding: 20px; display: flex; flex-direction: column; }
-        .brand { font-size: 20px; font-weight: bold; border-bottom: 1px solid var(--tkm-gold); padding-bottom: 10px; margin-bottom: 20px; }
-        .nav-link { padding: 12px; color: white; cursor: pointer; text-decoration: none; display: block; }
-        .nav-link:hover { background: rgba(255,255,255,0.1); }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; height: 100vh; background: #f5f7f9; }
 
-        /* КОНТЕНТ */
-        .main { flex: 1; overflow-y: auto; }
-        .top-bar { background: white; padding: 10px 20px; display: flex; justify-content: flex-end; gap: 15px; border-bottom: 1px solid #ddd; align-items: center; }
-        
-        .hero { background: var(--tkm-green); color: white; padding: 40px; text-align: center; }
-        .search-box { max-width: 900px; margin: -30px auto 20px; background: white; padding: 20px; border-radius: 8px; display: flex; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        
-        /* ПОДСКАЗКИ */
-        .input-wrap { position: relative; flex: 1; }
-        .input-wrap input { width: 100%; padding: 10px; box-sizing: border-box; }
-        .hints { position: absolute; background: white; border: 1px solid #ccc; width: 100%; z-index: 10; display: none; max-height: 150px; overflow-y: auto; }
-        .hints div { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; color: #333; }
-        .hints div:hover { background: #eee; }
+        /* SIDEBAR */
+        .sidebar { width: 260px; background: var(--tkm-green); color: white; padding: 25px; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+        .brand { font-size: 22px; font-weight: bold; margin-bottom: 30px; border-bottom: 1px solid var(--tkm-gold); padding-bottom: 10px; }
+        .nav-link { padding: 12px; color: rgba(255,255,255,0.9); cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 6px; transition: 0.2s; margin-bottom: 5px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: var(--tkm-gold); }
 
-        .btn-search { background: #2ecc71; color: white; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
-        .ticket { background: white; margin: 10px auto; max-width: 800px; display: flex; border: 1px solid #ddd; }
-        .ticket-info { flex: 1; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .ticket-buy { width: 150px; background: #f9f9f9; padding: 20px; text-align: center; border-left: 1px dashed #ccc; }
-        .btn-buy { background: #d63031; color: white; border: none; padding: 8px; width: 100%; cursor: pointer; }
+        /* MAIN CONTENT */
+        .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .top-bar { background: white; padding: 15px 30px; display: flex; justify-content: flex-end; align-items: center; gap: 20px; border-bottom: 1px solid #ddd; }
+        .lang-btn { cursor: pointer; font-weight: bold; color: var(--tkm-green); }
 
-        .page { display: none; padding: 20px; }
-        .active { display: block; }
+        .hero { background: var(--tkm-green); color: white; padding: 60px 20px; text-align: center; }
+        .hero h1 { margin: 0; font-size: 28px; }
+        .hero p { color: var(--tkm-gold); margin-top: 10px; font-size: 18px; }
+
+        /* SEARCH BOX */
+        .search-container { max-width: 1000px; margin: -40px auto 20px; width: 90%; }
+        .search-box { background: white; padding: 25px; border-radius: 12px; display: flex; gap: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .input-group { position: relative; flex: 1; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; outline: none; box-sizing: border-box; }
+        
+        /* SUGGESTIONS */
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 0 0 6px 6px; z-index: 100; display: none; max-height: 200px; overflow-y: auto; }
+        .suggestions div { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; color: #333; }
+        .suggestions div:hover { background: #f0f0f0; }
+
+        .btn-search { background: #2ecc71; color: white; border: none; padding: 0 35px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-search:hover { background: #27ae60; }
+
+        /* SECTIONS */
+        .page { display: none; padding: 30px; max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .active-page { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+        /* TICKETS */
+        .ticket { background: white; margin-bottom: 15px; border-radius: 12px; display: flex; border: 1px solid #eee; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .ticket-info { flex: 1; padding: 25px; display: flex; justify-content: space-around; align-items: center; }
+        .ticket-buy { width: 180px; padding: 25px; background: #fafafa; border-left: 1px dashed #ddd; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .price { font-size: 22px; font-weight: bold; color: var(--tkm-green); margin-bottom: 12px; }
+        .btn-buy { background: #d63031; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
     <div class="brand">SAPAR.TM</div>
-    <div id="menu-guest">
-        <div class="nav-link" onclick="showP('search-p')"><i class="fas fa-search"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
-        <div class="nav-link" onclick="openL()"><i class="fas fa-user"></i> <span class="lang" data-tk="Giriş" data-ru="Войти">Giriш</span></div>
+    <div id="guest-nav">
+        <div class="nav-link active" onclick="showSection('search-sec')"><i class="fas fa-search"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
+        <div class="nav-link" onclick="openLogin()"><i class="fas fa-sign-in-alt"></i> <span class="lang" data-tk="Giriş" data-ru="Войти">Giriş</span></div>
     </div>
-    <div id="menu-user" style="display:none;">
-        <div class="nav-link" onclick="showP('search-p')"><i class="fas fa-plane"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
-        <div class="nav-link" onclick="showP('orders-p')"><i class="fas fa-ticket-alt"></i> <span class="lang" data-tk="Sargytlarym" data-ru="Мои заказы">Sargytlarym</span></div>
-        <div class="nav-link" onclick="showP('settings-p')"><i class="fas fa-cog"></i> <span class="lang" data-tk="Sazlamalar" data-ru="Настройки">Sazlamalar</span></div>
-        <div class="nav-link" onclick="location.reload()" style="color: #ffaaae; margin-top: 20px;"><i class="fas fa-sign-out-alt"></i> <span class="lang" data-tk="Çykyş" data-ru="Выход">Çykyş</span></div>
+    <div id="user-nav" style="display:none;">
+        <div class="nav-link active" onclick="showSection('search-sec')"><i class="fas fa-plane"></i> <span class="lang" data-tk="Gözleg" data-ru="Поиск">Gözleg</span></div>
+        <div class="nav-link" onclick="showSection('orders-sec')"><i class="fas fa-ticket-alt"></i> <span class="lang" data-tk="Sargytlarym" data-ru="Мои заказы">Sargytlarym</span></div>
+        <div class="nav-link" onclick="showSection('settings-sec')"><i class="fas fa-cog"></i> <span class="lang" data-tk="Sazlamalar" data-ru="Настройки">Sazlamalar</span></div>
+        <div class="nav-link" onclick="location.reload()" style="margin-top: 30px; color: #ff7675;"><i class="fas fa-power-off"></i> <span class="lang" data-tk="Çykyş" data-ru="Выход">Çykyş</span></div>
     </div>
 </div>
 
 <div class="main">
     <div class="top-bar">
-        <i class="fas fa-user-circle" style="font-size: 20px; cursor:pointer;" onclick="openL()"></i>
-        <b style="cursor:pointer"><span onclick="setL('tk')">TKM</span> | <span onclick="setL('ru')">РУС</span></b>
+        <div class="lang-btn">
+            <span onclick="changeLang('tk')">TKM</span> | <span onclick="changeLang('ru')">РУС</span>
+        </div>
+        <i class="fas fa-user-circle" style="font-size: 24px; color: var(--tkm-green); cursor: pointer;" onclick="openLogin()"></i>
     </div>
 
-    <div id="search-p" class="page active">
+    <div id="search-sec" class="page active-page">
         <div class="hero">
-            <h1 id="slogan">Komfortly uçuş biziň bilen</h1>
+            <h1>SAPAR.TM</h1>
+            <p id="slogan">Komfortly uçuş biziň bilen</p>
         </div>
-        <div class="search-box">
-            <div class="input-wrap">
-                <input type="text" id="from" placeholder="Nireden" oninput="suggest(this, 'h1')">
-                <div id="h1" class="hints"></div>
+        <div class="search-container">
+            <div class="search-box">
+                <div class="input-group">
+                    <input type="text" id="from" placeholder="Nireden" oninput="handleSuggest(this, 's1')" autocomplete="off">
+                    <div id="s1" class="suggestions"></div>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="to" placeholder="Nirä" oninput="handleSuggest(this, 's2')" autocomplete="off">
+                    <div id="s2" class="suggestions"></div>
+                </div>
+                <input type="date" id="date">
+                <button class="btn-search" onclick="searchFlights()">TAP</button>
             </div>
-            <div class="input-wrap">
-                <input type="text" id="to" placeholder="Nirä" oninput="suggest(this, 'h2')">
-                <div id="h2" class="hints"></div>
-            </div>
-            <input type="date" id="date">
-            <button class="btn-search" onclick="searchFlights()">TAP</button>
+            <div id="results"></div>
         </div>
-        <div id="results"></div>
     </div>
 
-    <div id="orders-p" class="page">
-        <h2 class="lang" data-tk="Sargytlarym" data-ru="Мои заказы">Sargytlarym</h2>
-        <p>Билетов пока нет.</p>
+    <div id="orders-sec" class="page">
+        <h2 class="lang" data-tk="Meniň sargytlarym" data-ru="Мои заказы">Meniň sargytlarym</h2>
+        <div class="card">
+            <p class="lang" data-tk="Siz entek bilet satyn almadyňyz." data-ru="У вас пока нет купленных билетов.">Siz entek bilet satyn almadyňyz.</p>
+        </div>
     </div>
 
-    <div id="settings-p" class="page">
+    <div id="settings-sec" class="page">
         <h2 class="lang" data-tk="Sazlamalar" data-ru="Настройки">Sazlamalar</h2>
-        <div style="background:white; padding:20px;">
-            <label>Имя:</label><br>
-            <input type="text" id="u-name" style="width:100%; padding:10px; margin:10px 0;">
-            <button class="btn-search">Save</button>
+        <div class="card">
+            <label class="lang" data-tk="Adyňyz:" data-ru="Ваше имя:">Adyňyz:</label>
+            <input type="text" id="prof-name" style="width:100%; padding:10px; margin: 10px 0 20px; border:1px solid #ddd; border-radius:6px;">
+            <button class="btn-search" style="padding:10px 20px;">Save</button>
         </div>
     </div>
 </div>
 
 <script>
-    const cities = ["Ashgabat (ASB)", "Mary (MYP)", "Dashoguz (TAZ)", "Turkmenabat (CRZ)", "Turkmenbashy (KRW)", "Kerki (KEA)", "Istanbul (IST)", "Moscow (DME)", "Dubai (DXB)"];
+    // ВСЕ НАПРАВЛЕНИЯ
+    const directions = [
+        "Ashgabat (ASB)", "Mary (MYP)", "Dashoguz (TAZ)", "Turkmenabat (CRZ)", "Turkmenbashy (KRW)", "Kerki (KEA)",
+        "Istanbul (IST)", "Moscow (DME)", "Dubai (DXB)", "Frankfurt (FRA)", "Delhi (DEL)", "Kazan (KZN)"
+    ];
 
-    function suggest(inp, id) {
-        const h = document.getElementById(id);
+    function handleSuggest(inp, sugId) {
         const val = inp.value.toLowerCase();
-        h.innerHTML = "";
-        if(!val) { h.style.display="none"; return; }
-        const res = cities.filter(c => c.toLowerCase().includes(val));
-        if(res.length > 0) {
-            h.style.display="block";
-            res.forEach(c => {
+        const sug = document.getElementById(sugId);
+        sug.innerHTML = "";
+        if (!val) { sug.style.display = "none"; return; }
+        const res = directions.filter(d => d.toLowerCase().includes(val));
+        if (res.length > 0) {
+            sug.style.display = "block";
+            res.forEach(city => {
                 const d = document.createElement("div");
-                d.innerText = c;
-                d.onclick = () => { inp.value = c; h.style.display="none"; };
-                h.appendChild(d);
+                d.innerText = city;
+                d.onclick = () => { inp.value = city; sug.style.display = "none"; };
+                sug.appendChild(d);
             });
-        }
+        } else { sug.style.display = "none"; }
     }
 
-    // ТВОЯ ЛОГИКА (НЕ ИЗМЕНЕНА)
+    // ТВОЯ ЛОГИКА (БЕЗ ИЗМЕНЕНИЙ)
     async function searchFlights() {
-        const f = document.getElementById('from').value;
-        const t = document.getElementById('to').value;
-        const d = document.getElementById('date').value;
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
+        const date = document.getElementById('date').value;
         const resDiv = document.getElementById('results');
-        resDiv.innerHTML = "Gözlenilýär...";
+        resDiv.innerHTML = "<p style='text-align:center;'>Gözlenilýär...</p>";
+
         try {
             const response = await fetch('/api/search-live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ origin: f, destination: t, date: d })
+                body: JSON.stringify({ origin: from, destination: to, date: date })
             });
             const data = await response.json();
             resDiv.innerHTML = "";
-            data.tickets.forEach(tick => {
-                const pr = Math.round(tick.price * 1.05);
+            data.tickets.forEach(t => {
+                const price = Math.round(t.price * 1.05); // Наценка 5%
                 resDiv.innerHTML += `
                     <div class="ticket">
                         <div class="ticket-info">
-                            <div><b>10:00</b><br>${tick.origin}</div>
-                            <div style="color:var(--tkm-gold)"><i class="fas fa-plane"></i></div>
-                            <div><b>14:00</b><br>${tick.destination}</div>
+                            <div style="text-align:center"><b>10:30</b><br><small>${t.origin}</small></div>
+                            <div style="color:var(--tkm-gold);"><i class="fas fa-plane"></i></div>
+                            <div style="text-align:center"><b>14:15</b><br><small>${t.destination}</small></div>
                         </div>
                         <div class="ticket-buy">
-                            <div style="font-weight:bold; margin-bottom:10px;">${pr} RUB</div>
-                            <button class="btn-buy" onclick="alert('OK')">SATYN AL</button>
+                            <div class="price">${price} RUB</div>
+                            <button class="btn-buy" onclick="alert('Satyn alyndy!')">SATYN AL</button>
                         </div>
                     </div>`;
             });
-        } catch(e) { resDiv.innerHTML = "Error!"; }
+        } catch(e) { resDiv.innerHTML = "<p style='text-align:center;'>Error!</p>"; }
     }
 
-    function setL(l) {
-        document.querySelectorAll('.lang').forEach(e => e.innerText = e.getAttribute('data-' + l));
-        document.getElementById('slogan').innerText = (l==='tk') ? "Komfortly uçuş biziň bilen" : "Комфортный полет с нами";
+    // ПЕРЕКЛЮЧЕНИЕ ЯЗЫКОВ
+    function changeLang(l) {
+        document.querySelectorAll('.lang').forEach(el => {
+            el.innerText = el.getAttribute('data-' + l);
+        });
+        document.getElementById('slogan').innerText = (l === 'tk') ? "Komfortly uçuş biziň bilen" : "Комфортный полет с нами";
+        document.getElementById('from').placeholder = (l === 'tk') ? "Nireden" : "Откуда";
+        document.getElementById('to').placeholder = (l === 'tk') ? "Nirä" : "Куда";
     }
 
-    function showP(id) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+    // ЛОГИКА ЛК
+    function showSection(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        document.getElementById(id).classList.add('active-page');
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        event.currentTarget.classList.add('active');
     }
 
-    function openL() {
+    function openLogin() {
         const u = prompt("Login:");
-        if(u) {
-            document.getElementById('menu-guest').style.display='none';
-            document.getElementById('menu-user').style.display='block';
-            document.getElementById('u-name').value = u;
+        if (u) {
+            document.getElementById('guest-nav').style.display = 'none';
+            document.getElementById('user-nav').style.display = 'block';
+            document.getElementById('prof-name').value = u;
         }
     }
 </script>
