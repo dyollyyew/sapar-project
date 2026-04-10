@@ -27,6 +27,8 @@ app.post('/api/search-live', async (req, res) => {
             }
         });
 
+
+console.log(response.data.data);
         // Отправляем массив всех найденных билетов
         res.json({ tickets: response.data.data || [] });
     } catch (error) {

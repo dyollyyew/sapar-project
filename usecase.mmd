@@ -1,0 +1,19 @@
+useCaseDiagram
+    actor "Пассажир" as User
+    actor "Администратор" as Admin
+
+    package "ИС SAPAR.TM" {
+        usecase "Поиск авиабилетов" as UC1
+        usecase "Фильтрация результатов" as UC2
+        usecase "Просмотр деталей рейса" as UC3
+        usecase "Мониторинг статуса API" as UC4
+        usecase "Управление кэшем цен" as UC5
+    }
+
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    Admin --> UC4
+    Admin --> UC5
+    Admin --|> User : "Имеет права"
+    
