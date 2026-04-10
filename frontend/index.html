@@ -1,228 +1,206 @@
 <!DOCTYPE html>
-<html lang="tk">
+<html lang="tm">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Premium Travel</title>
+    <title>SAPAR.TM - Turkmenistan Airlines Style</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         :root {
-            --bg: #f5f7f9; --card: #ffffff; --text: #333; --border: #eee;
-            --green: #00563b; --gold: #c5a059; --danger: #e74c3c;
+            --tkm-green: #008755; /* Фирменный зеленый */
+            --tkm-dark: #005a38;
+            --gold: #d4af37;
+            --white: #ffffff;
+            --light-gray: #f4f4f4;
         }
-        /* ТЕМНАЯ ТЕМА */
-        body.dark-mode {
-            --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --border: #333;
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--light-gray); 
+            margin: 0; 
+            color: #333; 
         }
 
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--text); transition: 0.3s; }
+        /* Шапка в стиле авиалиний */
+        header { 
+            background: var(--white); 
+            padding: 15px 8%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 4px solid var(--tkm-green);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-text { font-size: 22px; font-weight: 900; color: var(--tkm-green); text-transform: uppercase; letter-spacing: 1px; }
         
-        .sidebar { width: 260px; background: var(--green); color: white; padding: 25px; display: flex; flex-direction: column; z-index: 10; }
-        .brand { font-size: 24px; font-weight: bold; margin-bottom: 40px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; text-align: center; }
-        .nav-link { padding: 14px; color: white; cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 12px; margin-bottom: 5px; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: var(--gold); }
+        .lang-btns button {
+            background: none; border: 1px solid var(--tkm-green); color: var(--tkm-green);
+            padding: 5px 12px; cursor: pointer; border-radius: 4px; font-weight: bold;
+            transition: 0.3s;
+        }
+        .lang-btns button:hover { background: var(--tkm-green); color: white; }
 
-        .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-        .top-bar { background: var(--card); padding: 15px 30px; display: flex; justify-content: flex-end; align-items: center; border-bottom: 1px solid var(--border); gap: 20px; }
+        /* Геро-секция с национальным колоритом */
+        .hero-banner { 
+            background: var(--tkm-green); 
+            height: 200px; 
+            background-image: linear-gradient(rgba(0,135,85,0.8), rgba(0,90,56,0.9)), url('https://www.transparenttextures.com/patterns/p6.png'); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--white); border-bottom: 4px solid var(--gold);
+        }
+        .hero-banner h1 { margin: 0; font-size: 28px; letter-spacing: 2px; text-align: center; }
+        .hero-banner p { margin-top: 10px; font-weight: 300; opacity: 0.9; }
 
-        .page { display: none; padding: 30px; animation: fadeIn 0.3s; }
-        .active-page { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .card { background: var(--card); border-radius: 20px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid var(--border); margin-bottom: 20px; }
-        .btn { border: none; padding: 12px 22px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .btn-green { background: var(--green); color: white; }
-        .btn-red { background: var(--danger); color: white; }
+        /* Панель поиска */
+        .search-section { max-width: 1100px; margin: -40px auto 40px; padding: 0 20px; }
+        .search-card { 
+            background: var(--white); padding: 30px; border-radius: 8px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
+            align-items: flex-end;
+        }
         
-        input { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; outline: none; }
+        .input-field { display: flex; flex-direction: column; gap: 8px; }
+        .input-field label { font-size: 12px; font-weight: 700; color: var(--tkm-dark); text-transform: uppercase; }
+        .input-field input { 
+            padding: 12px; border: 2px solid #e0e0e0; border-radius: 5px; 
+            font-size: 16px; outline: none; transition: 0.3s;
+        }
+        .input-field input:focus { border-color: var(--tkm-green); }
+        
+        .search-btn { 
+            background: var(--tkm-green); color: white; border: none; 
+            padding: 15px; border-radius: 5px; font-weight: bold; 
+            font-size: 16px; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .search-btn:hover { background: var(--tkm-dark); box-shadow: 0 5px 15px rgba(0,135,85,0.4); }
 
-        /* Admin Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); }
-        .premium-tag { color: var(--gold); font-weight: bold; }
-        .blocked-tag { color: var(--danger); font-weight: bold; }
+        /* Результаты */
+        .results-container { max-width: 900px; margin: 0 auto 50px; padding: 0 20px; }
+        .ticket-item { 
+            background: white; border-radius: 10px; margin-bottom: 20px; 
+            display: flex; border: 1px solid #ddd; position: relative;
+            transition: 0.3s;
+        }
+        .ticket-item:hover { border-color: var(--tkm-green); transform: translateY(-3px); }
+        .ticket-item::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--tkm-green);
+        }
 
-        /* Switch UI */
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--green); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        .route-details { flex: 1; padding: 30px; display: flex; align-items: center; justify-content: space-between; }
+        .price-tag { 
+            width: 220px; background: #fcfcfc; padding: 30px; 
+            border-left: 2px dashed #eee; text-align: center; 
+        }
+
+        .city-name { font-size: 22px; font-weight: 800; color: var(--tkm-dark); }
+        .airport-code { font-size: 13px; color: #888; font-weight: bold; }
+        .plane-path { flex: 1; text-align: center; position: relative; margin: 0 30px; }
+        .plane-path i { color: var(--tkm-green); font-size: 20px; }
+        .plane-path::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #ddd; z-index: 0; }
+
+        .cost { font-size: 26px; font-weight: 900; color: #1a1a1a; margin-bottom: 15px; }
+        .buy-now { 
+            background: #d32f2f; color: white; text-decoration: none; 
+            padding: 12px 20px; border-radius: 6px; display: block; 
+            font-weight: bold; transition: 0.3s;
+        }
+        .buy-now:hover { background: #b71c1c; }
+
+        .loader-box { text-align: center; padding: 40px; color: var(--tkm-green); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="login-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:1000; backdrop-filter:blur(5px);">
-    <div class="card" style="width:320px; text-align:center;">
-        <h3>Hoş geldiňiz!</h3>
-        <input type="text" id="log-user" placeholder="Login (Admin)" style="width:90%; margin-bottom:10px;">
-        <input type="password" id="log-pass" placeholder="Parol (777)" style="width:90%; margin-bottom:20px;">
-        <button class="btn btn-green" style="width:100%;" onclick="login()">Girmek</button>
+<header>
+    <div class="logo-area">
+        <i class="fas fa-paper-plane" style="color:var(--tkm-green); font-size: 24px;"></i>
+        <div class="logo-text">Turkmenistan <span style="color:var(--gold)">Airlines</span></div>
+    </div>
+    <div class="lang-btns">
+        <button>TKM</button>
+        <button>PYC</button>
+    </div>
+</header>
+
+<div class="hero-banner">
+    <h1>HOŞ GELDIŇIZ! / WELCOME</h1>
+    <p>Aşgabat — Dünýäniň gapysy</p>
+</div>
+
+<div class="search-section">
+    <div class="search-card">
+        <div class="input-field">
+            <label>Nireden (From)</label>
+            <input type="text" id="from" value="MOW">
+        </div>
+        <div class="input-field">
+            <label>Nirä (To)</label>
+            <input type="text" id="to" value="ASB">
+        </div>
+        <div class="input-field">
+            <label>Sene (Date)</label>
+            <input type="date" id="date">
+        </div>
+        <button class="search-btn" onclick="runSearch()">Gözleg (Search)</button>
     </div>
 </div>
 
-<div class="sidebar">
-    <div class="brand">SAPAR.TM</div>
-    <div class="nav-link active" onclick="showP('search-p')"><i class="fas fa-search"></i> Gözleg</div>
-    <div class="nav-link" id="link-acc" style="display:none;" onclick="showP('account-p')"><i class="fas fa-user-circle"></i> Şahsy otag</div>
-</div>
-
-<div class="main">
-    <div class="top-bar">
-        <div id="user-display" style="display:none; font-weight:bold;">
-            <i class="fas fa-crown" id="crown" style="display:none; color:var(--gold);"></i>
-            <span id="u-name"></span>
-        </div>
-        <button id="login-btn" class="btn btn-green" onclick="document.getElementById('login-modal').style.display='flex'">Giriş</button>
+<div class="results-container" id="results-list">
     </div>
 
-    <div id="search-p" class="page active-page">
-        <div class="card" style="background:var(--green); color:white; text-align:center; padding: 50px;">
-            <h1>Nirä uçmak isleýärsiňiz?</h1>
-            <div style="display:flex; gap:10px; margin-top:30px;">
-                <input type="text" id="from" placeholder="Nireden" style="flex:1">
-                <input type="text" id="to" placeholder="Nirä" style="flex:1">
-                <input type="text" id="date-picker" placeholder="Sene" style="flex:1">
-                <button class="btn btn-green" style="border:1px solid white" onclick="searchFlights()">GÖZLE</button>
-            </div>
-        </div>
-        <div id="results"></div>
-    </div>
-
-    <div id="account-p" class="page">
-        <div style="display:flex; gap:20px;">
-            <div class="card" style="width:240px; height:fit-content;">
-                <div class="nav-link active" style="color:var(--text)" onclick="tab('t-orders', this)">Sargytlarym</div>
-                <div class="nav-link" style="color:var(--text)" onclick="tab('t-docs', this)">Resminamalar</div>
-                <div class="nav-link" style="color:var(--text)" onclick="tab('t-settings', this)">Sazlamalar</div>
-                <div id="admin-nav" class="nav-link" style="display:none; color:var(--gold)" onclick="tab('t-admin', this)">Admin Panel</div>
-                <hr style="border:0; border-top:1px solid var(--border); margin:15px 0;">
-                <div class="nav-link" style="color:var(--danger)" onclick="location.reload()">Çykyş</div>
-            </div>
-
-            <div class="card" style="flex:1;">
-                <div id="t-orders" class="tab-c"><h3>Meniň sargytlarym</h3><div id="o-list">Sargyt ýok.</div></div>
-                
-                <div id="t-docs" class="tab-c" style="display:none;">
-                    <h3>Resminamalar</h3>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                        <input type="text" placeholder="Ady"> <input type="text" placeholder="Familiýasy">
-                        <input type="text" placeholder="Pasport seriýasy"> <input type="text" id="expire" placeholder="Möhleti">
-                    </div>
-                    <button class="btn btn-green" style="margin-top:20px;">Ýatda sakla</button>
-                </div>
-
-                <div id="t-settings" class="tab-c" style="display:none;">
-                    <h3>Sazlamalar</h3>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>Garaňky tema (Dark Mode)</span>
-                        <label class="switch"><input type="checkbox" id="dark-toggle" onchange="toggleDark()"><span class="slider"></span></label>
-                    </div>
-                </div>
-
-                <div id="t-admin" class="tab-c" style="display:none;">
-                    <h3 style="color:var(--danger)">Admin Dolandyryş</h3>
-                    <table id="admin-table">
-                        <thead><tr><th>Ulanyjy</th><th>Status</th><th>Hereket</th></tr></thead>
-                        <tbody id="user-rows"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    let users = [
-        {name: 'Myrat G.', status: 'Adaty', isPremium: false},
-        {name: 'Selbi A.', status: 'Adaty', isPremium: false}
-    ];
+    async function runSearch() {
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
+        const date = document.getElementById('date').value;
+        const resBox = document.getElementById('results-list');
 
-    flatpickr("#date-picker", { dateFormat: "d.m.Y" });
-    flatpickr("#expire", { dateFormat: "d.m.Y" });
+        if(!from || !to || !date) return alert("Maglumatlary giriziň!");
 
-    function toggleDark() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('dark', document.body.classList.contains('dark-mode'));
-    }
-    if(localStorage.getItem('dark') === 'true') { document.body.classList.add('dark-mode'); document.getElementById('dark-toggle').checked = true; }
+        resBox.innerHTML = '<div class="loader-box"><i class="fas fa-sync fa-spin"></i> Maglumatlar gözlenilýär...</div>';
 
-    async function searchFlights() {
-        const results = document.getElementById('results');
-        results.innerHTML = "Gözlenilýär...";
         try {
-            const res = await fetch('/api/search-live', {
+            const response = await fetch('/api/search-live', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ origin: document.getElementById('from').value, destination: document.getElementById('to').value, date: document.getElementById('date-picker').value })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ origin: from, destination: to, date: date })
             });
-            const data = await res.json();
-            results.innerHTML = "";
-            data.tickets.forEach(t => {
-                results.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>${t.price} RUB</b> <span>${document.getElementById('from').value} ➔ ${document.getElementById('to').value}</span>
-                    <button class="btn btn-green">SATYN AL</button>
-                </div>`;
-            });
-        } catch(e) { results.innerHTML = "Error!"; }
-    }
+            const data = await response.json();
+            resBox.innerHTML = "";
 
-    function login() {
-        const u = document.getElementById('log-user').value;
-        const p = document.getElementById('log-pass').value;
-        if(u) {
-            document.getElementById('u-name').innerText = u;
-            document.getElementById('user-display').style.display = 'block';
-            document.getElementById('login-btn').style.display = 'none';
-            document.getElementById('link-acc').style.display = 'flex';
-            if(u === 'Admin' && p === '777') {
-                document.getElementById('admin-nav').style.display = 'flex';
-                renderAdmin();
+            if(data.tickets && data.tickets.length > 0) {
+                data.tickets.forEach(t => {
+                    resBox.innerHTML += `
+                        <div class="ticket-item">
+                            <div class="route-details">
+                                <div style="text-align:center">
+                                    <div class="city-name">${t.origin}</div>
+                                    <div class="airport-code">Depart</div>
+                                </div>
+                                <div class="plane-path">
+                                    <i class="fas fa-plane"></i>
+                                </div>
+                                <div style="text-align:center">
+                                    <div class="city-name">${t.destination}</div>
+                                    <div class="airport-code">Arrive</div>
+                                </div>
+                            </div>
+                            <div class="price-tag">
+                                <div class="cost">${t.price.toLocaleString()} RUB</div>
+                                <a href="https://www.aviasales.ru${t.link}" class="buy-now" target="_blank">SATYN AL</a>
+                            </div>
+                        </div>`;
+                });
+            } else { 
+                resBox.innerHTML = "<div class='loader-box'>Gözlegiňize görä petek tapylmady.</div>"; 
             }
-            document.getElementById('login-modal').style.display = 'none';
-            showP('account-p');
+        } catch (e) {
+            resBox.innerHTML = "<div class='loader-box' style='color:red'>Näsazlyk ýüze çykdy. Railway baglanyşygyny barlaň.</div>";
         }
-    }
-
-    function renderAdmin() {
-        const tbody = document.getElementById('user-rows');
-        tbody.innerHTML = users.map((u, i) => `
-            <tr>
-                <td>${u.name}</td>
-                <td id="stat-${i}">${u.isPremium ? '<span class="premium-tag">Premium</span>' : u.status}</td>
-                <td>
-                    <button class="btn btn-green" style="padding:5px 10px;" onclick="makePrem(${i})">Premium</button>
-                    <button class="btn btn-red" style="padding:5px 10px;" onclick="makeBlock(${i})">Block</button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    function makePrem(i) {
-        users[i].isPremium = true;
-        document.getElementById('crown').style.display = 'inline';
-        renderAdmin();
-    }
-
-    function makeBlock(i) {
-        users[i].status = '<span class="blocked-tag">Blocked</span>';
-        users[i].isPremium = false;
-        renderAdmin();
-    }
-
-    function showP(id) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-        document.getElementById(id).classList.add('active-page');
-    }
-
-    function tab(id, el) {
-        document.querySelectorAll('.tab-c').forEach(t => t.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
-        document.querySelectorAll('.acc-menu .nav-link').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
     }
 </script>
 </body>
