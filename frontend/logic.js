@@ -1,37 +1,22 @@
-// 1. База городов
-const cities = [
-    { name: "Ашхабад", code: "ASB" },
-    { name: "Казань", code: "KZN" },
-    { name: "Москва", code: "MOW" },
-    { name: "Стамбул", code: "IST" },
-    { name: "Дубай", code: "DXB" }
-];
-
-// 2. Переключение языков
 const translations = {
     rus: {
-        welcome: "ДОБРО ПОЖАЛОВАТЬ!",
-        login: "Войти",
-        search: "ПОИСК",
-        from: "Откуда",
-        to: "Куда",
-        date: "Дата",
-        popular: "Популярные направления",
-        notFound: "Билеты не найдены."
+        welcome: "ДОБРО ПОЖАЛОВАТЬ!", login: "Войти", search: "ПОИСК",
+        from: "Откуда", to: "Куда", date: "Дата", popular: "Популярные направления",
+        rules: "Правила тарифа", depart: "Вылет", arrive: "Прилет", 
+        trans: "Пересадки", duration: "В пути", flight: "Рейс", 
+        direct: "Прямой", book: "ЗАБРОНИРОВАТЬ", success: "Вы переходите к бронированию!"
     },
     tkm: {
-        welcome: "HOŞ GELDIŇIZ!",
-        login: "Giriş",
-        search: "GÖZLEG",
-        from: "Nireden",
-        to: "Nirä",
-        date: "Sene",
-        popular: "Meşhur ugurlar",
-        notFound: "Petek tapylmady."
+        welcome: "HOŞ GELDIŇIZ!", login: "Giriş", search: "GÖZLEG",
+        from: "Nireden", to: "Nirä", date: "Sene", popular: "Meşhur ugurlar",
+        rules: "Tarif düzgünleri", depart: "Uçuş", arrive: "Geliş", 
+        trans: "Garaşmaly", duration: "Ýolda", flight: "Reýs", 
+        direct: "Gönümel", book: "PETEK SATYN AL", success: "Siz petek satyn almaga geçýärsiňiz!"
     }
 };
 
-let currentLang = 'rus';
+let currentLang = 'tkm';
+let lastSearch = null; // Храним данные последнего поиска для перевода билета
 
 function changeLang(lang) {
     currentLang = lang;
@@ -45,85 +30,53 @@ function changeLang(lang) {
     document.getElementById('lbl-to').innerText = translations[lang].to;
     document.getElementById('lbl-date').innerText = translations[lang].date;
     document.getElementById('txt-popular').innerText = translations[lang].popular;
+
+    // Если билет уже на экране, перерисовываем его
+    if (lastSearch) renderTicket(lastSearch.from, lastSearch.to);
 }
 
-// 3. Календарь
-flatpickr("#dateInput", {
-    locale: "ru",
-    dateFormat: "d.m.Y",
-    minDate: "today",
-    monthSelectorType: "dropdown"
-});
-
-// 4. Автозаполнение
-function setupAuto(id, listId) {
-    const input = document.getElementById(id);
-    const list = document.getElementById(listId);
-
-    input.oninput = () => {
-        const val = input.value.toLowerCase();
-        list.innerHTML = "";
-        if(!val) { list.style.display = "none"; return; }
-        
-        const filtered = cities.filter(c => c.name.toLowerCase().includes(val) || c.code.toLowerCase().includes(val));
-        if(filtered.length > 0) {
-            list.style.display = "block";
-            filtered.forEach(c => {
-                const div = document.createElement("div");
-                div.className = "city-opt";
-                div.innerHTML = `<b>${c.name}</b> <span style="color:#888">(${c.code})</span>`;
-                div.onclick = () => {
-                    input.value = `${c.name} (${c.code})`;
-                    list.style.display = "none";
-                };
-                list.appendChild(div);
-            });
-        }
-    };
-}
-setupAuto("fromCity", "listFrom");
-setupAuto("toCity", "listTo");
-
-// 5. Реверс
 function swapCities() {
     const f = document.getElementById("fromCity");
     const t = document.getElementById("toCity");
     [f.value, t.value] = [t.value, f.value];
 }
 
-// 6. Поиск (Твой идеальный билет)
+flatpickr("#dateInput", { dateFormat: "d.m.Y", minDate: "today" });
+
 function findFlight() {
-    const res = document.getElementById("resultsArea");
-    const from = document.getElementById("fromCity").value;
-    const to = document.getElementById("toCity").value;
-
-    if(!from || !to) return alert("Выберите города!");
-
+    const from = document.getElementById("fromCity").value || "Aşgabat";
+    const to = document.getElementById("toCity").value || "Stambul";
+    
+    lastSearch = { from, to }; // Сохраняем для смены языка
     document.getElementById("popular-section").style.display = "none";
-    res.innerHTML = "<center style='margin-top:40px;'><i class='fas fa-spinner fa-spin fa-2x'></i></center>";
+    renderTicket(from, to);
+}
 
-    setTimeout(() => {
-        // Убрали Turkmenistan Airlines, оставили только чистую инфу
-        res.innerHTML = `
-            <div class="ticket">
-                <div class="ticket-top">
-                    <span class="rules-link">Правила тарифа и нормы багажа</span>
-                </div>
-                <div class="ticket-route">
-                    ${from} <i class="fas fa-plane" style="font-size:14px; color:#ccc;"></i> ${to}
-                </div>
-                <div class="ticket-info">
-                    <div><div class="t-lbl">Вылет</div><div class="t-val">17:30</div></div>
-                    <div><div class="t-lbl">Прилет</div><div class="t-val">22:50</div></div>
-                    <div><div class="t-lbl">Пересадки</div><div class="t-val direct">Прямой</div></div>
-                    <div><div class="t-lbl">В пути</div><div class="t-val">03 ч 20 мин</div></div>
-                    <div><div class="t-lbl">Рейс</div><div class="t-val">740</div></div>
-                </div>
-                <div class="ticket-footer">
-                    <div class="price">31 988 ₽</div>
-                    <button class="btn-book">ЗАБРОНИРОВАТЬ</button>
-                </div>
+function renderTicket(from, to) {
+    const res = document.getElementById("resultsArea");
+    const t = translations[currentLang];
+    
+    res.innerHTML = `
+        <div class="ticket">
+            <div class="ticket-header">
+                <span style="color:#0056b3; font-size:12px; cursor:pointer">${t.rules}</span>
             </div>
-        `;
-    }, 600);
+            <div class="ticket-route">${from} <i class="fas fa-long-arrow-alt-right" style="color:#ddd"></i> ${to}</div>
+            <div class="ticket-grid">
+                <div><div class="t-lbl">${t.depart}</div><div class="t-val">17:30</div></div>
+                <div><div class="t-lbl">${t.arrive}</div><div class="t-val">22:50</div></div>
+                <div><div class="t-lbl">${t.trans}</div><div class="t-val" style="color:green">${t.direct}</div></div>
+                <div><div class="t-lbl">${t.duration}</div><div class="t-val">03:20</div></div>
+                <div><div class="t-lbl">${t.flight}</div><div class="t-val">T5-442</div></div>
+            </div>
+            <div class="ticket-footer">
+                <div class="price">3200 TMT</div>
+                <button class="btn-book" onclick="bookNow()">${t.book}</button>
+            </div>
+        </div>
+    `;
+}
+
+function bookNow() {
+    alert(translations[currentLang].success);
 }
