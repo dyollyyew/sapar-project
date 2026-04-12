@@ -1,151 +1,79 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="tm">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPARTM - Bronirleme ulugamy</title>
-    
+    <title>SAPARTM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
     <style>
-        :root { --green: #008755; --dark-green: #006b43; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; color: #333; }
+        :root { --green: #008755; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; overflow-x: hidden; }
 
-        /* Шапка сайта */
-        header { 
-            background: #fff; padding: 15px 8%; display: flex; 
-            justify-content: space-between; align-items: center; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
-        }
+        /* Header & Lang */
+        header { background: #fff; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-size: 24px; font-weight: 800; color: var(--green); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .lang-switcher { display: flex; background: #eee; padding: 4px; border-radius: 20px; }
+        .lang-switcher span { padding: 5px 15px; cursor: pointer; font-size: 12px; font-weight: bold; border-radius: 15px; }
+        .lang-switcher span.active { background: var(--green); color: #fff; }
+
+        .btn-profile { background: none; border: 1px solid #ddd; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+        /* Hero */
+        .hero { background: var(--green); height: 160px; color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+
+        /* Search Form */
+        .search-container { max-width: 1100px; margin: -40px auto 40px; padding: 0 20px; }
+        .search-card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: grid; grid-template-columns: 1fr 40px 1fr 1fr auto; align-items: end; gap: 15px; }
+        .field { display: flex; flex-direction: column; gap: 5px; position: relative; }
+        .field label { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; }
+        .field input { padding: 12px; border: 1px solid #eee; border-radius: 8px; outline: none; }
         
-        /* Логотип с анимацией самолета */
-        .logo { 
-            font-size: 26px; font-weight: 800; color: var(--green); 
-            text-decoration: none; display: flex; align-items: center; gap: 12px; 
-        }
-        @keyframes planeFly {
-            0% { transform: translate(0,0); opacity: 1; }
-            45% { transform: translate(35px, -35px); opacity: 0; }
-            50% { transform: translate(-35px, 35px); opacity: 0; }
-            100% { transform: translate(0,0); opacity: 1; }
-        }
-        .logo:hover i { animation: planeFly 0.7s ease-in-out; }
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #eee; z-index: 1000; display: none; border-radius: 0 0 8px 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .suggest-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f9f9f9; }
+        .suggest-item:hover { background: #f0f9f4; color: var(--green); }
 
-        /* Красивый переключатель языков */
-        .lang-switcher { 
-            display: flex; align-items: center; background: #f0f0f0; 
-            padding: 4px; border-radius: 25px; border: 1px solid #ddd;
-        }
-        .lang-switcher span { 
-            padding: 6px 15px; cursor: pointer; font-size: 13px; font-weight: bold; 
-            border-radius: 20px; transition: 0.3s; color: #666;
-        }
-        .lang-switcher span.active { background: var(--green); color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn-search { background: var(--green); color: white; border: none; padding: 0 30px; border-radius: 8px; font-weight: bold; cursor: pointer; height: 45px; }
 
-        /* Главный баннер */
-        .hero { 
-            background: linear-gradient(135deg, var(--green) 0%, var(--dark-green) 100%); 
-            height: 200px; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; color: white; text-align: center; 
-        }
-        .hero h1 { margin: 0; font-size: 32px; letter-spacing: 1px; }
-        .hero p { opacity: 0.9; margin-top: 10px; }
-
-        /* Форма поиска */
-        .search-container { max-width: 1100px; margin: -50px auto 50px; padding: 0 20px; }
-        .search-card { 
-            background: #fff; padding: 30px; border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            display: grid; grid-template-columns: 1fr 50px 1fr 1fr auto; 
-            align-items: end; gap: 15px;
-        }
-        .field { display: flex; flex-direction: column; gap: 8px; position: relative; }
-        .field label { font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; padding-left: 5px; }
-        .field input { 
-            padding: 14px; border: 2px solid #f0f0f0; border-radius: 10px; 
-            font-size: 16px; outline: none; transition: 0.3s;
-        }
-        .field input:focus { border-color: var(--green); background: #f9fff9; }
-        
-        /* Стили выпадающего списка автозаполнения */
-        .suggestions {
-            position: absolute; top: 100%; left: 0; right: 0; background: #fff;
-            border-radius: 0 0 12px 12px; z-index: 1000; display: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #eee;
-            max-height: 250px; overflow-y: auto;
-        }
-        .suggest-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; transition: 0.2s; }
-        .suggest-item:hover { background: #f0f9f4; color: var(--green); font-weight: 600; }
-
-        .btn-search { 
-            background: var(--green); color: white; border: none; 
-            padding: 0 35px; border-radius: 10px; font-weight: bold; 
-            cursor: pointer; height: 52px; font-size: 16px; transition: 0.3s;
-        }
-        .btn-search:hover { background: var(--dark-green); transform: translateY(-2px); }
-
-        .swap-btn { 
-            background: none; border: none; color: var(--green); 
-            cursor: pointer; font-size: 20px; margin-bottom: 15px; transition: 0.3s;
-        }
-        .swap-btn:hover { transform: rotate(180deg); }
-
-        /* Популярные направления */
+        /* Popular Section */
         .popular { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; }
-        .dest-card { 
-            background: #fff; border-radius: 15px; overflow: hidden; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; 
-        }
-        .dest-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
-        .dest-card img { width: 100%; height: 160px; object-fit: cover; }
-        .dest-card p { padding: 15px; font-weight: bold; text-align: center; margin: 0; color: #444; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .dest-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; text-align: center; transition: 0.3s; }
+        .dest-card:hover { transform: translateY(-5px); }
+        .dest-card img { width: 100%; height: 130px; object-fit: cover; }
+        .dest-card p { padding: 10px; font-weight: bold; margin: 0; font-size: 14px; }
 
-        /* Стили билета */
-        .ticket { 
-            background: #fff; border-radius: 15px; padding: 25px; 
-            margin: 20px auto; max-width: 900px; border: 1px solid #eee;
-            position: relative; overflow: hidden;
-        }
-        .ticket::before { 
-            content: ''; position: absolute; left: 0; top: 0; 
-            width: 5px; height: 100%; background: var(--green); 
-        }
-        .ticket-route { font-size: 20px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
-        .ticket-grid { display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; background: #fafafa; padding: 15px; border-radius: 10px; }
-        .t-lbl { color: #aaa; font-size: 11px; margin-bottom: 5px; text-transform: uppercase; font-weight: 700; }
-        .t-val { font-size: 18px; font-weight: bold; color: #333; }
+        /* Profile Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 20px; width: 350px; position: relative; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-content h3 { margin-top: 0; color: var(--green); }
+        .close-modal { position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 20px; color: #999; }
         
-        .ticket-footer { display: flex; justify-content: flex-end; align-items: center; gap: 30px; margin-top: 20px; }
-        .price-box { text-align: right; }
-        .price { font-size: 28px; font-weight: 800; color: var(--green); }
-        .comm-info { font-size: 11px; color: #999; font-style: italic; }
-        
-        .buy-btn { 
-            background: var(--green); color: white; border: none; 
-            padding: 14px 35px; border-radius: 10px; font-weight: 800; 
-            cursor: pointer; transition: 0.3s; text-transform: uppercase;
-        }
-        .buy-btn:hover { background: var(--dark-green); box-shadow: 0 5px 15px rgba(0,135,85,0.3); }
+        /* Custom Notification */
+        .toast { position: fixed; top: 20px; right: -300px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; transition: 0.5s; z-index: 3000; border-left: 5px solid var(--green); }
+        .toast.show { right: 20px; }
+        .toast i { color: var(--green); font-size: 20px; }
 
-        @media (max-width: 900px) {
-            .search-card { grid-template-columns: 1fr; }
-            .swap-btn { transform: rotate(90deg); margin: 0 auto; }
-            .ticket-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
-        }
+        /* Ticket */
+        .ticket { background: #fff; border-radius: 12px; padding: 20px; margin: 20px auto; max-width: 900px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .ticket-info { display: flex; gap: 40px; }
+        .buy-btn { background: var(--green); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="index.html" class="logo">
-        <i class="fas fa-paper-plane"></i> SAPARTM
-    </a>
-    
-    <div class="lang-switcher">
-        <span id="btn-tk" class="active" onclick="changeLang('tk')">TKM</span>
-        <span id="btn-ru" onclick="changeLang('ru')">РУС</span>
+    <a href="index.html" class="logo"><i class="fas fa-paper-plane"></i> SAPARTM</a>
+    <div class="nav-right">
+        <div class="lang-switcher">
+            <span id="btn-tk" class="active" onclick="changeLang('tk')">TKM</span>
+            <span id="btn-ru" onclick="changeLang('ru')">РУС</span>
+        </div>
+        <button class="btn-profile" onclick="openProfile()">
+            <i class="fas fa-user-circle"></i> <span id="txt-profile">Profil</span>
+        </button>
     </div>
 </header>
 
@@ -158,86 +86,61 @@
     <div class="search-card">
         <div class="field">
             <label id="lbl-from">Nireden</label>
-            <input type="text" id="from" placeholder="Meselem: ASB" autocomplete="off">
+            <input type="text" id="from" placeholder="Girişiň..." autocomplete="off">
             <div id="suggest-from" class="suggestions"></div>
         </div>
-
-        <button class="swap-btn" onclick="swapCities()">
-            <i class="fas fa-exchange-alt"></i>
-        </button>
-
+        <button onclick="swapCities()" style="background:none; border:none; color:var(--green); cursor:pointer; font-size:18px; margin-bottom:10px;"><i class="fas fa-exchange-alt"></i></button>
         <div class="field">
             <label id="lbl-to">Nirä</label>
-            <input type="text" id="to" placeholder="Meselem: KZN" autocomplete="off">
+            <input type="text" id="to" placeholder="Girişiň..." autocomplete="off">
             <div id="suggest-to" class="suggestions"></div>
         </div>
-
         <div class="field">
             <label id="lbl-date">Sene</label>
             <input type="text" id="date" placeholder="Saýlaň...">
         </div>
-
         <button class="btn-search" onclick="runSearch()" id="btn-search">GÖZLEG</button>
     </div>
 </div>
 
 <div class="popular" id="popular-section">
-    <h2 id="pop-title" style="text-align:center; margin-bottom:30px; font-size: 24px;">Meşhur ugurlar</h2>
+    <h2 id="pop-title" style="text-align:center; margin-bottom:25px;">Meşhur ugurlar</h2>
     <div class="grid">
-        <div class="dest-card" onclick="setQuickSearch('ASB', 'IST')">
-            <img src="img/stambul.jpg" alt="Istanbul">
-            <p>Aşgabat — Stambul</p>
-        </div>
-        <div class="dest-card" onclick="setQuickSearch('ASB', 'DME')">
-            <img src="img/moscow.jpg" alt="Moscow">
-            <p>Aşgabat — Moskwa</p>
-        </div>
-        <div class="dest-card" onclick="setQuickSearch('ASB', 'DXB')">
-            <img src="img/dubai.jpg" alt="Dubai">
-            <p>Aşgabat — Dubaý</p>
-        </div>
-        <div class="dest-card" onclick="setQuickSearch('ASB', 'KZN')">
-            <img src="img/kazan.jpg" alt="Kazan">
-            <p>Aşgabat — Kazan</p>
-        </div>
+        <div class="dest-card" onclick="setQuickSearch('Ashgabat (ASB)', 'Istanbul (IST)')"><img src="img/stambul.jpg"><p>Aşgabat — Stambul</p></div>
+        <div class="dest-card" onclick="setQuickSearch('Ashgabat (ASB)', 'Moscow (DME)')"><img src="img/moscow.jpg"><p>Aşgabat — Moskwa</p></div>
+        <div class="dest-card" onclick="setQuickSearch('Ashgabat (ASB)', 'Dubai (DXB)')"><img src="img/dubai.jpg"><p>Aşgabat — Dubaý</p></div>
+        <div class="dest-card" onclick="setQuickSearch('Ashgabat (ASB)', 'Kazan (KZN)')"><img src="img/kazan.jpg"><p>Aşgabat — Kazan</p></div>
     </div>
 </div>
 
-<div id="results-list" style="padding: 0 20px 60px;"></div>
+<div id="results-list" style="padding: 0 20px 50px;"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
-<script src="logic.js"></script>
-<div class="nav-right">
-    <div class="lang-switcher">
-        <span id="btn-tk" class="active" onclick="changeLang('tk')">TKM</span>
-        <span id="btn-ru" onclick="changeLang('ru')">РУС</span>
-    </div>
-    <button class="btn-login" onclick="toggleProfile()"><i class="fas fa-user-circle"></i> <span id="txt-profile">Profil</span></button>
-</div>
-
-<div id="profile-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center;">
-    <div style="background:white; padding:30px; border-radius:15px; width:90%; max-width:400px; position:relative;">
-        <span onclick="toggleProfile()" style="position:absolute; top:15px; right:15px; cursor:pointer; font-size:20px;">&times;</span>
-        <h3 id="modal-title">Passenger Data</h3>
+<div id="profile-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeProfile()">&times;</span>
+        <h3 id="modal-title">Passenger Profile</h3>
         <div class="field" style="margin-bottom:15px;">
-            <label>First Name (Latin)</label>
-            <input type="text" id="p-name" placeholder="SAPAR">
+            <label>First Name</label>
+            <input type="text" id="p-name" placeholder="John">
         </div>
         <div class="field" style="margin-bottom:15px;">
-            <label>Last Name (Latin)</label>
-            <input type="text" id="p-surname" placeholder="SAPAROW">
+            <label>Last Name</label>
+            <input type="text" id="p-surname" placeholder="Doe">
         </div>
         <div class="field" style="margin-bottom:15px;">
             <label>Email</label>
             <input type="email" id="p-email" placeholder="example@mail.com">
         </div>
-        <div class="field" style="margin-bottom:15px;">
-            <label>Phone</label>
-            <input type="text" id="p-phone" placeholder="+993...">
-        </div>
-        <button class="buy-btn" style="width:100%" onclick="saveProfile()">SAVE / ÝAZDYR</button>
+        <button class="btn-search" style="width:100%" onclick="saveProfile()">SAVE / ÝAZDYR</button>
     </div>
 </div>
+
+<div id="toast" class="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toast-msg">Successfully saved!</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="logic.js"></script>
 </body>
 </html>
