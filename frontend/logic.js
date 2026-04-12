@@ -145,26 +145,4 @@ function showSuggest(input, listId) {
     });
 }
 
-// В функции отрисовки билета (внутри runSearch) используй этот шаблон:
-
-resBox.innerHTML += `
-    <div class="new-ticket">
-        <div class="ticket-header">
-            <div class="airline-name">Turkmenistan Airline</div>
-            <div style="color: #008755; cursor:pointer; font-size:13px">Правила тарифа и нормы багажа</div>
-        </div>
-        <div style="font-weight:bold; margin-bottom:15px">${t.origin} ✈ ${t.destination}</div>
-        <div class="ticket-body">
-            <div><div class="label">Вылет</div><div class="time">17:30</div></div>
-            <div><div class="label">Прилет</div><div class="time">22:50</div></div>
-            <div><div class="label">Пересадки</div><div style="font-weight:600">Прямой</div></div>
-            <div><div class="label">В пути</div><div style="font-weight:600">03 ч 20 мин</div></div>
-            <div><div class="label">Рейс</div><div style="font-weight:600">740</div></div>
-        </div>
-        <div class="price-row">
-            <div style="font-size: 22px; font-weight: bold; color: #008755">${t.price} P</div>
-            <button class="buy-btn" style="background:#008755; padding:10px 25px">${dict[currentLang].buy}</button>
-        </div>
-    </div>
-`;
 }
