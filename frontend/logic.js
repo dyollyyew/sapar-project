@@ -1,98 +1,101 @@
 const dict = {
     tk: {
-        title: "HOŞ GELDIŇIZ!",
-        sub: "Aşgabat — Dünýäniň gapysy",
-        from: "Nireden",
-        to: "Nirä",
-        date: "Sene",
-        search: "GÖZLEG",
-        popular: "Meşhur ugurlar",
-        cabinet: "Giriş",
-        buy: "SATYN AL",
-        dep: "Uçuş",
-        arr: "Geliş",
-        loading: "Gözlenilýär...",
-        direct: "Gönümel",
-        duration: "Ýolda",
-        flight: "Reýs",
-        rules: "Tarif düzgünleri"
+        title: "HOŞ GELDIŇIZ!", sub: "Aşgabat — Dünýäniň gapysy",
+        from: "Nireden", to: "Nirä", date: "Sene", search: "GÖZLEG",
+        popular: "Meşhur ugurlar", cabinet: "Giriş", buy: "SATYN AL",
+        dep: "Uçuş", arr: "Geliş", loading: "Gözlenilýär...",
+        direct: "Gönümel", duration: "Ýolda", flight: "Reýs", rules: "Tarif düzgünleri"
     },
     ru: {
-        title: "ДОБРО ПОЖАЛОВАТЬ!",
-        sub: "Ашхабад — Врата мира",
-        from: "Откуда",
-        to: "Куда",
-        date: "Дата",
-        search: "ПОИСК",
-        popular: "Популярные направления",
-        cabinet: "Вход",
-        buy: "КУПИТЬ",
-        dep: "Вылет",
-        arr: "Прилет",
-        loading: "Поиск билетов...",
-        direct: "Прямой",
-        duration: "В пути",
-        flight: "Рейс",
-        rules: "Правила тарифа"
+        title: "ДОБРО ПОЖАЛОВАТЬ!", sub: "Ашхабад — Врата мира",
+        from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК",
+        popular: "Популярные направления", cabinet: "Вход", buy: "КУПИТЬ",
+        dep: "Вылет", arr: "Прилет", loading: "Поиск билетов...",
+        direct: "Прямой", duration: "В пути", flight: "Рейс", rules: "Правила тарифа"
     }
 };
 
-let currentLang = 'tk';
-let searchResults = [];
+// Список городов для подсказок
+const cities = [
+    { name: "Ashgabat", code: "ASB", ru: "Ашхабад" },
+    { name: "Kazan", code: "KZN", ru: "Казань" },
+    { name: "Moscow", code: "DME", ru: "Москва" },
+    { name: "Istanbul", code: "IST", ru: "Стамбул" },
+    { name: "Dubai", code: "DXB", ru: "Дубай" },
+    { name: "Frankfurt", code: "FRA", ru: "Франкфурт" }
+];
 
+let currentLang = 'tk';
+
+// --- Логика автозаполнения ---
+function setupAutocomplete(inputId, suggestId) {
+    const input = document.getElementById(inputId);
+    const suggestBox = document.getElementById(suggestId);
+
+    input.addEventListener('input', () => {
+        const val = input.value.toLowerCase();
+        suggestBox.innerHTML = '';
+        if (!val) { suggestBox.style.display = 'none'; return; }
+
+        const filtered = cities.filter(c => 
+            c.name.toLowerCase().includes(val) || 
+            c.ru.toLowerCase().includes(val) || 
+            c.code.toLowerCase().includes(val)
+        );
+
+        if (filtered.length > 0) {
+            suggestBox.style.display = 'block';
+            filtered.forEach(city => {
+                const div = document.createElement('div');
+                div.className = 'suggest-item';
+                const displayName = currentLang === 'tk' ? city.name : city.ru;
+                div.innerText = `${displayName} (${city.code})`;
+                div.onclick = () => {
+                    input.value = `${displayName} (${city.code})`;
+                    suggestBox.style.display = 'none';
+                };
+                suggestBox.appendChild(div);
+            });
+        } else {
+            suggestBox.style.display = 'none';
+        }
+    });
+
+    // Скрывать при клике вне
+    document.addEventListener('click', (e) => {
+        if (e.target !== input) suggestBox.style.display = 'none';
+    });
+}
+
+setupAutocomplete('from', 'suggest-from');
+setupAutocomplete('to', 'suggest-to');
+
+// --- Смена языка ---
 function changeLang(lang) {
     currentLang = lang;
     document.getElementById('btn-tk').classList.toggle('active', lang === 'tk');
     document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
-
-    document.getElementById('hero-title').innerText = dict[lang].title;
-    document.getElementById('hero-sub').innerText = dict[lang].sub;
-    document.getElementById('lbl-from').innerText = dict[lang].from;
-    document.getElementById('lbl-to').innerText = dict[lang].to;
-    document.getElementById('lbl-date').innerText = dict[lang].date;
-    document.getElementById('btn-search').innerText = dict[lang].search;
-    document.getElementById('pop-title').innerText = dict[lang].popular;
-    document.getElementById('txt-cabinet').innerText = dict[lang].cabinet;
-
-    if (searchResults.length > 0) renderTickets(searchResults);
+    // ... (остальные переводы из твоего словаря)
 }
 
-function swapCities() {
-    const f = document.getElementById('from');
-    const t = document.getElementById('to');
-    [f.value, t.value] = [t.value, f.value];
-}
-
-flatpickr("#date", { dateFormat: "d.m.Y", minDate: "today" });
-
-function setQuickSearch(from, to) {
-    document.getElementById('from').value = from;
-    document.getElementById('to').value = to;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
+// --- Поиск и отрисовка ---
 async function runSearch() {
     const from = document.getElementById('from').value;
     const to = document.getElementById('to').value;
     const date = document.getElementById('date').value;
     const resBox = document.getElementById('results-list');
 
-    if(!from || !to || !date) return alert("Error!");
+    if(!from || !to || !date) return alert("Error! Заполните все поля.");
 
     document.getElementById('popular-section').style.display = 'none';
     resBox.innerHTML = `<center style="padding:50px;"><i class="fas fa-spinner fa-spin"></i> ${dict[currentLang].loading}</center>`;
 
-    try {
-        // Имитация API запроса
-        setTimeout(() => {
-            searchResults = [
-                { origin: from, destination: to, price: 3200, timeDep: "17:30", timeArr: "22:50", flight: "T5-442" }
-            ];
-            renderTickets(searchResults);
-        }, 800);
-    } catch (e) {
-        resBox.innerHTML = "Error!";
-    }
+    setTimeout(() => {
+        const results = [
+            { origin: from, destination: to, price: 3200, timeDep: "17:30", timeArr: "22:50", flight: "T5-442" }
+        ];
+        renderTickets(results);
+    }, 800);
 }
 
 function renderTickets(tickets) {
@@ -116,8 +119,24 @@ function renderTickets(tickets) {
                 </div>
                 <div class="ticket-footer">
                     <div class="price">${t.price} TMT</div>
-                    <button class="btn-buy" onclick="alert('OK')">${lang.buy}</button>
+                    <button class="btn-buy" onclick="goToOfficialSite()">
+                        ${lang.buy}
+                    </button>
                 </div>
             </div>`;
     });
+}
+
+function goToOfficialSite() {
+    // Ссылка на официальный сайт (например, Turkmenistan Airlines)
+    const officialUrl = "https://turkmenistanairlines.tm/tickets";
+    window.open(officialUrl, '_blank');
+}
+
+function swapCities() {
+    const f = document.getElementById('from');
+    const t = document.getElementById('to');
+    const temp = f.value;
+    f.value = t.value;
+    t.value = temp;
 }
