@@ -1,12 +1,13 @@
-const MARKER = "716446";
 const dict = {
-    tk: { 
-        title: "HOŞ GELDIŇIZ!", from: "Nireden", to: "Nirä", date: "Sene", search: "GÖZLEG", 
-        pop: "Meşhur ugurlar", buy: "SATYN AL", loading: "Gözlenilýär...", comm: "+5% hyzmat tölegi goşuldy" 
+    tk: {
+        title: "HOŞ GELDIŇIZ!", sub: "Aşgabat — Dünýäniň gapysy", from: "Nireden", to: "Nirä", date: "Sene",
+        search: "GÖZLEG", popular: "Meşhur ugurlar", buy: "SATYN AL",
+        dep: "Uçuş", arr: "Geliş", loading: "Gözlenilýär...", direct: "Gönümel", flight: "Reýs", comm: "+5% hyzmat tölegi goşuldy"
     },
-    ru: { 
-        title: "ДОБРО ПОЖАЛОВАТЬ!", from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК", 
-        pop: "Популярные направления", buy: "КУПИТЬ", loading: "Поиск билетов...", comm: "+5% комиссия включена" 
+    ru: {
+        title: "ДОБРО ПОЖАЛОВАТЬ!", sub: "Ашхабад — Врата мира", from: "Откуда", to: "Куда", date: "Дата",
+        search: "ПОИСК", popular: "Популярные направления", buy: "КУПИТЬ",
+        dep: "Вылет", arr: "Прилет", loading: "Поиск билетов...", direct: "Прямой", flight: "Рейс", comm: "+5% комиссия сервиса включена"
     }
 };
 
@@ -19,154 +20,137 @@ const cities = [
 ];
 
 let currentLang = 'tk';
+let lastTickets = [];
 
-// Инициализация календаря
-const fp = flatpickr("#date", { 
-    dateFormat: "d.m.Y", 
-    minDate: "today", 
-    defaultDate: "today",
-    locale: "ru" // или "tk" если есть файл локализации
+// 1. Календарь
+const fp = flatpickr("#date", {
+    dateFormat: "d.m.Y",
+    minDate: "today",
+    defaultDate: "today"
 });
 
-// 1. Поиск названия города (улучшено)
-function getCityName(code) {
-    if (!code) return "";
-    const city = cities.find(c => c.code === code.toUpperCase().trim());
-    return city ? (currentLang === 'tk' ? city.name : city.ru) : code.toUpperCase();
+// 2. Переключение языка
+function changeLang(lang) {
+    currentLang = lang;
+    document.getElementById('btn-tk').classList.toggle('active', lang === 'tk');
+    document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+
+    document.getElementById('hero-title').innerText = dict[lang].title;
+    document.getElementById('hero-sub').innerText = dict[lang].sub;
+    document.getElementById('lbl-from').innerText = dict[lang].from;
+    document.getElementById('lbl-to').innerText = dict[lang].to;
+    document.getElementById('lbl-date').innerText = dict[lang].date;
+    document.getElementById('btn-search').innerText = dict[lang].search;
+    document.getElementById('pop-title').innerText = dict[lang].popular;
+
+    if (lastTickets.length > 0) renderTickets(lastTickets);
 }
 
-// 2. Личный кабинет
-function toggleModal(show) {
-    const modal = document.getElementById('lk-modal');
-    if (modal) modal.style.display = show ? 'flex' : 'none';
-}
+// 3. Автозаполнение
+function initAutocomplete(inputId, suggestId) {
+    const input = document.getElementById(inputId);
+    const box = document.getElementById(suggestId);
 
-function saveUser() {
-    const fio = document.getElementById('u-fio').value.trim();
-    const pass = document.getElementById('u-pass').value.trim();
-    if (!fio || !pass) return alert("Maglumatlary dolduryň!");
-    
-    localStorage.setItem('sap_user', JSON.stringify({ fio, pass }));
-    
-    const userBtn = document.getElementById('user-btn');
-    if (userBtn) userBtn.innerText = fio.split(' ')[0];
-    
-    toggleModal(false);
-}
+    input.addEventListener('input', () => {
+        const val = input.value.toLowerCase();
+        box.innerHTML = '';
+        if(!val) { box.style.display = 'none'; return; }
 
-// 3. Поиск билетов (исправлена обработка ошибок и форматирование)
+        const filtered = cities.filter(c => c.name.toLowerCase().includes(val) || c.code.toLowerCase().includes(val) || c.ru.toLowerCase().includes(val));
+        
+        if(filtered.length > 0) {
+            box.style.display = 'block';
+            filtered.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'suggest-item';
+                div.innerText = `${currentLang === 'tk' ? c.name : c.ru} (${c.code})`;
+                div.onclick = () => {
+                    input.value = c.code;
+                    box.style.display = 'none';
+                };
+                box.appendChild(div);
+            });
+        }
+    });
+}
+initAutocomplete('from', 'suggest-from');
+initAutocomplete('to', 'suggest-to');
+
+// 4. Поиск
 async function runSearch() {
-    const fromInput = document.getElementById('from');
-    const toInput = document.getElementById('to');
-    const dateInput = document.getElementById('date');
+    const from = document.getElementById('from').value;
+    const to = document.getElementById('to').value;
+    const date = document.getElementById('date').value;
     const resBox = document.getElementById('results-list');
 
-    const from = fromInput.value.toUpperCase().trim();
-    const to = toInput.value.toUpperCase().trim();
-    const dateStr = dateInput.value;
+    if(!from || !to || !date) return alert("Error!");
 
-    if(!from || !to || !dateStr) return alert("Error: Dolduryň!");
-
-    // Конвертация даты DD.MM.YYYY -> YYYY-MM-DD
-    const parts = dateStr.split('.');
-    const apiDate = `${parts[2]}-${parts[1]}-${parts[0]}`; 
-
-    const popSection = document.getElementById('popular-section');
-    if (popSection) popSection.style.display = 'none';
-    
+    document.getElementById('popular-section').style.display = 'none';
     resBox.innerHTML = `<center style="padding:50px;"><i class="fas fa-spinner fa-spin"></i> ${dict[currentLang].loading}</center>`;
 
-    try {
-        const response = await fetch('/api/search-live', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ origin: from, destination: to, date: apiDate })
-        });
-        
-        if (!response.ok) throw new Error('Network error');
-        
-        const data = await response.json();
-        renderTickets(data.tickets, from, to, dateStr);
-    } catch (err) {
-        resBox.innerHTML = `<center style="color:red; padding:50px;">API Connection Error. Check Token/Internet.</center>`;
-    }
+    // Имитация API запроса
+    setTimeout(() => {
+        lastTickets = [{
+            origin: from.toUpperCase(),
+            destination: to.toUpperCase(),
+            basePrice: 3200,
+            date: date,
+            flight: "T5-442"
+        }];
+        renderTickets(lastTickets);
+    }, 1000);
 }
 
-// 4. Отрисовка билетов
-function renderTickets(tickets, fromCode, toCode, dateStr) {
+// 5. Отрисовка билета и логика покупки
+function renderTickets(tickets) {
     const resBox = document.getElementById('results-list');
     resBox.innerHTML = "";
-    const fromName = getCityName(fromCode);
-    const toName = getCityName(toCode);
-
-    if (!tickets || tickets.length === 0) {
-        resBox.innerHTML = "<center style='padding:40px;'>Bilet tapylmady.</center>";
-        return;
-    }
+    const lang = dict[currentLang];
 
     tickets.forEach(t => {
-        const finalPrice = Math.round(t.price * 1.05);
+        // Расчет цены с комиссией 5%
+        const finalPrice = Math.round(t.basePrice * 1.05);
+
         resBox.innerHTML += `
             <div class="ticket">
-                <div class="ticket-route">
-                    <img src="https://pics.avs.io/100/35/${t.airline}.png" alt="Airline"> 
-                    <span>${fromName}</span> ✈ <span>${toName}</span>
-                </div>
+                <div class="ticket-route">${t.origin} <i class="fas fa-plane" style="color:#ccc; margin:0 10px;"></i> ${t.destination}</div>
                 <div class="ticket-grid">
-                    <div><div class="t-lbl">${currentLang === 'tk' ? 'Reýs' : 'Рейс'}</div><div class="t-val">${t.flight_number}</div></div>
-                    <div><div class="t-lbl">${currentLang === 'tk' ? 'Sene' : 'Дата'}</div><div class="t-val">${dateStr}</div></div>
-                    <div><div class="t-lbl">Status</div><div class="t-val" style="color:green">${currentLang === 'tk' ? 'Gönümel' : 'Прямой'}</div></div>
+                    <div><div class="t-lbl">${lang.dep}</div><div class="t-val">17:30</div></div>
+                    <div><div class="t-lbl">${lang.arr}</div><div class="t-val">22:50</div></div>
+                    <div><div class="t-lbl">Status</div><div class="t-val" style="color:green">${lang.direct}</div></div>
+                    <div><div class="t-lbl">${lang.date}</div><div class="t-val">${t.date}</div></div>
+                    <div><div class="t-lbl">${lang.flight}</div><div class="t-val">${t.flight}</div></div>
                 </div>
                 <div class="ticket-footer">
                     <div class="price-box">
-                        <div class="price">${finalPrice.toLocaleString()} RUB</div>
-                        <div class="comm-info">${dict[currentLang].comm}</div>
+                        <div class="price">${finalPrice} TMT</div>
+                        <div class="comm-info">${lang.comm}</div>
                     </div>
-                    <button class="buy-btn" onclick="handleBuy('${t.link}')">${dict[currentLang].buy}</button>
+                    <button class="buy-btn" onclick="redirectToAviasales('${t.origin}', '${t.destination}', '${t.date}')">
+                        ${lang.buy}
+                    </button>
                 </div>
             </div>`;
     });
 }
 
-function handleBuy(link) {
-    if (!localStorage.getItem('sap_user')) {
-        alert(currentLang === 'tk' ? "Bilet almak üçin Profil maglumatlaryny dolduryň!" : "Для покупки билета заполните профиль!");
-        toggleModal(true);
-        return;
-    }
-    window.open(`https://www.aviasales.ru${link}&marker=${MARKER}`, '_blank');
-}
-
-// 5. Полное переключение языка (исправлено)
-function changeLang(lang) {
-    currentLang = lang;
+// 6. Сложная ссылка на Aviasales
+function redirectToAviasales(from, to, date) {
+    // Форматируем дату из DD.MM.YYYY в DDMM для ссылки Aviasales
+    const parts = date.split('.');
+    const formattedDate = parts[0] + parts[1]; 
     
-    // Активные кнопки
-    document.querySelectorAll('.lang-switcher span').forEach(s => s.classList.remove('active'));
-    const activeLangBtn = document.getElementById('btn-' + lang);
-    if (activeLangBtn) activeLangBtn.classList.add('active');
-
-    // Текстовые блоки
-    const elements = {
-        'hero-title': dict[lang].title,
-        'lbl-from': dict[lang].from,
-        'lbl-to': dict[lang].to,
-        'lbl-date': dict[lang].date,
-        'btn-search': dict[lang].search,
-        'pop-title': dict[lang].pop
-    };
-
-    for (let id in elements) {
-        const el = document.getElementById(id);
-        if (el) el.innerText = elements[id];
-    }
+    // Формируем URL: https://www.aviasales.ru/search/ASB1204KZN1 (пример)
+    const aviaUrl = `https://www.aviasales.ru/search/${from}${formattedDate}${to}1`;
+    
+    // В реальности здесь данные пассажира отправляются на ваш сервер (Email/Ticket), 
+    // а пользователь летит на оплату.
+    window.open(aviaUrl, '_blank');
 }
 
 function swapCities() {
     const f = document.getElementById('from'), t = document.getElementById('to');
-    const temp = f.value;
-    f.value = t.value;
-    t.value = temp;
+    [f.value, t.value] = [t.value, f.value];
 }
 
 function setQuickSearch(f, t) {
@@ -174,13 +158,3 @@ function setQuickSearch(f, t) {
     document.getElementById('to').value = t;
     runSearch();
 }
-
-// Загрузка данных
-window.addEventListener('DOMContentLoaded', () => {
-    const saved = localStorage.getItem('sap_user');
-    if (saved) {
-        const u = JSON.parse(saved);
-        const userBtn = document.getElementById('user-btn');
-        if (userBtn) userBtn.innerText = u.fio.split(' ')[0];
-    }
-});
