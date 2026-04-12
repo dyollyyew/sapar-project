@@ -1,65 +1,55 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tm">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPARTM</title>
+    <title>SAPARTM - Bronirleme</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
-        :root { --green: #008755; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; overflow-x: hidden; }
-
-        /* Header & Lang */
-        header { background: #fff; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .logo { font-size: 24px; font-weight: 800; color: var(--green); text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .nav-right { display: flex; align-items: center; gap: 20px; }
-        .lang-switcher { display: flex; background: #eee; padding: 4px; border-radius: 20px; }
-        .lang-switcher span { padding: 5px 15px; cursor: pointer; font-size: 12px; font-weight: bold; border-radius: 15px; }
+        :root { --green: #008755; --blue: #007bff; --bg: #f4f7f6; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; }
+        
+        header { background: #fff; padding: 12px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); sticky: top; z-index: 1000; }
+        .logo { font-size: 22px; font-weight: 800; color: var(--green); text-decoration: none; }
+        
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .lang-switcher span { padding: 5px 12px; cursor: pointer; border-radius: 15px; font-size: 12px; font-weight: bold; background: #eee; }
         .lang-switcher span.active { background: var(--green); color: #fff; }
+        .user-pill { background: #f8f9fa; border: 1px solid #ddd; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 
-        .btn-profile { background: none; border: 1px solid #ddd; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-
-        /* Hero */
-        .hero { background: var(--green); height: 160px; color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-
-        /* Search Form */
-        .search-container { max-width: 1100px; margin: -40px auto 40px; padding: 0 20px; }
-        .search-card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: grid; grid-template-columns: 1fr 40px 1fr 1fr auto; align-items: end; gap: 15px; }
-        .field { display: flex; flex-direction: column; gap: 5px; position: relative; }
-        .field label { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; }
-        .field input { padding: 12px; border: 1px solid #eee; border-radius: 8px; outline: none; }
+        .hero { background: var(--green); height: 120px; }
+        .search-container { max-width: 1100px; margin: -50px auto 30px; padding: 0 20px; }
+        .search-card { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: grid; grid-template-columns: 1fr 40px 1fr 1fr auto; align-items: end; gap: 12px; }
         
-        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #eee; z-index: 1000; display: none; border-radius: 0 0 8px 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .suggest-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f9f9f9; }
-        .suggest-item:hover { background: #f0f9f4; color: var(--green); }
+        .field { display: flex; flex-direction: column; gap: 4px; }
+        .field label { font-size: 11px; font-weight: bold; color: #999; text-transform: uppercase; }
+        .field input { padding: 12px; border: 1px solid #eee; border-radius: 10px; outline: none; }
 
-        .btn-search { background: var(--green); color: white; border: none; padding: 0 30px; border-radius: 8px; font-weight: bold; cursor: pointer; height: 45px; }
+        /* Карточка билета */
+        .ticket { background: #fff; border-radius: 16px; margin-bottom: 15px; border: 1px solid #eee; position: relative; overflow: hidden; display: flex; }
+        .ticket-badge { position: absolute; top: 0; left: 0; padding: 4px 12px; font-size: 11px; font-weight: 800; color: #fff; border-radius: 0 0 10px 0; }
+        .cheap { background: var(--green); }
+        .optimal { background: var(--blue); }
+        .fast { background: #9c27b0; }
 
-        /* Popular Section */
+        .ticket-left { flex: 2; padding: 30px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .ticket-right { flex: 1; padding: 20px; border-left: 1px dashed #eee; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .price { font-size: 26px; font-weight: 900; color: #333; margin-bottom: 10px; }
+        
+        .buy-btn { background: var(--green); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; }
+
+        /* Популярные */
         .popular { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-        .dest-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; text-align: center; transition: 0.3s; }
-        .dest-card:hover { transform: translateY(-5px); }
-        .dest-card img { width: 100%; height: 130px; object-fit: cover; }
-        .dest-card p { padding: 10px; font-weight: bold; margin: 0; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .dest-card { background: #fff; border-radius: 12px; overflow: hidden; cursor: pointer; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .dest-card img { width: 100%; height: 120px; object-fit: cover; }
 
-        /* Profile Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: #fff; padding: 30px; border-radius: 20px; width: 350px; position: relative; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-content h3 { margin-top: 0; color: var(--green); }
-        .close-modal { position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 20px; color: #999; }
-        
-        /* Custom Notification */
-        .toast { position: fixed; top: 20px; right: -300px; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; transition: 0.5s; z-index: 3000; border-left: 5px solid var(--green); }
+        /* ЛК и Уведомление */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 20px; width: 350px; }
+        .toast { position: fixed; bottom: 20px; right: -300px; background: #333; color: #fff; padding: 15px 25px; border-radius: 10px; transition: 0.5s; z-index: 3000; }
         .toast.show { right: 20px; }
-        .toast i { color: var(--green); font-size: 20px; }
-
-        /* Ticket */
-        .ticket { background: #fff; border-radius: 12px; padding: 20px; margin: 20px auto; max-width: 900px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .ticket-info { display: flex; gap: 40px; }
-        .buy-btn { background: var(--green); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -71,74 +61,57 @@
             <span id="btn-tk" class="active" onclick="changeLang('tk')">TKM</span>
             <span id="btn-ru" onclick="changeLang('ru')">РУС</span>
         </div>
-        <button class="btn-profile" onclick="openProfile()">
-            <i class="fas fa-user-circle"></i> <span id="txt-profile">Profil</span>
-        </button>
+        <div class="user-pill" onclick="toggleLK()">
+            <i class="fas fa-user-circle"></i> <span id="user-name-display">Profil</span>
+        </div>
     </div>
 </header>
 
-<div class="hero">
-    <h1 id="hero-title">HOŞ GELDIŇIZ!</h1>
-    <p id="hero-sub">Aşgabat — Dünýäniň gapysy</p>
-</div>
+<div class="hero"></div>
 
 <div class="search-container">
     <div class="search-card">
         <div class="field">
             <label id="lbl-from">Nireden</label>
-            <input type="text" id="from" placeholder="Girişiň..." autocomplete="off">
-            <div id="suggest-from" class="suggestions"></div>
+            <input type="text" id="from" placeholder="ASB">
         </div>
-        <button onclick="swapCities()" style="background:none; border:none; color:var(--green); cursor:pointer; font-size:18px; margin-bottom:10px;"><i class="fas fa-exchange-alt"></i></button>
+        <button onclick="swap()" style="background:none; border:none; color:var(--green); cursor:pointer;"><i class="fas fa-exchange-alt"></i></button>
         <div class="field">
             <label id="lbl-to">Nirä</label>
-            <input type="text" id="to" placeholder="Girişiň..." autocomplete="off">
-            <div id="suggest-to" class="suggestions"></div>
+            <input type="text" id="to" placeholder="KZN">
         </div>
         <div class="field">
             <label id="lbl-date">Sene</label>
-            <input type="text" id="date" placeholder="Saýlaň...">
+            <input type="text" id="date">
         </div>
-        <button class="btn-search" onclick="runSearch()" id="btn-search">GÖZLEG</button>
+        <button class="buy-btn" style="height:48px;" onclick="getFlights()">GÖZLEG</button>
     </div>
 </div>
 
-<div class="popular" id="popular-section">
-    <h2 id="pop-title" style="text-align:center; margin-bottom:25px;">Meşhur ugurlar</h2>
+<div id="results" style="max-width:900px; margin: auto; padding: 0 20px;"></div>
+
+<div class="popular" id="popular">
+    <h2 id="pop-title" style="text-align:center">Meşhur ugurlar</h2>
     <div class="grid">
-        <div class="dest-card" onclick="setQuickSearch('Ashgabat (ASB)', 'Istanbul (IST)')"><img src="img/stambul.jpg"><p>Aşgabat — Stambul</p></div>
-        <div class="dest-card" onclick="setQuickSearch('Ashgabat (ASB)', 'Moscow (DME)')"><img src="img/moscow.jpg"><p>Aşgabat — Moskwa</p></div>
-        <div class="dest-card" onclick="setQuickSearch('Ashgabat (ASB)', 'Dubai (DXB)')"><img src="img/dubai.jpg"><p>Aşgabat — Dubaý</p></div>
-        <div class="dest-card" onclick="setQuickSearch('Ashgabat (ASB)', 'Kazan (KZN)')"><img src="img/kazan.jpg"><p>Aşgabat — Kazan</p></div>
+        <div class="dest-card" onclick="quick('ASB','IST')"><img src="img/stambul.jpg"><p>Stambul</p></div>
+        <div class="dest-card" onclick="quick('ASB','DME')"><img src="img/moscow.jpg"><p>Moskwa</p></div>
+        <div class="dest-card" onclick="quick('ASB','DXB')"><img src="img/dubai.jpg"><p>Dubaý</p></div>
+        <div class="dest-card" onclick="quick('ASB','KZN')"><img src="img/kazan.jpg"><p>Kazan</p></div>
     </div>
 </div>
 
-<div id="results-list" style="padding: 0 20px 50px;"></div>
-
-<div id="profile-modal" class="modal">
+<div id="modal" class="modal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeProfile()">&times;</span>
-        <h3 id="modal-title">Passenger Profile</h3>
-        <div class="field" style="margin-bottom:15px;">
-            <label>First Name</label>
-            <input type="text" id="p-name" placeholder="John">
-        </div>
-        <div class="field" style="margin-bottom:15px;">
-            <label>Last Name</label>
-            <input type="text" id="p-surname" placeholder="Doe">
-        </div>
-        <div class="field" style="margin-bottom:15px;">
-            <label>Email</label>
-            <input type="email" id="p-email" placeholder="example@mail.com">
-        </div>
-        <button class="btn-search" style="width:100%" onclick="saveProfile()">SAVE / ÝAZDYR</button>
+        <h3 id="lk-title">Profil maglumatlary</h3>
+        <input type="text" id="u-name" placeholder="Name" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+        <input type="text" id="u-surname" placeholder="Surname" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+        <input type="email" id="u-email" placeholder="Email" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+        <button class="buy-btn" onclick="saveUser()">ÝAZDYR</button>
+        <p onclick="toggleLK()" style="text-align:center; color:red; cursor:pointer; margin-top:15px;">Yapmak</p>
     </div>
 </div>
 
-<div id="toast" class="toast">
-    <i class="fas fa-check-circle"></i>
-    <span id="toast-msg">Successfully saved!</span>
-</div>
+<div id="toast" class="toast">Successfully saved!</div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="logic.js"></script>

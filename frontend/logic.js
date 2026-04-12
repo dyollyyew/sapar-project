@@ -1,159 +1,127 @@
+const TOKEN = "23a9b11bc2672f0692432adc75cfc003";
 const MARKER = "716446";
-const COMMISSION = 1.05;
 
 const dict = {
-    tk: {
-        title: "HOŞ GELDIŇIZ!", sub: "Aşgabat — Dünýäniň gapysy", from: "Nireden", to: "Nirä", date: "Sene",
-        search: "GÖZLEG", popular: "Meşhur ugurlar", profile: "Profil", buy: "SATYN AL",
-        loading: "Gözlenilýär...", saved: "Siziň maglumatlaryňyz ýazdyryldy!", modal: "Passenger Maglumatlary"
-    },
-    ru: {
-        title: "ДОБРО ПОЖАЛОВАТЬ!", sub: "Ашхабад — Врата мира", from: "Откуда", to: "Куда", date: "Дата",
-        search: "ПОИСК", popular: "Популярные направления", profile: "Профиль", buy: "КУПИТЬ",
-        loading: "Поиск билетов...", saved: "Ваши данные успешно сохранены!", modal: "Данные пассажира"
-    }
+    tk: { from: "Nireden", to: "Nirä", date: "Sene", search: "GÖZLEG", popular: "Meşhur ugurlar", lk: "Profil maglumatlary", saved: "Ýazdyryldy!" },
+    ru: { from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК", popular: "Популярные направления", lk: "Данные профиля", saved: "Сохранено!" }
 };
 
-const cities = [
-    { name: "Ashgabat", code: "ASB", ru: "Ашхабад" },
-    { name: "Kazan", code: "KZN", ru: "Казань" },
-    { name: "Moscow", code: "DME", ru: "Москва" },
-    { name: "Istanbul", code: "IST", ru: "Стамбул" },
-    { name: "Dubai", code: "DXB", ru: "Дубай" }
-];
-
 let currentLang = 'tk';
+flatpickr("#date", { dateFormat: "Y-m-d", minDate: "today" });
 
-// Initialize Calendar
-flatpickr("#date", { dateFormat: "d.m.Y", minDate: "today" });
-
-// Language Switcher
 function changeLang(lang) {
     currentLang = lang;
     document.getElementById('btn-tk').classList.toggle('active', lang === 'tk');
     document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
-    
-    document.getElementById('hero-title').innerText = dict[lang].title;
-    document.getElementById('hero-sub').innerText = dict[lang].sub;
     document.getElementById('lbl-from').innerText = dict[lang].from;
     document.getElementById('lbl-to').innerText = dict[lang].to;
     document.getElementById('lbl-date').innerText = dict[lang].date;
-    document.getElementById('btn-search').innerText = dict[lang].search;
     document.getElementById('pop-title').innerText = dict[lang].popular;
-    document.getElementById('txt-profile').innerText = dict[lang].profile;
-    document.getElementById('modal-title').innerText = dict[lang].modal;
+    document.getElementById('lk-title').innerText = dict[lang].lk;
 }
 
-// Autocomplete
-function setupSuggest(inputId, suggestId) {
-    const input = document.getElementById(inputId);
-    const box = document.getElementById(suggestId);
-    input.oninput = () => {
-        const val = input.value.toLowerCase();
-        box.innerHTML = '';
-        if(!val) { box.style.display = 'none'; return; }
-        const filtered = cities.filter(c => c.name.toLowerCase().includes(val) || c.ru.toLowerCase().includes(val) || c.code.toLowerCase().includes(val));
-        if(filtered.length > 0) {
-            box.style.display = 'block';
-            filtered.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'suggest-item';
-                const fullName = currentLang === 'tk' ? c.name : c.ru;
-                div.innerText = `${fullName} (${c.code})`;
-                div.onclick = () => {
-                    input.value = `${fullName} (${c.code})`;
-                    box.style.display = 'none';
-                };
-                box.appendChild(div);
-            });
-        }
+function toggleLK() {
+    const m = document.getElementById('modal');
+    m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+}
+
+function saveUser() {
+    const user = {
+        name: document.getElementById('u-name').value,
+        surname: document.getElementById('u-surname').value,
+        email: document.getElementById('u-email').value
     };
-}
-setupSuggest('from', 'suggest-from');
-setupSuggest('to', 'suggest-to');
-
-// Profile Logic
-function openProfile() {
-    document.getElementById('profile-modal').style.display = 'flex';
-    const saved = JSON.parse(localStorage.getItem('user_data') || '{}');
-    if(saved.name) {
-        document.getElementById('p-name').value = saved.name;
-        document.getElementById('p-surname').value = saved.surname;
-        document.getElementById('p-email').value = saved.email;
-    }
-}
-function closeProfile() { document.getElementById('profile-modal').style.display = 'none'; }
-
-function saveProfile() {
-    const data = {
-        name: document.getElementById('p-name').value,
-        surname: document.getElementById('p-surname').value,
-        email: document.getElementById('p-email').value
-    };
-    localStorage.setItem('user_data', JSON.stringify(data));
+    localStorage.setItem('sap_user', JSON.stringify(user));
+    document.getElementById('user-name-display').innerText = user.name || "Profil";
     showToast(dict[currentLang].saved);
-    closeProfile();
+    toggleLK();
 }
 
 function showToast(msg) {
     const t = document.getElementById('toast');
-    document.getElementById('toast-msg').innerText = msg;
+    t.innerText = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// Search & Buy Logic
-function runSearch() {
-    const from = document.getElementById('from').value;
-    const to = document.getElementById('to').value;
+async function getFlights() {
+    const from = document.getElementById('from').value.toUpperCase();
+    const to = document.getElementById('to').value.toUpperCase();
     const date = document.getElementById('date').value;
-    if(!from || !to || !date) return alert("Fill all fields!");
+    const res = document.getElementById('results');
 
-    const resBox = document.getElementById('results-list');
-    document.getElementById('popular-section').style.display = 'none';
-    resBox.innerHTML = `<center style="padding:40px;">${dict[currentLang].loading}</center>`;
+    if(!from || !to || !date) return alert("Dolduryň!");
 
-    setTimeout(() => {
-        const price = 3200;
-        const finalPrice = Math.round(price * COMMISSION);
-        resBox.innerHTML = `
+    document.getElementById('popular').style.display = 'none';
+    res.innerHTML = "<center>Gözlenilýär...</center>";
+
+    try {
+        // Запрос к реальному API Aviasales
+        const url = `https://api.travelpayouts.com/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${date}&currency=tmt&token=${TOKEN}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if(!data.data || data.data.length === 0) {
+            res.innerHTML = "<center>Билеты не найдены.</center>";
+            return;
+        }
+
+        render(data.data, from, to);
+    } catch (e) {
+        res.innerHTML = "<center>Error API.</center>";
+    }
+}
+
+function render(data, from, to) {
+    const res = document.getElementById('results');
+    res.innerHTML = "";
+    
+    // Сортируем для меток (самый дешевый и т.д.)
+    const sorted = [...data].sort((a,b) => a.price - b.price);
+
+    data.slice(0, 5).forEach((f, i) => {
+        let badgeClass = "optimal";
+        let badgeText = "Оптимальный";
+        
+        if(f.price === sorted[0].price) { badgeClass = "cheap"; badgeText = "Самый дешевый"; }
+        if(i === 2) { badgeClass = "fast"; badgeText = "Самый быстрый"; }
+
+        const priceWithComm = Math.round(f.price * 1.05);
+
+        res.innerHTML += `
             <div class="ticket">
-                <div class="ticket-info">
-                    <div><b>${from}</b><br><small>12:00</small></div>
-                    <div style="color:#ccc">✈</div>
-                    <div><b>${to}</b><br><small>15:30</small></div>
+                <div class="ticket-badge ${badgeClass}">${badgeText}</div>
+                <div class="ticket-left">
+                    <div><b style="font-size:20px;">${from}</b><br><small>${f.departure_at.split('T')[0]}</small></div>
+                    <div style="color:#ddd">✈</div>
+                    <div><b style="font-size:20px;">${to}</b><br><small>Reýs: ${f.flight_number}</small></div>
                 </div>
-                <div style="text-align:right">
-                    <div style="font-size:22px; font-weight:800; color:var(--green)">${finalPrice} TMT</div>
-                    <button class="buy-btn" onclick="buyTicket('${from}', '${to}', '${date}')">${dict[currentLang].buy}</button>
+                <div class="ticket-right">
+                    <div class="price">${priceWithComm} TMT</div>
+                    <button class="buy-btn" onclick="book('${f.link}')">SATYN AL</button>
                 </div>
             </div>`;
-    }, 1000);
+    });
 }
 
-function buyTicket(from, to, date) {
-    const user = JSON.parse(localStorage.getItem('user_data') || '{}');
+function book(link) {
+    const user = JSON.parse(localStorage.getItem('sap_user') || '{}');
     if(!user.name) {
-        alert(currentLang === 'tk' ? "Profil dolduryň!" : "Заполните профиль!");
-        return openProfile();
+        alert("Profil dolduryň!");
+        toggleLK();
+        return;
     }
-    
-    // Extract IATA codes from "City Name (IATA)"
-    const fromCode = from.match(/\((.*?)\)/)[1];
-    const toCode = to.match(/\((.*?)\)/)[1];
-    const d = date.split('.').join('').substring(0,4); // Format: 1204
-    
-    const url = `https://www.aviasales.ru/search/${fromCode}${d}${toCode}1?marker=${MARKER}&name=${user.name}&surname=${user.surname}&email=${user.email}`;
-    window.open(url, '_blank');
+    // Формируем финальную ссылку с твоим маркером
+    const final = `https://www.aviasales.ru${link}&marker=${MARKER}&name=${user.name}`;
+    window.open(final, '_blank');
 }
 
-function swapCities() {
+function swap() {
     const f = document.getElementById('from'), t = document.getElementById('to');
     [f.value, t.value] = [t.value, f.value];
 }
 
-function setQuickSearch(f, t) {
+function quick(f, t) {
     document.getElementById('from').value = f;
     document.getElementById('to').value = t;
-    runSearch();
 }
