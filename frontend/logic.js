@@ -125,33 +125,73 @@ function renderTickets(tickets) {
     });
 }
 
-// ПЕРЕХОД НА AVIASALES С ДАННЫМИ
-function bookTicket(from, to, date) {
-    const dateParts = date.split('.');
-    const ddmmyy = dateParts[0] + dateParts[1]; // Формат 1204 (12 апреля)
-    // Пример добавления в функцию bookTicket
-fetch('https://your-api.com/save-order', {
-    method: 'POST',
-    body: JSON.stringify({ passenger, flight: from + "-" + to, date })
-});
-
-    // Формируем Deep Link с маркером и данными пассажира
-    const baseUrl = `https://www.aviasales.ru/search/${from}${ddmmyy}${to}1`;
-    const params = new URLSearchParams({
-        marker: MARKER,
-        with_request: "true",
-        // Параметры предзаполнения данных (поддерживается многими агентствами через Aviasales)
-        email: passenger.email,
-        phone: passenger.phone,
-        first_name: passenger.firstName,
-        last_name: passenger.lastName
-    });
-
-    const finalUrl = `${baseUrl}?${params.toString()}`;
+//3. ПЕРЕХОД К ОПЛАТЕ С ДАННЫМИ ПАССАЖИРА
+function redirectToPartner(from, to, date) {
+    const saved = JSON.parse(localStorage.getItem('passenger') || '{}');
     
-    // В реальной системе здесь должен быть запрос на ваш Email API, 
-    // чтобы данные ушли вам на почту ПЕРЕД переходом.
-    console.log("Данные пассажира зафиксированы:", passenger);
+    if(!saved.name) {
+        alert(currentLang === 'tk' ? "Hahys, profil maglumatlaryny dolduryn!" : "Пожалуйста, заполните данные в профиле!");
+        toggleProfile();
+        return;
+    }
+
+    const parts = date.split('.');
+    const ddmmyy = parts[0] + parts[1]; 
+
+    // Формируем ссылку Aviasales с данными из ЛК
+    const url = `https://www.aviasales.ru/search/${from}${ddmmyy}${to}1?marker=${MARKER}` +
+                `&first_name=${encodeURIComponent(saved.name)}` +
+                `&last_name=${encodeURIComponent(saved.surname)}` +
+                `&email=${encodeURIComponent(saved.email)}` +
+                `&phone=${encodeURIComponent(saved.phone)}`;
+
+    window.open(url, '_blank');
+}
+// БОТА С ЛК (ДАННЫЕ ПАССАЖИРА)//
+function toggleProfile() {
+    const modal = document.getElementById('profile-modal');
+    modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'flex' : 'none';
     
-    window.open(finalUrl, '_blank');
+    // Подгружаем данные из памяти если есть
+    const saved = JSON.parse(localStorage.getItem('passenger') || '{}');
+    if(saved.name) {
+        document.getElementById('p-name').value = saved.name;
+        document.getElementById('p-surname').value = saved.surname;
+        document.getElementById('p-email').value = saved.email;
+        document.getElementById('p-phone').value = saved.phone;
+    }
+}
+
+function saveProfile() {
+    const data = {
+        name: document.getElementById('p-name').value,
+        surname: document.getElementById('p-surname').value,
+        email: document.getElementById('p-email').value,
+        phone: document.getElementById('p-phone').value
+    };
+    localStorage.setItem('passenger', JSON.stringify(data));
+    alert(currentLang === 'tk' ? "Yatda saklanyldy!" : "Данные сохранены!");
+    toggleProfile();
+}
+// ПРАВИЛЬНЫЙ ПЕРЕХОД ЯЗЫКОВ//
+function changeLang(lang) {
+    currentLang = lang;
+    
+    // Визуал кнопок
+    document.getElementById('btn-tk').classList.toggle('active', lang === 'tk');
+    document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+
+    // Тексты интерфейса
+    document.getElementById('hero-title').innerText = dict[lang].title;
+    document.getElementById('hero-sub').innerText = dict[lang].sub;
+    document.getElementById('lbl-from').innerText = dict[lang].from;
+    document.getElementById('lbl-to').innerText = dict[lang].to;
+    document.getElementById('lbl-date').innerText = dict[lang].date;
+    document.getElementById('btn-search').innerText = dict[lang].search;
+    document.getElementById('pop-title').innerText = dict[lang].popular;
+    document.getElementById('txt-profile').innerText = dict[lang].profile;
+    document.getElementById('modal-title').innerText = dict[lang].modal;
+
+    // Если на экране есть билеты, перерисовываем их с новым языком
+    if (typeof lastTickets !== 'undefined' && lastTickets.length > 0) renderTickets(lastTickets);
 }
