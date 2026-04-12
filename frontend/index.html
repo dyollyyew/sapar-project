@@ -6,70 +6,37 @@
     <title>SAPAR.TM - Sapar Airlines Style</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-/* Эффект Glassmorphism для формы поиска */
-.search-card {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+:root {
+    --tkm-green: #008755;
+    --gold: #d4af37;
 }
 
-/* Стили для популярных направлений */
-.popular-title {
-    text-align: center;
-    color: var(--tkm-dark);
-    margin: 40px 0 20px;
-    font-weight: 800;
+body { font-family: sans-serif; background: #f4f4f4; line-height: 1.6; }
+
+header { 
+    background: white; padding: 15px 5%; 
+    display: flex; justify-content: space-between; 
+    border-bottom: 4px solid var(--tkm-green); 
 }
 
-.popular-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    max-width: 1100px;
-    margin: 0 auto 40px;
-    padding: 0 20px;
+.hero-banner { 
+    background: var(--tkm-green); color: white; 
+    text-align: center; padding: 60px 20px; 
 }
 
-.city-card {
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    cursor: pointer;
-    transition: 0.4s;
-    position: relative;
+.search-card { 
+    background: white; max-width: 1000px; margin: -30px auto 40px; 
+    padding: 30px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
 }
 
-.city-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0,135,85,0.2);
+.popular-grid { 
+    display: flex; gap: 20px; justify-content: center; padding: 20px; 
 }
 
-.city-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-}
-
-.city-overlay {
-    padding: 15px;
-    background: white;
-    text-align: center;
-}
-
-.city-overlay h3 {
-    margin: 0;
-    color: var(--tkm-dark);
-}
-
-/* Анимация плавного появления */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.popular-grid, .ticket-item {
-    animation: fadeInUp 0.8s ease-out forwards;
+.city-card { 
+    background: white; border-radius: 10px; overflow: hidden; width: 250px; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }</style>
 </head>
 <body>
