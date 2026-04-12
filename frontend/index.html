@@ -121,4 +121,37 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="logic.js"></script>
 </body>
+<header>
+    <a href="index.html" class="logo"><i class="fas fa-paper-plane"></i> SAPARTM</a>
+    <div class="nav-right" style="display: flex; gap: 15px; align-items: center;">
+        <button class="btn-login" id="user-btn" onclick="toggleModal(true)">Profil / Giriş</button>
+        <div class="lang-switcher">
+            <span id="btn-tk" class="active" onclick="changeLang('tk')">TKM</span>
+            <span id="btn-ru" onclick="changeLang('ru')">РУС</span>
+        </div>
+    </div>
+</header>
+
+<div id="lk-modal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:30px; border-radius:15px; width:100%; max-width:400px; position:relative;">
+        <h2 style="margin-top:0; color:var(--green);">Şahsy otag (ЛК)</h2>
+        <p style="font-size:13px; color:#666;">Bilet satyn almak üçin maglumatlary dolduryň.</p>
+        
+        <div class="field" style="margin-bottom:15px;">
+            <label>Doly adyňyz (ФИО)</label>
+            <input type="text" id="u-fio" placeholder="Meselem: Batyr Batyrow" style="width:100%; box-sizing:border-box;">
+        </div>
+        <div class="field" style="margin-bottom:15px;">
+            <label>Pasport seriýasy we belgisi</label>
+            <input type="text" id="u-pass" placeholder="A1904657" style="width:100%; box-sizing:border-box;">
+        </div>
+        <div class="field" style="margin-bottom:20px;">
+            <label>E-mail</label>
+            <input type="email" id="u-email" placeholder="example@mail.com" style="width:100%; box-sizing:border-box;">
+        </div>
+        
+        <button class="btn-search" onclick="saveUser()" style="width:100%;">Ýatda sakla (Сохранить)</button>
+        <button onclick="toggleModal(false)" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer;">Ýap (Закрыть)</button>
+    </div>
+</div>
 </html>
