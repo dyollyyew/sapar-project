@@ -1,77 +1,67 @@
-const TOKEN = "23a9b11bc2672f0692432adc75cfc003"; //
-const MARKER = "716446"; //
+const TOKEN = "23a9b11bc2672f0692432adc75cfc003"; // Твой токен
+const MARKER = "716446"; // Твой маркер
 
-// Настройка календаря
-flatpickr("#date", { dateFormat: "Y-m-d", minDate: "today" }); //
+// Настройка календаря (строго YYYY-MM-DD)
+flatpickr("#date", { dateFormat: "Y-m-d", minDate: "today" });
 
 async function startSearch() {
-    // 1. Фикс регистра: kzn -> KZN
+    // Исправление ввода: всегда в верхний регистр
     const from = document.getElementById('from').value.toUpperCase().trim();
     const to = document.getElementById('to').value.toUpperCase().trim();
     const date = document.getElementById('date').value;
     const resDiv = document.getElementById('results');
 
-    if (!from || !to || !date) return alert("Заполните все поля!");
+    if (!from || !to || !date) return alert("Пожалуйста, заполните все поля!");
 
-    resDiv.innerHTML = "<center style='padding:40px;'>Gözlenilýär...</center>";
+    resDiv.innerHTML = "<center style='padding:50px;'>Gözlenilýär (Идет поиск)...</center>";
 
-    // 2. Ссылка на API
+    // Используем мощный прокси для обхода "API Error"
     const apiUrl = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${date}&currency=rub&token=${TOKEN}`;
-    
-    // Используем прокси AllOrigins (он самый стабильный для Vercel)
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
 
     try {
         const response = await fetch(proxyUrl);
-        if (!response.ok) throw new Error('Proxy error');
-        
         const wrapper = await response.json();
-        const json = JSON.parse(wrapper.contents); // Декодируем данные из прокси
+        const json = JSON.parse(wrapper.contents); // Извлекаем данные из прокси-обертки
 
         if (!json.data || json.data.length === 0) {
-            resDiv.innerHTML = "<center style='padding:40px;'>Билетов не найдено на эту дату.</center>";
+            resDiv.innerHTML = "<center style='padding:50px;'>Билетов не найдено. Попробуйте другую дату.</center>";
             return;
         }
 
-        renderTickets(json.data, from, to);
+        // Очищаем и рисуем билеты
+        resDiv.innerHTML = "";
+        json.data.slice(0, 5).forEach((f, i) => {
+            // Наценка 5%
+            const priceWithMarkup = Math.round(f.price * 1.05);
+            
+            resDiv.innerHTML += `
+                <div style="background:#fff; border-radius:15px; padding:20px; margin:15px auto; max-width:800px; display:flex; justify-content:space-between; align-items:center; border:1px solid #ddd; position:relative;">
+                    ${i === 0 ? '<div style="position:absolute; top:-10px; left:20px; background:#008755; color:white; padding:2px 10px; border-radius:10px; font-size:12px;">Самый дешевый</div>' : ''}
+                    <div>
+                        <img src="https://pics.avs.io/100/35/${f.airline}.png">
+                        <div style="margin-top:10px;"><b style="font-size:18px;">${from} ✈ ${to}</b></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:26px; font-weight:bold;">${priceWithMarkup.toLocaleString()} ₽</div>
+                        <div style="font-size:11px; color:gray; margin-bottom:10px;">5% сбор включен</div>
+                        <button onclick="handlePay('${f.link}')" style="background:#008755; color:white; border:none; padding:10px 25px; border-radius:8px; cursor:pointer; font-weight:bold;">SATYN AL</button>
+                    </div>
+                </div>`;
+        });
     } catch (err) {
-        console.error(err);
-        resDiv.innerHTML = `<center style='color:red; padding:40px;'>API Connection Error. <br> Проверьте токен или интернет.</center>`; //
+        resDiv.innerHTML = "<center style='color:red; padding:50px;'>API Error. Проверьте токен или интернет.</center>"; //
     }
 }
 
-function renderTickets(data, from, to) {
-    const resDiv = document.getElementById('results');
-    resDiv.innerHTML = "";
-
-    data.slice(0, 5).forEach((f, i) => {
-        // 3. Твой сбор 5%
-        const finalPrice = Math.round(f.price * 1.05);
-        
-        resDiv.innerHTML += `
-            <div style="background:#fff; border-radius:12px; padding:20px; margin:15px auto; max-width:800px; display:flex; justify-content:space-between; align-items:center; border:1px solid #ddd; position:relative;">
-                ${i === 0 ? '<div style="position:absolute; top:-10px; left:20px; background:#008755; color:white; padding:2px 10px; border-radius:10px; font-size:12px;">САМЫЙ ДЕШЕВЫЙ</div>' : ''}
-                <div>
-                    <img src="https://pics.avs.io/100/35/${f.airline}.png"><br>
-                    <b style="font-size:18px;">${from} ✈ ${to}</b>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:24px; font-weight:bold;">${finalPrice.toLocaleString()} ₽</div>
-                    <div style="font-size:11px; color:gray; margin-bottom:8px;">+5% сбор включен</div>
-                    <button onclick="checkAndPay('${f.link}')" style="background:#008755; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold;">ОПЛАТИТЬ</button>
-                </div>
-            </div>`;
-    });
-}
-
-function checkAndPay(link) {
-    // 4. Проверка ЛК и паспортных данных (A1904657) перед оплатой
+function handlePay(link) {
+    // Проверка ЛК перед покупкой
     const user = localStorage.getItem('sap_user');
     if (!user) {
-        alert("Сначала создайте ЛК и заполните данные паспорта!");
-        openModal(); // Функция открытия твоей модалки
+        alert("Пожалуйста, сначала заполните данные в Профиле (ЛК)!");
+        if(typeof openModal === "function") openModal(); 
         return;
     }
-    // Автоматический переход с твоим маркером
+    // Переход на Aviasales с твоим маркером
     window.open(`https://www.aviasales.ru${link}&marker=${MARKER}`, '_blank');
 }
