@@ -1,71 +1,96 @@
-const API_KEY = "23a9b11bc2672f0692432adc75cfc003";
+const TOKEN = "23a9b11bc2672f0692432adc75cfc003";
 const MARKER = "716446";
 
-async function doSearch() {
-    // 1. Принудительно переводим в верхний регистр (KZN, ASB)
-    const f = document.getElementById('from').value.trim().toUpperCase();
-    const t = document.getElementById('to').value.trim().toUpperCase();
-    const d = document.getElementById('date').value;
-    const res = document.getElementById('results');
+const langData = {
+    tk: { btn: "GÖZLEG", login: "Giriş", ph: "Adyňyz", empty: "Ähli meýdançalary dolduryň!", error: "Bilet tapylmady" },
+    ru: { btn: "ПОИСК", login: "Вход", ph: "Ваше имя", empty: "Заполните все поля!", error: "Билеты не найдены" }
+};
 
-    if(!f || !t || !d) {
-        alert("Ähli meýdançalary dolduryň!"); // Твоя ошибка из image_6982e6
+let currentLang = 'tk';
+
+// Настройка даты
+flatpickr("#date", { dateFormat: "Y-m-d", defaultDate: "today" });
+
+// Перевод
+function changeLang(l) {
+    currentLang = l;
+    document.getElementById('btn-tk').className = l === 'tk' ? 'active' : '';
+    document.getElementById('btn-ru').className = l === 'ru' ? 'active' : '';
+    document.getElementById('search-text').innerText = langData[l].btn;
+    document.getElementById('user-label').innerText = langData[l].login;
+    document.getElementById('user-input').placeholder = langData[l].ph;
+}
+
+// Профиль
+function openProfile() { document.getElementById('modal-profile').style.display = 'flex'; }
+function saveUser() {
+    const name = document.getElementById('user-input').value;
+    if(name) {
+        localStorage.setItem('user', name);
+        document.getElementById('user-label').innerText = name;
+        document.getElementById('modal-profile').style.display = 'none';
+    }
+}
+
+// Поиск
+async function findFlights() {
+    const from = document.getElementById('from').value.toUpperCase().trim();
+    const to = document.getElementById('to').value.toUpperCase().trim();
+    const date = document.getElementById('date').value;
+    const resDiv = document.getElementById('results');
+
+    if(!from || !to || !date) {
+        alert(langData[currentLang].empty);
         return;
     }
 
-    res.innerHTML = "<center style='padding:40px;'>Gözlenilýär...</center>";
+    document.getElementById('popular-box').style.display = 'none';
+    resDiv.innerHTML = "<center>Gözlenilýär...</center>";
 
     try {
-        // 2. Добавляем прокси (cors-anywhere), если браузер блокирует прямой запрос
-        // Попробуй сначала без прокси (чистый URL), если не выйдет - добавь приставку
-        const baseUrl = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${f}&destination=${t}&departure_at=${d}&currency=rub&token=${API_KEY}`;
-        
-        const resp = await fetch(baseUrl);
-        
-        if (!resp.ok) throw new Error('Network response was not ok');
-        
-        const resJson = await resp.json();
+        // Запрос цен в РУБЛЯХ (RUB)
+        const url = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${date}&currency=rub&token=${TOKEN}`;
+        const response = await fetch(url);
+        const json = await response.json();
 
-        if(!resJson.data || resJson.data.length === 0) {
-            res.innerHTML = "<center style='padding:40px;'>Bilet tapylmady (Билеты не найдены).</center>";
+        if(!json.data || json.data.length === 0) {
+            resDiv.innerHTML = `<center>${langData[currentLang].error}</center>`;
             return;
         }
 
-        renderResults(resJson.data, f, t);
+        resDiv.innerHTML = "";
+        json.data.slice(0, 5).forEach((f, i) => {
+            let tag = i === 0 ? "Самый дешевый" : (i === 1 ? "Оптимальный" : "");
+            resDiv.innerHTML += `
+                <div class="ticket">
+                    <div>
+                        <img src="https://pics.avs.io/100/40/${f.airline}.png"><br>
+                        <b>${from} ✈ ${to}</b><br>
+                        <small>Reýs: ${f.flight_number}</small>
+                    </div>
+                    <div style="text-align:right">
+                        <h2 style="margin:0">${f.price.toLocaleString()} ₽</h2>
+                        <button class="btn-go" onclick="window.open('https://www.aviasales.ru${f.link}&marker=${MARKER}')">SATYN AL</button>
+                    </div>
+                </div>`;
+        });
     } catch (e) {
-        console.error(e);
-        res.innerHTML = "<center style='color:red; padding:40px;'>API Error. Barlap görüň: <br> 1. Token dogrymy? <br> 2. Internet barmy?</center>";
+        resDiv.innerHTML = "<center style='color:red'>API Error. Token barlap görüň!</center>";
     }
 }
 
-function renderResults(data, f, t) {
-    const res = document.getElementById('results');
-    res.innerHTML = "";
-    
-    // Сортируем как на твоем скриншоте image_736961 (Оптимальный, Дешевый)
-    data.slice(0, 5).forEach((item, index) => {
-        let tag = "";
-        let color = "";
-        if (index === 0) { tag = "Самый дешевый"; color = "#008755"; }
-        if (index === 1) { tag = "Оптимальный"; color = "#007bff"; }
-
-        res.innerHTML += `
-            <div class="ticket" style="border: 1px solid #eee; padding: 20px; border-radius: 15px; margin-bottom: 10px; background: #fff; position: relative;">
-                ${tag ? `<span style="background:${color}; color:white; padding:2px 10px; border-radius:10px; font-size:12px; position:absolute; top:-10px; left:20px;">${tag}</span>` : ''}
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <img src="https://pics.avs.io/100/40/${item.airline}.png">
-                        <div style="font-size: 20px; font-weight: bold;">${item.price.toLocaleString()} ₽</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div>${f} ✈ ${t}</div>
-                        <small>Reýs: ${item.flight_number}</small>
-                    </div>
-                    <button onclick="window.open('https://www.aviasales.ru${item.link}&marker=${MARKER}')" 
-                            style="background: #008755; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
-                        SATYN AL
-                    </button>
-                </div>
-            </div>`;
-    });
+function quickSearch(f, t) {
+    document.getElementById('from').value = f;
+    document.getElementById('to').value = t;
+    findFlights();
 }
+
+function swap() {
+    let f = document.getElementById('from'), t = document.getElementById('to');
+    [f.value, t.value] = [t.value, f.value];
+}
+
+window.onload = () => {
+    const n = localStorage.getItem('user');
+    if(n) document.getElementById('user-label').innerText = n;
+};
