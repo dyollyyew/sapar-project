@@ -1,31 +1,31 @@
-const dict = {
+\const dict = {
     tk: {
         title: "HOŞ GELDIŇIZ!",
         sub: "Aşgabat — Dünýäniň gapysy",
-        from: "Nireden (From)",
-        to: "Nirä (To)",
-        date: "Sene (Date)",
-        search: "Gözleg (Search)",
+        from: "Nireden",
+        to: "Nirä",
+        date: "Sene",
+        search: "GÖZLEG",
         popular: "Meşhur ugurlar",
-        loading: "Gözlenilýär...",
-        none: "Petek tapylmady.",
+        cabinet: "Hasabym",
         buy: "SATYN AL",
         dep: "Uçuş",
-        arr: "Geliş"
+        arr: "Geliş",
+        loading: "Gözlenilýär..."
     },
     ru: {
         title: "ДОБРО ПОЖАЛОВАТЬ!",
         sub: "Ашхабад — Врата мира",
-        from: "Откуда (From)",
-        to: "Куда (To)",
-        date: "Дата (Date)",
-        search: "Поиск (Search)",
+        from: "Откуда",
+        to: "Куда",
+        date: "Дата",
+        search: "ПОИСК",
         popular: "Популярные направления",
-        loading: "Поиск билетов...",
-        none: "Билетов не найдено.",
+        cabinet: "Кабинет",
         buy: "КУПИТЬ",
         dep: "Вылет",
-        arr: "Прилет"
+        arr: "Прилет",
+        loading: "Поиск билетов..."
     }
 };
 
@@ -34,17 +34,19 @@ let currentLang = 'tk';
 function changeLang(lang) {
     currentLang = lang;
     
-    // Обновляем тексты на странице
+    // Активные кнопки
+    document.getElementById('btn-tk').classList.toggle('active', lang === 'tk');
+    document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+
+    // Тексты
     document.getElementById('hero-title').innerText = dict[lang].title;
     document.getElementById('hero-sub').innerText = dict[lang].sub;
     document.getElementById('lbl-from').innerText = dict[lang].from;
     document.getElementById('lbl-to').innerText = dict[lang].to;
     document.getElementById('lbl-date').innerText = dict[lang].date;
     document.getElementById('btn-search').innerText = dict[lang].search;
-    document.getElementById('pop-title').innerText = `${dict[lang].popular} / Популярные направления`;
-    
-    // Если на экране есть результаты поиска, очищаем их (чтобы не путать языки)
-    document.getElementById('results-list').innerHTML = "";
+    document.getElementById('pop-title').innerText = dict[lang].popular;
+    document.getElementById('txt-cabinet').innerText = dict[lang].cabinet;
 }
 
 function setQuickSearch(from, to) {
@@ -59,15 +61,15 @@ async function runSearch() {
     const date = document.getElementById('date').value;
     const resBox = document.getElementById('results-list');
 
-    if(!from || !to || !date) return alert(currentLang === 'tk' ? "Maglumatlary giriziň!" : "Заполните все поля!");
+    if(!from || !to || !date) return alert("Error!");
 
-    resBox.innerHTML = `<div style="text-align:center; padding:20px; color:#008755;"><i class="fas fa-sync fa-spin"></i> ${dict[currentLang].loading}</div>`;
+    resBox.innerHTML = `<div class="loader"><i class="fas fa-spinner fa-spin"></i> ${dict[currentLang].loading}</div>`;
 
     try {
         const response = await fetch('/api/search-live', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ origin: from, destination: to, date: date })
+            body: JSON.stringify({ origin: from.toUpperCase(), destination: to.toUpperCase(), date: date })
         });
         const data = await response.json();
         resBox.innerHTML = "";
@@ -75,28 +77,32 @@ async function runSearch() {
         if(data.tickets && data.tickets.length > 0) {
             data.tickets.forEach(t => {
                 resBox.innerHTML += `
-                    <div class="ticket-item">
-                        <div class="route-details">
-                            <div style="text-align:center">
-                                <div class="city-name">${t.origin}</div>
-                                <div style="font-size:12px; color:#888">${dict[currentLang].dep}</div>
+                    <div class="ticket">
+                        <div class="ticket-left">
+                            <div class="city-block">
+                                <h2>${t.origin}</h2>
+                                <p>${dict[currentLang].dep}</p>
                             </div>
-                            <div class="plane-path"><i class="fas fa-plane"></i></div>
-                            <div style="text-align:center">
-                                <div class="city-name">${t.destination}</div>
-                                <div style="font-size:12px; color:#888">${dict[currentLang].arr}</div>
+                            <div class="flight-info">
+                                <div style="font-size: 11px; color:#aaa; margin-bottom:5px;">SAPAR AIRLINES</div>
+                                <div class="line"></div>
+                                <div style="font-size: 11px; color:#aaa; margin-top:5px;">Direct Flight</div>
+                            </div>
+                            <div class="city-block" style="text-align: right;">
+                                <h2>${t.destination}</h2>
+                                <p>${dict[currentLang].arr}</p>
                             </div>
                         </div>
-                        <div class="price-tag">
-                            <div class="cost" style="font-size:20px; font-weight:bold;">${t.price.toLocaleString()} RUB</div>
-                            <a href="https://www.aviasales.ru${t.link}" class="buy-now" target="_blank" style="background:#d32f2f; color:white; text-decoration:none; padding:10px; border-radius:5px; display:block; margin-top:10px;">${dict[currentLang].buy}</a>
+                        <div class="ticket-right">
+                            <div class="price">${t.price.toLocaleString()} RUB</div>
+                            <a href="https://www.aviasales.ru${t.link}" target="_blank" class="buy-btn">${dict[currentLang].buy}</a>
                         </div>
                     </div>`;
             });
         } else {
-            resBox.innerHTML = `<div style="text-align:center; padding:20px;">${dict[currentLang].none}</div>`;
+            resBox.innerHTML = "<center>No tickets found</center>";
         }
     } catch (e) {
-        resBox.innerHTML = `<div style="text-align:center; padding:20px; color:red;">Error!</div>`;
+        resBox.innerHTML = "<center style='color:red'>Server Error</center>";
     }
 }
