@@ -21,17 +21,24 @@ const cities = [
 let currentLang = 'tk';
 
 // Инициализация календаря
-const fp = flatpickr("#date", { dateFormat: "d.m.Y", minDate: "today", defaultDate: "today" });
+const fp = flatpickr("#date", { 
+    dateFormat: "d.m.Y", 
+    minDate: "today", 
+    defaultDate: "today",
+    locale: "ru" // или "tk" если есть файл локализации
+});
 
-// 1. Функция поиска названия города
+// 1. Поиск названия города (улучшено)
 function getCityName(code) {
-    const city = cities.find(c => c.code === code.toUpperCase());
-    return city ? (currentLang === 'tk' ? city.name : city.ru) : code;
+    if (!code) return "";
+    const city = cities.find(c => c.code === code.toUpperCase().trim());
+    return city ? (currentLang === 'tk' ? city.name : city.ru) : code.toUpperCase();
 }
 
-// 2. Личный кабинет: Сохранение данных
+// 2. Личный кабинет
 function toggleModal(show) {
-    document.getElementById('lk-modal').style.display = show ? 'flex' : 'none';
+    const modal = document.getElementById('lk-modal');
+    if (modal) modal.style.display = show ? 'flex' : 'none';
 }
 
 function saveUser() {
@@ -40,32 +47,33 @@ function saveUser() {
     if (!fio || !pass) return alert("Maglumatlary dolduryň!");
     
     localStorage.setItem('sap_user', JSON.stringify({ fio, pass }));
-    document.getElementById('user-btn').innerText = fio.split(' ')[0]; // Показываем только имя
+    
+    const userBtn = document.getElementById('user-btn');
+    if (userBtn) userBtn.innerText = fio.split(' ')[0];
+    
     toggleModal(false);
 }
 
-// Проверка ЛК при загрузке
-window.onload = () => {
-    const saved = localStorage.getItem('sap_user');
-    if (saved) {
-        const u = JSON.parse(saved);
-        document.getElementById('user-btn').innerText = u.fio.split(' ')[0];
-    }
-};
-
-// 3. Поиск билетов через бэкенд
+// 3. Поиск билетов (исправлена обработка ошибок и форматирование)
 async function runSearch() {
-    const from = document.getElementById('from').value.toUpperCase().trim();
-    const to = document.getElementById('to').value.toUpperCase().trim();
-    const dateStr = document.getElementById('date').value;
+    const fromInput = document.getElementById('from');
+    const toInput = document.getElementById('to');
+    const dateInput = document.getElementById('date');
     const resBox = document.getElementById('results-list');
+
+    const from = fromInput.value.toUpperCase().trim();
+    const to = toInput.value.toUpperCase().trim();
+    const dateStr = dateInput.value;
 
     if(!from || !to || !dateStr) return alert("Error: Dolduryň!");
 
-    const [d, m, y] = dateStr.split('.');
-    const apiDate = `${y}-${m}-${d}`; // Формат для API
+    // Конвертация даты DD.MM.YYYY -> YYYY-MM-DD
+    const parts = dateStr.split('.');
+    const apiDate = `${parts[2]}-${parts[1]}-${parts[0]}`; 
 
-    document.getElementById('popular-section').style.display = 'none';
+    const popSection = document.getElementById('popular-section');
+    if (popSection) popSection.style.display = 'none';
+    
     resBox.innerHTML = `<center style="padding:50px;"><i class="fas fa-spinner fa-spin"></i> ${dict[currentLang].loading}</center>`;
 
     try {
@@ -74,10 +82,13 @@ async function runSearch() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ origin: from, destination: to, date: apiDate })
         });
+        
+        if (!response.ok) throw new Error('Network error');
+        
         const data = await response.json();
         renderTickets(data.tickets, from, to, dateStr);
     } catch (err) {
-        resBox.innerHTML = `<center style="color:red; padding:50px;">API Connection Error</center>`; //
+        resBox.innerHTML = `<center style="color:red; padding:50px;">API Connection Error. Check Token/Internet.</center>`;
     }
 }
 
@@ -94,17 +105,17 @@ function renderTickets(tickets, fromCode, toCode, dateStr) {
     }
 
     tickets.forEach(t => {
-        const finalPrice = Math.round(t.price * 1.05); // Наценка 5%
+        const finalPrice = Math.round(t.price * 1.05);
         resBox.innerHTML += `
             <div class="ticket">
                 <div class="ticket-route">
-                    <img src="https://pics.avs.io/100/35/${t.airline}.png"> 
+                    <img src="https://pics.avs.io/100/35/${t.airline}.png" alt="Airline"> 
                     <span>${fromName}</span> ✈ <span>${toName}</span>
                 </div>
                 <div class="ticket-grid">
-                    <div><div class="t-lbl">Reýs</div><div class="t-val">${t.flight_number}</div></div>
-                    <div><div class="t-lbl">Sene</div><div class="t-val">${dateStr}</div></div>
-                    <div><div class="t-lbl">Status</div><div class="t-val" style="color:green">Gönümel</div></div>
+                    <div><div class="t-lbl">${currentLang === 'tk' ? 'Reýs' : 'Рейс'}</div><div class="t-val">${t.flight_number}</div></div>
+                    <div><div class="t-lbl">${currentLang === 'tk' ? 'Sene' : 'Дата'}</div><div class="t-val">${dateStr}</div></div>
+                    <div><div class="t-lbl">Status</div><div class="t-val" style="color:green">${currentLang === 'tk' ? 'Gönümel' : 'Прямой'}</div></div>
                 </div>
                 <div class="ticket-footer">
                     <div class="price-box">
@@ -119,26 +130,43 @@ function renderTickets(tickets, fromCode, toCode, dateStr) {
 
 function handleBuy(link) {
     if (!localStorage.getItem('sap_user')) {
-        alert("Bilet almak üçin Profil maglumatlaryny dolduryň!");
+        alert(currentLang === 'tk' ? "Bilet almak üçin Profil maglumatlaryny dolduryň!" : "Для покупки билета заполните профиль!");
         toggleModal(true);
         return;
     }
     window.open(`https://www.aviasales.ru${link}&marker=${MARKER}`, '_blank');
 }
 
-// Вспомогательные функции
+// 5. Полное переключение языка (исправлено)
 function changeLang(lang) {
     currentLang = lang;
+    
+    // Активные кнопки
     document.querySelectorAll('.lang-switcher span').forEach(s => s.classList.remove('active'));
-    document.getElementById('btn-' + lang).classList.add('active');
-    document.getElementById('hero-title').innerText = dict[lang].title;
-    document.getElementById('btn-search').innerText = dict[lang].search;
-    // ... обновить остальные заголовки
+    const activeLangBtn = document.getElementById('btn-' + lang);
+    if (activeLangBtn) activeLangBtn.classList.add('active');
+
+    // Текстовые блоки
+    const elements = {
+        'hero-title': dict[lang].title,
+        'lbl-from': dict[lang].from,
+        'lbl-to': dict[lang].to,
+        'lbl-date': dict[lang].date,
+        'btn-search': dict[lang].search,
+        'pop-title': dict[lang].pop
+    };
+
+    for (let id in elements) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = elements[id];
+    }
 }
 
 function swapCities() {
     const f = document.getElementById('from'), t = document.getElementById('to');
-    [f.value, t.value] = [t.value, f.value];
+    const temp = f.value;
+    f.value = t.value;
+    t.value = temp;
 }
 
 function setQuickSearch(f, t) {
@@ -146,3 +174,13 @@ function setQuickSearch(f, t) {
     document.getElementById('to').value = t;
     runSearch();
 }
+
+// Загрузка данных
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('sap_user');
+    if (saved) {
+        const u = JSON.parse(saved);
+        const userBtn = document.getElementById('user-btn');
+        if (userBtn) userBtn.innerText = u.fio.split(' ')[0];
+    }
+});
