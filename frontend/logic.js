@@ -2,14 +2,12 @@ const dict = {
     tk: {
         title: "HOŞ GELDIŇIZ!", sub: "Aşgabat — Dünýäniň gapysy", from: "Nireden", to: "Nirä", date: "Sene",
         search: "GÖZLEG", popular: "Meşhur ugurlar", buy: "SATYN AL",
-        dep: "Uçuş", arr: "Geliş", loading: "Gözlenilýär...", direct: "Gönümel", flight: "Reýs", 
-        comm: "+5% hyzmat tölegi goşuldy", error: "Ähli meýdançalary dolduryň!"
+        dep: "Uçuş", arr: "Geliş", loading: "Gözlenilýär...", direct: "Gönümel", flight: "Reýs", comm: "+5% hyzmat tölegi goşuldy"
     },
     ru: {
         title: "ДОБРО ПОЖАЛОВАТЬ!", sub: "Ашхабад — Врата мира", from: "Откуда", to: "Куда", date: "Дата",
         search: "ПОИСК", popular: "Популярные направления", buy: "КУПИТЬ",
-        dep: "Вылет", arr: "Прилет", loading: "Поиск билетов...", direct: "Прямой", flight: "Рейс", 
-        comm: "+5% комиссия сервиса включена", error: "Заполните все поля!"
+        dep: "Вылет", arr: "Прилет", loading: "Поиск билетов...", direct: "Прямой", flight: "Рейс", comm: "+5% комиссия сервиса включена"
     }
 };
 
@@ -21,25 +19,21 @@ const cities = [
     { name: "Dubai", code: "DXB", ru: "Дубай" }
 ];
 
-// ТВОЙ ПАРТНЕРСКИЙ МАРКЕР AVIASALES
-const PARTNER_MARKER = "123456"; // Замени на свой реальный ID
-
 let currentLang = 'tk';
 let lastTickets = [];
 
-// 1. Инициализация календаря
+// 1. Календарь
 const fp = flatpickr("#date", {
     dateFormat: "d.m.Y",
     minDate: "today",
-    defaultDate: "today",
-    locale: "ru"
+    defaultDate: "today"
 });
 
-// 2. Смена языка
+// 2. Переключение языка
 function changeLang(lang) {
     currentLang = lang;
-    document.querySelectorAll('.lang-switcher span').forEach(s => s.classList.remove('active'));
-    document.getElementById('btn-' + lang).classList.add('active');
+    document.getElementById('btn-tk').classList.toggle('active', lang === 'tk');
+    document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
 
     document.getElementById('hero-title').innerText = dict[lang].title;
     document.getElementById('hero-sub').innerText = dict[lang].sub;
@@ -52,7 +46,7 @@ function changeLang(lang) {
     if (lastTickets.length > 0) renderTickets(lastTickets);
 }
 
-// 3. Автозаполнение (Исправлено)
+// 3. Автозаполнение
 function initAutocomplete(inputId, suggestId) {
     const input = document.getElementById(inputId);
     const box = document.getElementById(suggestId);
@@ -62,11 +56,7 @@ function initAutocomplete(inputId, suggestId) {
         box.innerHTML = '';
         if(!val) { box.style.display = 'none'; return; }
 
-        const filtered = cities.filter(c => 
-            c.name.toLowerCase().includes(val) || 
-            c.code.toLowerCase().includes(val) || 
-            c.ru.toLowerCase().includes(val)
-        );
+        const filtered = cities.filter(c => c.name.toLowerCase().includes(val) || c.code.toLowerCase().includes(val) || c.ru.toLowerCase().includes(val));
         
         if(filtered.length > 0) {
             box.style.display = 'block';
@@ -75,16 +65,13 @@ function initAutocomplete(inputId, suggestId) {
                 div.className = 'suggest-item';
                 div.innerText = `${currentLang === 'tk' ? c.name : c.ru} (${c.code})`;
                 div.onclick = () => {
-                    input.value = c.code; // Устанавливаем IATA код для поиска
+                    input.value = c.code;
                     box.style.display = 'none';
                 };
                 box.appendChild(div);
             });
         }
     });
-
-    // Закрыть список при клике вне
-    document.addEventListener('click', (e) => { if (e.target !== input) box.style.display = 'none'; });
 }
 initAutocomplete('from', 'suggest-from');
 initAutocomplete('to', 'suggest-to');
@@ -96,13 +83,13 @@ async function runSearch() {
     const date = document.getElementById('date').value;
     const resBox = document.getElementById('results-list');
 
-    if(!from || !to || !date) return alert(dict[currentLang].error);
+    if(!from || !to || !date) return alert("Error!");
 
     document.getElementById('popular-section').style.display = 'none';
     resBox.innerHTML = `<center style="padding:50px;"><i class="fas fa-spinner fa-spin"></i> ${dict[currentLang].loading}</center>`;
 
+    // Имитация API запроса
     setTimeout(() => {
-        // Данные имитируют ответ от API
         lastTickets = [{
             origin: from.toUpperCase(),
             destination: to.toUpperCase(),
@@ -114,14 +101,15 @@ async function runSearch() {
     }, 1000);
 }
 
-// 5. Отрисовка билета
+// 5. Отрисовка билета и логика покупки
 function renderTickets(tickets) {
     const resBox = document.getElementById('results-list');
     resBox.innerHTML = "";
     const lang = dict[currentLang];
 
     tickets.forEach(t => {
-        const finalPrice = Math.round(t.basePrice * 1.05); // Твои +5% комиссии
+        // Расчет цены с комиссией 5%
+        const finalPrice = Math.round(t.basePrice * 1.05);
 
         resBox.innerHTML += `
             <div class="ticket">
@@ -138,7 +126,7 @@ function renderTickets(tickets) {
                         <div class="price">${finalPrice} TMT</div>
                         <div class="comm-info">${lang.comm}</div>
                     </div>
-                    <button class="buy-btn" onclick="redirectToPartner('${t.origin}', '${t.destination}', '${t.date}')">
+                    <button class="buy-btn" onclick="redirectToAviasales('${t.origin}', '${t.destination}', '${t.date}')">
                         ${lang.buy}
                     </button>
                 </div>
@@ -146,18 +134,18 @@ function renderTickets(tickets) {
     });
 }
 
-// 6. ПЕРЕХОД С ПАРТНЕРСКИМ МАРКЕРОМ
-function redirectToPartner(from, to, date) {
-    // 1. Форматируем дату DD.MM.YYYY в DDMM для Aviasales
+// 6. Сложная ссылка на Aviasales
+function redirectToAviasales(from, to, date) {
+    // Форматируем дату из DD.MM.YYYY в DDMM для ссылки Aviasales
     const parts = date.split('.');
-    const ddmmyy = parts[0] + parts[1]; 
-
-    // 2. Строим URL (Пример: https://www.aviasales.ru/search/ASB1204KZN1?marker=123456)
-    // 1 в конце означает 1 взрослого пассажира
-    const url = `https://www.aviasales.ru/search/${from}${ddmmyy}${to}1?marker=${PARTNER_MARKER}`;
+    const formattedDate = parts[0] + parts[1]; 
     
-    // 3. Открываем в новой вкладке
-    window.open(url, '_blank');
+    // Формируем URL: https://www.aviasales.ru/search/ASB1204KZN1 (пример)
+    const aviaUrl = `https://www.aviasales.ru/search/${from}${formattedDate}${to}1`;
+    
+    // В реальности здесь данные пассажира отправляются на ваш сервер (Email/Ticket), 
+    // а пользователь летит на оплату.
+    window.open(aviaUrl, '_blank');
 }
 
 function swapCities() {
