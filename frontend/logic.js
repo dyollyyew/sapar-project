@@ -1,97 +1,77 @@
 const TOKEN = "23a9b11bc2672f0692432adc75cfc003"; //
 const MARKER = "716446"; //
 
-// Инициализация календаря в правильном формате YYYY-MM-DD
-flatpickr("#date", { dateFormat: "Y-m-d", minDate: "today" });
-
-function openModal() { document.getElementById('lk-modal').style.display = 'flex'; }
-function closeModal() { document.getElementById('lk-modal').style.display = 'none'; }
-
-// Сохранение ЛК (Паспортные данные)
-function saveLK() {
-    const user = {
-        fio: document.getElementById('u-fio').value.trim(),
-        passport: document.getElementById('u-pass').value.trim()
-    };
-    if (!user.fio || !user.passport) return alert("Please fill FIO and Passport!");
-    localStorage.setItem('sap_user', JSON.stringify(user));
-    document.getElementById('user-btn').innerText = user.fio.split(' ')[0];
-    closeModal();
-}
+// Настройка календаря
+flatpickr("#date", { dateFormat: "Y-m-d", minDate: "today" }); //
 
 async function startSearch() {
-    // Принудительный верхний регистр
+    // 1. Фикс регистра: kzn -> KZN
     const from = document.getElementById('from').value.toUpperCase().trim();
     const to = document.getElementById('to').value.toUpperCase().trim();
     const date = document.getElementById('date').value;
     const resDiv = document.getElementById('results');
 
-    if (!from || !to || !date) return alert("Fill all fields!");
+    if (!from || !to || !date) return alert("Заполните все поля!");
 
-    resDiv.innerHTML = "<center>Searching with 5% markup calculation...</center>";
+    resDiv.innerHTML = "<center style='padding:40px;'>Gözlenilýär...</center>";
+
+    // 2. Ссылка на API
+    const apiUrl = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${date}&currency=rub&token=${TOKEN}`;
+    
+    // Используем прокси AllOrigins (он самый стабильный для Vercel)
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
 
     try {
-        // Использование прокси для обхода API Error (CORS)
-        const apiUrl = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${date}&currency=rub&token=${TOKEN}`;
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
-        
         const response = await fetch(proxyUrl);
-        const dataWrapper = await response.json();
-        const json = JSON.parse(dataWrapper.contents);
+        if (!response.ok) throw new Error('Proxy error');
+        
+        const wrapper = await response.json();
+        const json = JSON.parse(wrapper.contents); // Декодируем данные из прокси
 
         if (!json.data || json.data.length === 0) {
-            resDiv.innerHTML = "<center>No flights found for these dates.</center>";
+            resDiv.innerHTML = "<center style='padding:40px;'>Билетов не найдено на эту дату.</center>";
             return;
         }
 
-        render(json.data, from, to);
+        renderTickets(json.data, from, to);
     } catch (err) {
-        resDiv.innerHTML = "<center style='color:red;'>API Connection Error. Check Token/Internet.</center>"; //
+        console.error(err);
+        resDiv.innerHTML = `<center style='color:red; padding:40px;'>API Connection Error. <br> Проверьте токен или интернет.</center>`; //
     }
 }
 
-function render(data, from, to) {
+function renderTickets(data, from, to) {
     const resDiv = document.getElementById('results');
     resDiv.innerHTML = "";
 
     data.slice(0, 5).forEach((f, i) => {
-        // Наценка 5%
+        // 3. Твой сбор 5%
         const finalPrice = Math.round(f.price * 1.05);
         
         resDiv.innerHTML += `
-            <div class="ticket">
-                ${i === 0 ? '<div class="badge">Cheap Flight</div>' : ''}
+            <div style="background:#fff; border-radius:12px; padding:20px; margin:15px auto; max-width:800px; display:flex; justify-content:space-between; align-items:center; border:1px solid #ddd; position:relative;">
+                ${i === 0 ? '<div style="position:absolute; top:-10px; left:20px; background:#008755; color:white; padding:2px 10px; border-radius:10px; font-size:12px;">САМЫЙ ДЕШЕВЫЙ</div>' : ''}
                 <div>
                     <img src="https://pics.avs.io/100/35/${f.airline}.png"><br>
-                    <b>${from} ✈ ${to}</b><br>
-                    <small>Flight: ${f.flight_number}</small>
+                    <b style="font-size:18px;">${from} ✈ ${to}</b>
                 </div>
                 <div style="text-align:right;">
-                    <div class="price-text">${finalPrice.toLocaleString()} ₽</div>
-                    <div style="font-size:11px; color:gray;">Includes 5% fee</div>
-                    <button class="btn-main" onclick="goToPay('${f.link}')" style="margin-top:10px;">BUY NOW</button>
+                    <div style="font-size:24px; font-weight:bold;">${finalPrice.toLocaleString()} ₽</div>
+                    <div style="font-size:11px; color:gray; margin-bottom:8px;">+5% сбор включен</div>
+                    <button onclick="checkAndPay('${f.link}')" style="background:#008755; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold;">ОПЛАТИТЬ</button>
                 </div>
             </div>`;
     });
 }
 
-function goToPay(link) {
+function checkAndPay(link) {
+    // 4. Проверка ЛК и паспортных данных (A1904657) перед оплатой
     const user = localStorage.getItem('sap_user');
-    // Проверка ЛК перед оплатой
     if (!user) {
-        alert("Please create Profile and fill Passport (A1904657) first!");
-        openModal();
+        alert("Сначала создайте ЛК и заполните данные паспорта!");
+        openModal(); // Функция открытия твоей модалки
         return;
     }
-    // Редирект с партнерским маркером
+    // Автоматический переход с твоим маркером
     window.open(`https://www.aviasales.ru${link}&marker=${MARKER}`, '_blank');
 }
-
-// Проверка ЛК при загрузке страницы
-window.onload = () => {
-    const saved = localStorage.getItem('sap_user');
-    if (saved) {
-        const u = JSON.parse(saved);
-        document.getElementById('user-btn').innerText = u.fio.split(' ')[0];
-    }
-};
