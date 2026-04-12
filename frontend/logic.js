@@ -1,4 +1,4 @@
-\const dict = {
+const dict = {
     tk: {
         title: "HOŞ GELDIŇIZ!",
         sub: "Aşgabat — Dünýäniň gapysy",
