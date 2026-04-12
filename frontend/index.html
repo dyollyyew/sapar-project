@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPAR.TM - Turkmenistan Airlines Style</title>
+    <title>SAPAR.TM - Sapar Airlines Style</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -118,11 +118,11 @@
 <header>
     <div class="logo-area">
         <i class="fas fa-paper-plane" style="color:var(--tkm-green); font-size: 24px;"></i>
-        <div class="logo-text">Turkmenistan <span style="color:var(--gold)">Airlines</span></div>
+        <div class="logo-text">Sapar<span style="color:var(--gold)">Airlines</span></div>
     </div>
     <div class="lang-btns">
-        <button>TKM</button>
-        <button>PYC</button>
+        <button onclick="changeLang('tk')">TKM</button>
+        <button onclick="changeLang('ru')">РУС</button>
     </div>
 </header>
 
@@ -152,56 +152,6 @@
 <div class="results-container" id="results-list">
     </div>
 
-<script>
-    async function runSearch() {
-        const from = document.getElementById('from').value;
-        const to = document.getElementById('to').value;
-        const date = document.getElementById('date').value;
-        const resBox = document.getElementById('results-list');
-
-        if(!from || !to || !date) return alert("Maglumatlary giriziň!");
-
-        resBox.innerHTML = '<div class="loader-box"><i class="fas fa-sync fa-spin"></i> Maglumatlar gözlenilýär...</div>';
-
-        try {
-            const response = await fetch('/api/search-live', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ origin: from, destination: to, date: date })
-            });
-            const data = await response.json();
-            resBox.innerHTML = "";
-
-            if(data.tickets && data.tickets.length > 0) {
-                data.tickets.forEach(t => {
-                    resBox.innerHTML += `
-                        <div class="ticket-item">
-                            <div class="route-details">
-                                <div style="text-align:center">
-                                    <div class="city-name">${t.origin}</div>
-                                    <div class="airport-code">Depart</div>
-                                </div>
-                                <div class="plane-path">
-                                    <i class="fas fa-plane"></i>
-                                </div>
-                                <div style="text-align:center">
-                                    <div class="city-name">${t.destination}</div>
-                                    <div class="airport-code">Arrive</div>
-                                </div>
-                            </div>
-                            <div class="price-tag">
-                                <div class="cost">${t.price.toLocaleString()} RUB</div>
-                                <a href="https://www.aviasales.ru${t.link}" class="buy-now" target="_blank">SATYN AL</a>
-                            </div>
-                        </div>`;
-                });
-            } else { 
-                resBox.innerHTML = "<div class='loader-box'>Gözlegiňize görä petek tapylmady.</div>"; 
-            }
-        } catch (e) {
-            resBox.innerHTML = "<div class='loader-box' style='color:red'>Näsazlyk ýüze çykdy. Railway baglanyşygyny barlaň.</div>";
-        }
-    }
-</script>
+<script src="logic.js"></script>
 </body>
 </html>
