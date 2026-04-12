@@ -1,129 +1,108 @@
-// 1. База городов
-const cities = [
-    { name: "Ашхабад", code: "ASB" },
-    { name: "Казань", code: "KZN" },
-    { name: "Москва", code: "MOW" },
-    { name: "Стамбул", code: "IST" },
-    { name: "Дубай", code: "DXB" }
-];
-
-// 2. Переключение языков
-const translations = {
-    rus: {
-        welcome: "ДОБРО ПОЖАЛОВАТЬ!",
-        login: "Войти",
-        search: "ПОИСК",
-        from: "Откуда",
-        to: "Куда",
-        date: "Дата",
-        popular: "Популярные направления",
-        notFound: "Билеты не найдены."
-    },
-    tkm: {
-        welcome: "HOŞ GELDIŇIZ!",
-        login: "Giriş",
-        search: "GÖZLEG",
+const dict = {
+    tk: {
+        title: "HOŞ GELDIŇIZ!",
+        sub: "Aşgabat — Dünýäniň gapysy",
         from: "Nireden",
         to: "Nirä",
         date: "Sene",
+        search: "GÖZLEG",
         popular: "Meşhur ugurlar",
-        notFound: "Petek tapylmady."
+        cabinet: "Hasabym",
+        buy: "SATYN AL",
+        dep: "Uçuş",
+        arr: "Geliş",
+        loading: "Gözlenilýär..."
+    },
+    ru: {
+        title: "ДОБРО ПОЖАЛОВАТЬ!",
+        sub: "Ашхабад — Врата мира",
+        from: "Откуда",
+        to: "Куда",
+        date: "Дата",
+        search: "ПОИСК",
+        popular: "Популярные направления",
+        cabinet: "Кабинет",
+        buy: "КУПИТЬ",
+        dep: "Вылет",
+        arr: "Прилет",
+        loading: "Поиск билетов..."
     }
 };
 
-let currentLang = 'rus';
+let currentLang = 'tk';
 
 function changeLang(lang) {
     currentLang = lang;
-    document.getElementById('lang-rus').classList.toggle('active', lang === 'rus');
-    document.getElementById('lang-tkm').classList.toggle('active', lang === 'tkm');
     
-    document.getElementById('txt-welcome').innerText = translations[lang].welcome;
-    document.getElementById('txt-login').innerText = translations[lang].login;
-    document.getElementById('btn-search').innerText = translations[lang].search;
-    document.getElementById('lbl-from').innerText = translations[lang].from;
-    document.getElementById('lbl-to').innerText = translations[lang].to;
-    document.getElementById('lbl-date').innerText = translations[lang].date;
-    document.getElementById('txt-popular').innerText = translations[lang].popular;
+    // Активные кнопки
+    document.getElementById('btn-tk').classList.toggle('active', lang === 'tk');
+    document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+
+    // Тексты
+    document.getElementById('hero-title').innerText = dict[lang].title;
+    document.getElementById('hero-sub').innerText = dict[lang].sub;
+    document.getElementById('lbl-from').innerText = dict[lang].from;
+    document.getElementById('lbl-to').innerText = dict[lang].to;
+    document.getElementById('lbl-date').innerText = dict[lang].date;
+    document.getElementById('btn-search').innerText = dict[lang].search;
+    document.getElementById('pop-title').innerText = dict[lang].popular;
+    document.getElementById('txt-cabinet').innerText = dict[lang].cabinet;
 }
 
-// 3. Календарь
-flatpickr("#dateInput", {
-    locale: "ru",
-    dateFormat: "d.m.Y",
-    minDate: "today",
-    monthSelectorType: "dropdown"
-});
+function setQuickSearch(from, to) {
+    document.getElementById('from').value = from;
+    document.getElementById('to').value = to;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-// 4. Автозаполнение
-function setupAuto(id, listId) {
-    const input = document.getElementById(id);
-    const list = document.getElementById(listId);
+async function runSearch() {
+    const from = document.getElementById('from').value;
+    const to = document.getElementById('to').value;
+    const date = document.getElementById('date').value;
+    const resBox = document.getElementById('results-list');
 
-    input.oninput = () => {
-        const val = input.value.toLowerCase();
-        list.innerHTML = "";
-        if(!val) { list.style.display = "none"; return; }
-        
-        const filtered = cities.filter(c => c.name.toLowerCase().includes(val) || c.code.toLowerCase().includes(val));
-        if(filtered.length > 0) {
-            list.style.display = "block";
-            filtered.forEach(c => {
-                const div = document.createElement("div");
-                div.className = "city-opt";
-                div.innerHTML = `<b>${c.name}</b> <span style="color:#888">(${c.code})</span>`;
-                div.onclick = () => {
-                    input.value = `${c.name} (${c.code})`;
-                    list.style.display = "none";
-                };
-                list.appendChild(div);
+    if(!from || !to || !date) return alert("Error!");
+
+    resBox.innerHTML = `<div class="loader"><i class="fas fa-spinner fa-spin"></i> ${dict[currentLang].loading}</div>`;
+
+    try {
+        const response = await fetch('/api/search-live', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ origin: from.toUpperCase(), destination: to.toUpperCase(), date: date })
+        });
+        const data = await response.json();
+        resBox.innerHTML = "";
+
+        if(data.tickets && data.tickets.length > 0) {
+            data.tickets.forEach(t => {
+                resBox.innerHTML += `
+                    <div class="ticket">
+                        <div class="ticket-left">
+                            <div class="city-block">
+                                <h2>${t.origin}</h2>
+                                <p>${dict[currentLang].dep}</p>
+                            </div>
+                            <div class="flight-info">
+                                <div style="font-size: 11px; color:#aaa; margin-bottom:5px;">SAPAR AIRLINES</div>
+                                <div class="line"></div>
+                                <div style="font-size: 11px; color:#aaa; margin-top:5px;">Direct Flight</div>
+                            </div>
+                            <div class="city-block" style="text-align: right;">
+                                <h2>${t.destination}</h2>
+                                <p>${dict[currentLang].arr}</p>
+                            </div>
+                        </div>
+                        <div class="ticket-right">
+                            <div class="price">${t.price.toLocaleString()} RUB</div>
+                            <a href="https://www.aviasales.ru${t.link}" target="_blank" class="buy-btn">${dict[currentLang].buy}</a>
+                        </div>
+                    </div>`;
             });
+        } else {
+            resBox.innerHTML = "<center>No tickets found</center>";
         }
-    };
-}
-setupAuto("fromCity", "listFrom");
-setupAuto("toCity", "listTo");
-
-// 5. Реверс
-function swapCities() {
-    const f = document.getElementById("fromCity");
-    const t = document.getElementById("toCity");
-    [f.value, t.value] = [t.value, f.value];
-}
-
-// 6. Поиск (Твой идеальный билет)
-function findFlight() {
-    const res = document.getElementById("resultsArea");
-    const from = document.getElementById("fromCity").value;
-    const to = document.getElementById("toCity").value;
-
-    if(!from || !to) return alert("Выберите города!");
-
-    document.getElementById("popular-section").style.display = "none";
-    res.innerHTML = "<center style='margin-top:40px;'><i class='fas fa-spinner fa-spin fa-2x'></i></center>";
-
-    setTimeout(() => {
-        // Убрали Turkmenistan Airlines, оставили только чистую инфу
-        res.innerHTML = `
-            <div class="ticket">
-                <div class="ticket-top">
-                    <span class="rules-link">Правила тарифа и нормы багажа</span>
-                </div>
-                <div class="ticket-route">
-                    ${from} <i class="fas fa-plane" style="font-size:14px; color:#ccc;"></i> ${to}
-                </div>
-                <div class="ticket-info">
-                    <div><div class="t-lbl">Вылет</div><div class="t-val">17:30</div></div>
-                    <div><div class="t-lbl">Прилет</div><div class="t-val">22:50</div></div>
-                    <div><div class="t-lbl">Пересадки</div><div class="t-val direct">Прямой</div></div>
-                    <div><div class="t-lbl">В пути</div><div class="t-val">03 ч 20 мин</div></div>
-                    <div><div class="t-lbl">Рейс</div><div class="t-val">740</div></div>
-                </div>
-                <div class="ticket-footer">
-                    <div class="price">31 988 ₽</div>
-                    <button class="btn-book">ЗАБРОНИРОВАТЬ</button>
-                </div>
-            </div>
-        `;
-    }, 600);
+    } catch (e) {
+        resBox.innerHTML = "<center style='color:red'>Server Error</center>";
+    }
 }

@@ -1,150 +1,155 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="tm">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPARTM</title>
-    
+    <title>SAPAR - Onlaýn Petekler</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_green.css">
-
     <style>
-        :root { --green: #008755; --bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; transition: 0.3s; }
+        :root {
+            --tkm-green: #008755;
+            --gold: #d4af37;
+            --dark: #1a1a1a;
+        }
 
-        /* Шапка */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f0f2f5; }
+
+        /* Новая Шапка */
         header { 
-            background: #fff; padding: 12px 8%; display: flex; 
-            justify-content: space-between; align-items: center; border-bottom: 1px solid #eee;
+            background: white; padding: 10px 8%; 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
         }
-        .logo { font-size: 24px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+
+        .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .brand i { font-size: 28px; color: var(--tkm-green); transform: rotate(-45deg); }
+        .brand-name { font-size: 24px; font-weight: 900; letter-spacing: 2px; color: var(--dark); text-transform: uppercase; }
+        .brand-name span { color: var(--tkm-green); }
+
         .nav-right { display: flex; align-items: center; gap: 20px; }
-        .lang-switcher span { cursor: pointer; font-size: 14px; font-weight: bold; color: #999; }
-        .lang-switcher span.active { color: var(--green); border-bottom: 2px solid var(--green); }
-        .btn-login { padding: 8px 20px; border-radius: 20px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-weight: 600; }
-
-        /* Герой-блок */
-        .hero { background: var(--green); height: 200px; display: flex; align-items: center; justify-content: center; color: white; }
-        .hero h1 { font-size: 42px; margin: 0; letter-spacing: 2px; }
-
-        /* Поиск рейсов */
-        .search-container { max-width: 1100px; margin: -50px auto 40px; padding: 0 20px; }
-        .search-card { 
-            background: #fff; padding: 30px; border-radius: 15px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); display: grid; 
-            grid-template-columns: 1fr 50px 1fr 1fr auto; align-items: end; gap: 15px;
+        .user-cabinet { 
+            display: flex; align-items: center; gap: 8px; 
+            padding: 8px 15px; border-radius: 20px; background: #f8f9fa;
+            color: var(--dark); text-decoration: none; font-weight: 600; font-size: 14px;
+            transition: 0.3s; border: 1px solid #ddd;
         }
-        .field { display: flex; flex-direction: column; gap: 8px; position: relative; }
-        .field label { font-size: 12px; font-weight: bold; color: #666; text-transform: uppercase; }
-        .field input { padding: 12px; border: 1.5px solid #eee; border-radius: 8px; font-size: 16px; outline: none; width: 100%; box-sizing: border-box; }
-        .field input:focus { border-color: var(--green); }
+        .user-cabinet:hover { background: var(--tkm-green); color: white; border-color: var(--tkm-green); }
 
-        .swap-btn { 
-            height: 44px; width: 44px; border-radius: 50%; border: 1px solid #eee; 
-            background: #fff; cursor: pointer; color: var(--green); display: flex; 
-            align-items: center; justify-content: center; margin-bottom: 2px; transition: 0.3s;
+        .lang-btns button {
+            background: none; border: none; font-weight: bold; cursor: pointer; color: #888; transition: 0.3s;
         }
-        .swap-btn:hover { background: var(--green); color: #fff; transform: rotate(180deg); }
+        .lang-btns button.active { color: var(--tkm-green); border-bottom: 2px solid var(--tkm-green); }
 
-        .btn-find { background: var(--green); color: #fff; border: none; padding: 14px 40px; border-radius: 8px; font-weight: bold; cursor: pointer; height: 48px; }
+        /* Геро и Поиск */
+        .hero { background: var(--tkm-green); padding: 50px 20px 80px; text-align: center; color: white; }
+        .hero h1 { font-size: 36px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
 
-        /* Популярные направления */
-        .popular { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-        .popular h2 { text-align: center; margin-bottom: 30px; color: #333; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-        .dest-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; cursor: pointer; }
-        .dest-card img { width: 100%; height: 150px; object-fit: cover; }
-        .dest-card p { padding: 15px; font-weight: bold; margin: 0; }
+        .search-box { 
+            max-width: 1000px; margin: -40px auto 40px; background: white; 
+            padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; align-items: flex-end;
+        }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 11px; font-weight: 800; color: #777; text-transform: uppercase; }
+        .input-group input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 15px; }
 
-        /* Билет (Твой любимый дизайн) */
+        .btn-search { 
+            background: var(--tkm-green); color: white; border: none; padding: 14px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; 
+        }
+        .btn-search:hover { background: var(--dark); transform: scale(1.02); }
+
+        /* Секция направлений */
+        .section-title { text-align: center; margin: 40px 0 20px; font-size: 22px; color: var(--dark); }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1100px; margin: 0 auto 50px; padding: 0 20px; }
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); }
+        .card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-info { padding: 15px; text-align: center; font-weight: bold; }
+
+        /* Дизайн Билета (Улучшенный) */
         .ticket { 
-            background: #fff; border-radius: 10px; padding: 25px; margin: 20px auto; 
-            max-width: 900px; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background: white; border-radius: 12px; margin: 0 auto 20px; max-width: 800px;
+            display: flex; overflow: hidden; border: 1px solid #eee; transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
-        .ticket-top { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-        .rules-link { font-size: 13px; color: #0056b3; cursor: pointer; text-decoration: none; }
-        .ticket-route { font-size: 20px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .ticket-info { display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; border-top: 1px solid #f0f0f0; padding-top: 20px; }
-        .t-lbl { color: #888; font-size: 12px; margin-bottom: 5px; }
-        .t-val { font-size: 18px; font-weight: bold; }
-        .direct { color: #008755; }
-        .ticket-footer { display: flex; justify-content: flex-end; align-items: center; gap: 25px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #f0f0f0; }
-        .price { font-size: 26px; font-weight: bold; color: #008755; }
-        .btn-book { background: #008755; color: white; border: none; padding: 12px 30px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .ticket:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: var(--tkm-green); }
+        .ticket-left { flex: 3; padding: 25px; display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .ticket-right { flex: 1; background: #fcfcfc; border-left: 2px dashed #eee; padding: 25px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        
+        .city-block h2 { font-size: 28px; color: var(--dark); margin: 0; }
+        .city-block p { font-size: 12px; color: #888; font-weight: 600; }
+        
+        .flight-info { flex: 1; text-align: center; color: var(--tkm-green); }
+        .flight-info i { font-size: 20px; margin-bottom: 5px; }
+        .line { height: 2px; background: #eee; width: 100%; position: relative; margin: 10px 0; }
+        .line::after { content: '✈'; position: absolute; top: -10px; left: 45%; background: white; padding: 0 5px; }
 
-        /* Выпадающий список городов */
-        .autocomplete { position: absolute; top: 100%; left: 0; right: 0; background: #fff; z-index: 10; border-radius: 0 0 8px 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; }
-        .city-opt { padding: 12px; cursor: pointer; border-bottom: 1px solid #f9f9f9; }
-        .city-opt:hover { background: #f0f9f4; }
+        .price { font-size: 22px; font-weight: 800; color: var(--dark); margin-bottom: 10px; }
+        .buy-btn { background: #e63946; color: white; text-decoration: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 14px; }
+        
+        .loader { text-align: center; padding: 50px; color: var(--tkm-green); font-size: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="#" class="logo"><i class="fas fa-paper-plane"></i> SAPARTM</a>
+    <div class="brand">
+        <i class="fas fa-paper-plane"></i>
+        <div class="brand-name" id="logo-text">SAPAR<span>TM</span></div>
+    </div>
     <div class="nav-right">
-        <div class="lang-switcher">
-            <span id="lang-tkm" onclick="changeLang('tkm')">TKM</span> | 
-            <span id="lang-rus" class="active" onclick="changeLang('rus')">РУС</span>
+        <div class="lang-btns">
+            <button id="btn-tk" onclick="changeLang('tk')" class="active">TKM</button>
+            <button id="btn-ru" onclick="changeLang('ru')">РУС</button>
         </div>
-        <button class="btn-login"><i class="fas fa-user-circle"></i> <span id="txt-login">Giriş</span></button>
+        <a href="#" class="user-cabinet" id="nav-cabinet">
+            <i class="fas fa-user-circle"></i>
+            <span id="txt-cabinet">Hasabym</span>
+        </a>
     </div>
 </header>
 
-<div class="hero"><h1 id="txt-welcome">HOŞ GELDIŇIZ!</h1></div>
+<div class="hero">
+    <h1 id="hero-title">HOŞ GELDIŇIZ!</h1>
+    <p id="hero-sub">Aşgabat — Dünýäniň gapysy</p>
+</div>
 
-<div class="search-container">
-    <div class="search-card">
-        <div class="field">
-            <label id="lbl-from">Nireden (Откуда)</label>
-            <input type="text" id="fromCity" placeholder="Город..." autocomplete="off">
-            <div id="listFrom" class="autocomplete"></div>
-        </div>
-        
-        <button class="swap-btn" onclick="swapCities()"><i class="fas fa-exchange-alt"></i></button>
+<div class="search-box">
+    <div class="input-group">
+        <label id="lbl-from">Nireden</label>
+        <input type="text" id="from" value="ASB">
+    </div>
+    <div class="input-group">
+        <label id="lbl-to">Nirä</label>
+        <input type="text" id="to" value="MOW">
+    </div>
+    <div class="input-group">
+        <label id="lbl-date">Sene</label>
+        <input type="date" id="date">
+    </div>
+    <button class="btn-search" onclick="runSearch()" id="btn-search">GÖZLEG</button>
+</div>
 
-        <div class="field">
-            <label id="lbl-to">Nirä (Куда)</label>
-            <input type="text" id="toCity" placeholder="Город..." autocomplete="off">
-            <div id="listTo" class="autocomplete"></div>
-        </div>
-
-        <div class="field">
-            <label id="lbl-date">Sene (Дата)</label>
-            <input type="text" id="dateInput" placeholder="Выберите дату">
-        </div>
-
-        <button class="btn-find" onclick="findFlight()" id="btn-search">GÖZLEG</button>
+<h2 class="section-title" id="pop-title">Meşhur ugurlar</h2>
+<div class="cards">
+    <div class="card" onclick="setQuickSearch('ASB', 'IST')">
+        <img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=600" alt="Istanbul">
+        <div class="card-info">Aşgabat — Stambul</div>
+    </div>
+    <div class="card" onclick="setQuickSearch('ASB', 'DME')">
+        <img src="https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=600" alt="Moscow">
+        <div class="card-info">Aşgabat — Moskwa</div>
+    </div>
+    <div class="card" onclick="setQuickSearch('ASB', 'DXB')">
+        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=600" alt="Dubai">
+        <div class="card-info">Aşgabat — Dubaý</div>
     </div>
 </div>
 
-<div class="popular" id="popular-section">
-    <h2 id="txt-popular">Meşhur ugurlar / Популярные направления</h2>
-    <div class="grid">
-        <div class="dest-card">
-            <img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=400" alt="Stambul">
-            <p>Aşgabat — Stambul</p>
-        </div>
-        <div class="dest-card">
-            <img src="https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=400" alt="Moskwa">
-            <p>Aşgabat — Moskwa</p>
-        </div>
-        <div class="dest-card">
-            <img src="https://images.unsplash.com/photo-1518684079-3c830dcef090?q=80&w=400" alt="Dubai">
-            <p>Aşgabat — Dubaý</p>
-        </div>
-        <div class="dest-card">
-            <img src="https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?q=80&w=400" alt="Kazan">
-            <p>Aşgabat — Kazan</p>
-        </div>
-    </div>
-</div>
+<div id="results-list" style="padding: 0 20px 50px;"></div>
 
-<div id="resultsArea"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
 <script src="logic.js"></script>
 </body>
 </html>
