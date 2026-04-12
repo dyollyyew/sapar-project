@@ -105,4 +105,66 @@ async function runSearch() {
     } catch (e) {
         resBox.innerHTML = "<center style='color:red'>Server Error</center>";
     }
+    // Инициализация красивого календаря
+flatpickr("#date", {
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    "locale": "ru" // Можно менять динамически
+});
+
+const dict = {
+    tk: { cabinet: "Giriş", search: "GÖZLEG", popular: "Meşhur ugurlar", buy: "Bronlamak" },
+    ru: { cabinet: "Вход", search: "ПОИСК", popular: "Популярные направления", buy: "ЗАБРОНИРОВАТЬ" }
+};
+
+// Список городов для подсказок (можно тянуть с API)
+const cities = [
+    {name: "Ashgabat", code: "ASB", full: "Aşgabat (ASB)"},
+    {name: "Istanbul", code: "IST", full: "Stambul (IST)"},
+    {name: "Moscow", code: "DME", full: "Moskwa (DME)"},
+    {name: "Kazan", code: "KZN", full: "Kazan (KZN)"},
+    {name: "Dubai", code: "DXB", full: "Dubaý (DXB)"}
+];
+
+function showSuggest(input, listId) {
+    const list = document.getElementById(listId);
+    const val = input.value.toLowerCase();
+    list.innerHTML = "";
+    if(!val) return;
+
+    const filtered = cities.filter(c => c.name.toLowerCase().includes(val) || c.code.toLowerCase().includes(val));
+    filtered.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'suggest-item';
+        div.innerText = c.full;
+        div.onclick = () => {
+            input.value = c.code;
+            list.innerHTML = "";
+        };
+        list.appendChild(div);
+    });
+}
+
+// В функции отрисовки билета (внутри runSearch) используй этот шаблон:
+
+resBox.innerHTML += `
+    <div class="new-ticket">
+        <div class="ticket-header">
+            <div class="airline-name">Turkmenistan Airline</div>
+            <div style="color: #008755; cursor:pointer; font-size:13px">Правила тарифа и нормы багажа</div>
+        </div>
+        <div style="font-weight:bold; margin-bottom:15px">${t.origin} ✈ ${t.destination}</div>
+        <div class="ticket-body">
+            <div><div class="label">Вылет</div><div class="time">17:30</div></div>
+            <div><div class="label">Прилет</div><div class="time">22:50</div></div>
+            <div><div class="label">Пересадки</div><div style="font-weight:600">Прямой</div></div>
+            <div><div class="label">В пути</div><div style="font-weight:600">03 ч 20 мин</div></div>
+            <div><div class="label">Рейс</div><div style="font-weight:600">740</div></div>
+        </div>
+        <div class="price-row">
+            <div style="font-size: 22px; font-weight: bold; color: #008755">${t.price} P</div>
+            <button class="buy-btn" style="background:#008755; padding:10px 25px">${dict[currentLang].buy}</button>
+        </div>
+    </div>
+`;
 }
