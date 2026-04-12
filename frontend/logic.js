@@ -107,4 +107,27 @@ function renderTicketCard(t) {
                 <a href="https://www.aviasales.ru${t.link}" class="buy-now" target="_blank">${dict[currentLang].buy}</a>
             </div>
         </div>`;
+        // Функция для быстрой подстановки городов из карточек
+function setQuickSearch(from, to) {
+    document.getElementById('from').value = from;
+    document.getElementById('to').value = to;
+    
+    // Плавный скролл обратно к поиску
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Подсветим кнопку поиска, чтобы пользователь понял — надо жать
+    const btn = document.querySelector('.search-btn');
+    btn.style.transform = 'scale(1.1)';
+    setTimeout(() => btn.style.transform = 'scale(1)', 300);
+}
+
+// Обнови словарь (добавь заголовок для карточек)
+dict.tk.popularTitle = "Meşhur ugurlar";
+dict.ru.popularTitle = "Популярные направления";
+
+// В функции changeLang добавь обновление этого заголовка
+function changeLang(lang) {
+    // ... твой старый код функции ...
+    document.querySelector('.popular-title').innerText = dict[lang].popularTitle;
+}
 }

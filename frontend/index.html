@@ -6,112 +6,71 @@
     <title>SAPAR.TM - Sapar Airlines Style</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --tkm-green: #008755; /* Фирменный зеленый */
-            --tkm-dark: #005a38;
-            --gold: #d4af37;
-            --white: #ffffff;
-            --light-gray: #f4f4f4;
-        }
+/* Эффект Glassmorphism для формы поиска */
+.search-card {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
 
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--light-gray); 
-            margin: 0; 
-            color: #333; 
-        }
+/* Стили для популярных направлений */
+.popular-title {
+    text-align: center;
+    color: var(--tkm-dark);
+    margin: 40px 0 20px;
+    font-weight: 800;
+}
 
-        /* Шапка в стиле авиалиний */
-        header { 
-            background: var(--white); 
-            padding: 15px 8%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 4px solid var(--tkm-green);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+.popular-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto 40px;
+    padding: 0 20px;
+}
 
-        .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-text { font-size: 22px; font-weight: 900; color: var(--tkm-green); text-transform: uppercase; letter-spacing: 1px; }
-        
-        .lang-btns button {
-            background: none; border: 1px solid var(--tkm-green); color: var(--tkm-green);
-            padding: 5px 12px; cursor: pointer; border-radius: 4px; font-weight: bold;
-            transition: 0.3s;
-        }
-        .lang-btns button:hover { background: var(--tkm-green); color: white; }
+.city-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: 0.4s;
+    position: relative;
+}
 
-        /* Геро-секция с национальным колоритом */
-        .hero-banner { 
-            background: var(--tkm-green); 
-            height: 200px; 
-            background-image: linear-gradient(rgba(0,135,85,0.8), rgba(0,90,56,0.9)), url('https://www.transparenttextures.com/patterns/p6.png'); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--white); border-bottom: 4px solid var(--gold);
-        }
-        .hero-banner h1 { margin: 0; font-size: 28px; letter-spacing: 2px; text-align: center; }
-        .hero-banner p { margin-top: 10px; font-weight: 300; opacity: 0.9; }
+.city-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,135,85,0.2);
+}
 
-        /* Панель поиска */
-        .search-section { max-width: 1100px; margin: -40px auto 40px; padding: 0 20px; }
-        .search-card { 
-            background: var(--white); padding: 30px; border-radius: 8px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
-            align-items: flex-end;
-        }
-        
-        .input-field { display: flex; flex-direction: column; gap: 8px; }
-        .input-field label { font-size: 12px; font-weight: 700; color: var(--tkm-dark); text-transform: uppercase; }
-        .input-field input { 
-            padding: 12px; border: 2px solid #e0e0e0; border-radius: 5px; 
-            font-size: 16px; outline: none; transition: 0.3s;
-        }
-        .input-field input:focus { border-color: var(--tkm-green); }
-        
-        .search-btn { 
-            background: var(--tkm-green); color: white; border: none; 
-            padding: 15px; border-radius: 5px; font-weight: bold; 
-            font-size: 16px; cursor: pointer; transition: 0.3s;
-            text-transform: uppercase;
-        }
-        .search-btn:hover { background: var(--tkm-dark); box-shadow: 0 5px 15px rgba(0,135,85,0.4); }
+.city-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
 
-        /* Результаты */
-        .results-container { max-width: 900px; margin: 0 auto 50px; padding: 0 20px; }
-        .ticket-item { 
-            background: white; border-radius: 10px; margin-bottom: 20px; 
-            display: flex; border: 1px solid #ddd; position: relative;
-            transition: 0.3s;
-        }
-        .ticket-item:hover { border-color: var(--tkm-green); transform: translateY(-3px); }
-        .ticket-item::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--tkm-green);
-        }
+.city-overlay {
+    padding: 15px;
+    background: white;
+    text-align: center;
+}
 
-        .route-details { flex: 1; padding: 30px; display: flex; align-items: center; justify-content: space-between; }
-        .price-tag { 
-            width: 220px; background: #fcfcfc; padding: 30px; 
-            border-left: 2px dashed #eee; text-align: center; 
-        }
+.city-overlay h3 {
+    margin: 0;
+    color: var(--tkm-dark);
+}
 
-        .city-name { font-size: 22px; font-weight: 800; color: var(--tkm-dark); }
-        .airport-code { font-size: 13px; color: #888; font-weight: bold; }
-        .plane-path { flex: 1; text-align: center; position: relative; margin: 0 30px; }
-        .plane-path i { color: var(--tkm-green); font-size: 20px; }
-        .plane-path::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #ddd; z-index: 0; }
+/* Анимация плавного появления */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-        .cost { font-size: 26px; font-weight: 900; color: #1a1a1a; margin-bottom: 15px; }
-        .buy-now { 
-            background: #d32f2f; color: white; text-decoration: none; 
-            padding: 12px 20px; border-radius: 6px; display: block; 
-            font-weight: bold; transition: 0.3s;
-        }
-        .buy-now:hover { background: #b71c1c; }
-
-        .loader-box { text-align: center; padding: 40px; color: var(--tkm-green); font-weight: bold; }
-    </style>
+.popular-grid, .ticket-item {
+    animation: fadeInUp 0.8s ease-out forwards;
+}</style>
 </head>
 <body>
 
@@ -132,6 +91,28 @@
 </div>
 
 <div class="search-section">
+    <h2 class="popular-title" data-i18n="popularTitle">Meşhur ugurlar / Популярные направления</h2>
+
+<div class="popular-grid">
+    <div class="city-card" onclick="setQuickSearch('ASB', 'IST')">
+        <img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=400" alt="Istanbul">
+        <div class="city-overlay">
+            <h3>Aşgabat — Stambul</h3>
+        </div>
+    </div>
+    <div class="city-card" onclick="setQuickSearch('ASB', 'DME')">
+        <img src="https://images.unsplash.com/photo-1513326738677-b964603b136d?w=400" alt="Moscow">
+        <div class="city-overlay">
+            <h3>Aşgabat — Moskwa</h3>
+        </div>
+    </div>
+    <div class="city-card" onclick="setQuickSearch('ASB', 'DXB')">
+        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400" alt="Dubai">
+        <div class="city-overlay">
+            <h3>Aşgabat — Dubaý</h3>
+        </div>
+    </div>
+</div>
     <div class="search-card">
         <div class="input-field">
             <label>Nireden (From)</label>
