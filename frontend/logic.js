@@ -1,99 +1,114 @@
 const TOKEN = "23a9b11bc2672f0692432adc75cfc003";
 const MARKER = "716446";
 
+const translations = {
+    tk: { welcome: "Hoş geldiňiz!", from: "Nireden", to: "Nirä", date: "Sene", search: "GÖZLEG", popular: "Meşhur ugurlar", profile: "Profil", save: "Ýazdyr", error: "Bilet tapylmady" },
+    ru: { welcome: "Добро пожаловать!", from: "Откуда", to: "Куда", date: "Дата", search: "ПОИСК", popular: "Популярные направления", profile: "Профиль", save: "Сохранить", error: "Билеты не найдены" }
+};
+
+let currentLang = 'tk';
+
 // Инициализация календаря
-flatpickr("#date", { dateFormat: "Y-m-d", minDate: "today" });
+flatpickr("#date", { dateFormat: "Y-m-d", defaultDate: "today" });
 
-async function getFlights() {
-    const from = document.getElementById('from').value.trim().toUpperCase();
-    const to = document.getElementById('to').value.trim().toUpperCase();
-    const date = document.getElementById('date').value;
-    const resDiv = document.getElementById('results');
+// Смена языка
+function setLang(lang) {
+    currentLang = lang;
+    document.getElementById('lang-tk').className = (lang === 'tk' ? 'active' : '');
+    document.getElementById('lang-ru').className = (lang === 'ru' ? 'active' : '');
+    
+    document.getElementById('welcome-text').innerText = translations[lang].welcome;
+    document.getElementById('lbl-from').innerText = translations[lang].from;
+    document.getElementById('lbl-to').innerText = translations[lang].to;
+    document.getElementById('lbl-date').innerText = translations[lang].date;
+    document.getElementById('btn-search').innerText = translations[lang].search;
+    document.getElementById('popular-title').innerText = translations[lang].popular;
+    document.getElementById('lk-title').innerText = translations[lang].profile;
+}
 
-    if (!from || !to || !date) {
-        showToast("Ähli meýdançalary dolduryň!");
-        return;
-    }
+// Модальное окно профиля
+function toggleModal() {
+    const modal = document.getElementById('user-modal');
+    modal.style.display = (modal.style.display === 'flex' ? 'none' : 'flex');
+}
 
-    // Скрываем популярные направления при поиске
-    const popularSection = document.getElementById('popular');
-    if (popularSection) popularSection.style.display = 'none';
-
-    resDiv.innerHTML = `<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Gözlenilýär...</div>`;
-
-    try {
-        // Используем более стабильный эндпоинт цен
-        const url = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${date}&unique=false&sorting=price&direct=false&currency=tmt&limit=10&token=${TOKEN}`;
-        
-        const response = await fetch(url);
-        const json = await response.json();
-
-        if (!json.success || !json.data || json.data.length === 0) {
-            resDiv.innerHTML = `<div style="text-align:center; padding:20px;">Bilet tapylmady. Başga sene saýlap görüň.</div>`;
-            return;
-        }
-
-        renderTickets(json.data, from, to);
-    } catch (error) {
-        console.error("API Error:", error);
-        resDiv.innerHTML = `<div style="text-align:center; color:red; padding:20px;">Error API. Internetiňizi barlaň.</div>`;
+function saveProfile() {
+    const name = document.getElementById('u-name').value;
+    if(name) {
+        localStorage.setItem('user_name', name);
+        document.getElementById('user-display').innerText = name;
+        toggleModal();
     }
 }
 
-function renderTickets(flights, from, to) {
+// Поиск билетов через API (Исправлено на RUB)
+async function searchFlights() {
+    const from = document.getElementById('from').value.toUpperCase();
+    const to = document.getElementById('to').value.toUpperCase();
+    const date = document.getElementById('date').value;
     const resDiv = document.getElementById('results');
-    resDiv.innerHTML = "";
 
-    // Сортируем для категорий (как на фото Aviasales)
-    const sortedByPrice = [...flights].sort((a, b) => a.price - b.price);
+    if(!from || !to || !date) return alert("Заполните поля!");
 
-    flights.forEach((f, i) => {
-        let badgeClass = "optimal";
-        let badgeText = "Оптимальный";
+    document.getElementById('popular-section').style.display = 'none';
+    resDiv.innerHTML = "<center>Поиск...</center>";
 
-        if (f.price === sortedByPrice[0].price) {
-            badgeClass = "cheap";
-            badgeText = "Самый дешевый";
-        } else if (i === flights.length - 1) {
-            badgeClass = "fast";
-            badgeText = "Самый быстрый";
+    try {
+        // Используем рабочий эндпоинт для цен в RUB
+        const url = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${date}&currency=rub&token=${TOKEN}`;
+        const response = await fetch(url);
+        const json = await response.json();
+
+        if(!json.data || json.data.length === 0) {
+            resDiv.innerHTML = `<center>${translations[currentLang].error}</center>`;
+            return;
         }
 
-        // Форматируем время из API (строка типа 2026-05-30T17:30:00Z)
-        const depTime = f.departure_at ? f.departure_at.split('T')[1].substring(0, 5) : "--:--";
-        
-        // Логотип авиакомпании (используем сервис Aviasales для иконок)
-        const logoUrl = `https://pics.avs.io/200/80/${f.airline}.png`;
+        render(json.data, from, to);
+    } catch (e) {
+        resDiv.innerHTML = "<center style='color:red;'>API Error. Проверьте токен или интернет.</center>";
+    }
+}
 
+function render(data, from, to) {
+    const resDiv = document.getElementById('results');
+    resDiv.innerHTML = "";
+    
+    data.slice(0, 5).forEach((f, i) => {
+        let label = i === 0 ? "Самый дешевый" : (i === 1 ? "Оптимальный" : "");
+        let color = i === 0 ? "#008755" : "#007bff";
+        
         resDiv.innerHTML += `
             <div class="ticket">
-                <div class="ticket-badge ${badgeClass}">${badgeText}</div>
-                <div class="ticket-left">
-                    <img src="${logoUrl}" alt="${f.airline}" style="height:30px; margin-bottom:10px;">
-                    <div style="display:flex; align-items:center; gap:20px; width:100%;">
-                        <div><b style="font-size:22px;">${depTime}</b><br><small>${from}</small></div>
-                        <div style="flex:1; border-bottom:1px solid #ddd; position:relative;">
-                            <span style="position:absolute; top:-12px; left:45%; background:#fff; padding:0 5px;">✈</span>
-                        </div>
-                        <div><b style="font-size:22px;">--:--</b><br><small>${to}</small></div>
-                    </div>
+                ${label ? `<div class="badge" style="background:${color}">${label}</div>` : ''}
+                <div>
+                    <img src="https://pics.avs.io/100/40/${f.airline}.png"><br>
+                    <b>${from} ✈ ${to}</b><br>
+                    <small>Рейс: ${f.flight_number}</small>
                 </div>
-                <div class="ticket-right">
-                    <div class="price">${Math.round(f.price)} TMT</div>
-                    <button class="buy-btn" onclick="book('${f.link}')">SATYN AL</button>
+                <div style="text-align:right">
+                    <h2 style="margin:0; color:#333;">${f.price.toLocaleString()} ₽</h2>
+                    <button class="btn-main" onclick="window.open('https://www.aviasales.ru${f.link}&marker=${MARKER}')">КУПИТЬ</button>
                 </div>
             </div>`;
     });
 }
 
-function book(link) {
-    const user = JSON.parse(localStorage.getItem('sap_user') || '{}');
-    if (!user.name) {
-        showToast("Profil maglumatlaryňyzy dolduryň!");
-        toggleLK();
-        return;
-    }
-    // Отправляем на Aviasales с твоим маркером
-    const finalUrl = `https://www.aviasales.ru${link}&marker=${MARKER}`;
-    window.open(finalUrl, '_blank');
+// Автозаполнение при клике на картинку
+function quickSearch(f, t) {
+    document.getElementById('from').value = f;
+    document.getElementById('to').value = t;
+    searchFlights();
 }
+
+// Смена местами
+function swapCities() {
+    let f = document.getElementById('from'), t = document.getElementById('to');
+    [f.value, t.value] = [t.value, f.value];
+}
+
+// Загрузка имени из памяти
+window.onload = () => {
+    const saved = localStorage.getItem('user_name');
+    if(saved) document.getElementById('user-display').innerText = saved;
+};
