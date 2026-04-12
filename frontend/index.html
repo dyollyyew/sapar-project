@@ -2,37 +2,134 @@
 <html lang="tm">
 <head>
     <meta charset="UTF-8">
-    <title>SAPARTM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPARTM — Арзан билетлар</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    </head>
+
+    <style>
+        :root { --green: #008755; --bg: #f8f9fa; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; color: #333; }
+
+        /* Хедер */
+        header { background: var(--white); padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-size: 24px; font-weight: 800; color: var(--green); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .btn-login { padding: 8px 20px; border-radius: 20px; border: 1px solid var(--green); background: transparent; color: var(--green); cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .btn-login:hover { background: var(--green); color: white; }
+
+        .lang-switcher { display: flex; gap: 10px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .lang-switcher span.active { color: var(--green); border-bottom: 2px solid var(--green); }
+
+        /* Hero секция */
+        .hero { background: var(--green); padding: 60px 20px 100px; color: white; text-align: center; }
+        .hero h1 { margin: 0; font-size: 32px; letter-spacing: 1px; }
+
+        /* Поиск */
+        .search-container { max-width: 1000px; margin: -50px auto 40px; padding: 0 20px; }
+        .search-card { 
+            background: var(--white); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: grid; grid-template-columns: 1fr 40px 1fr 1fr auto; align-items: end; gap: 15px;
+        }
+        .field { display: flex; flex-direction: column; gap: 8px; position: relative; }
+        .field label { font-size: 12px; font-weight: bold; color: #888; text-transform: uppercase; }
+        .field input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; transition: 0.3s; }
+        .field input:focus { border-color: var(--green); }
+
+        .btn-search { background: var(--green); color: white; border: none; padding: 0 35px; border-radius: 8px; font-weight: bold; cursor: pointer; height: 48px; transition: 0.3s; }
+        .btn-search:hover { background: #006b43; transform: scale(1.02); }
+
+        /* Результаты */
+        .ticket { background: var(--white); border-radius: 12px; padding: 25px; margin: 20px auto; max-width: 900px; border: 1px solid #eee; transition: 0.3s; }
+        .ticket:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .ticket-route { font-size: 20px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
+        .ticket-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; border-top: 1px solid #f5f5f5; padding-top: 15px; }
+        .t-lbl { color: #999; font-size: 11px; text-transform: uppercase; }
+        .t-val { font-size: 16px; font-weight: 600; }
+
+        .ticket-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ddd; }
+        .price { font-size: 28px; font-weight: 800; color: var(--green); }
+        .comm-info { font-size: 11px; color: #aaa; }
+
+        /* Модальное окно ЛК */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-content { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 380px; text-align: center; }
+        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+
+        @media (max-width: 768px) {
+            .search-card { grid-template-columns: 1fr; }
+            header { padding: 15px 20px; }
+        }
+    </style>
+</head>
 <body>
+
 <header>
     <a href="/" class="logo"><i class="fas fa-paper-plane"></i> SAPARTM</a>
-    <div style="display:flex; gap:15px;">
+    <div class="nav-right">
         <button class="btn-login" id="user-btn" onclick="toggleModal(true)">Profil</button>
         <div class="lang-switcher">
-            <span onclick="changeLang('tk')" id="btn-tk" class="active">TKM</span>
-            <span onclick="changeLang('ru')" id="btn-ru">РУС</span>
+            <span id="btn-tk" class="active" onclick="changeLang('tk')">TKM</span>
+            <span id="btn-ru" onclick="changeLang('ru')">РУС</span>
         </div>
     </div>
 </header>
 
-<div class="hero"><h1 id="hero-title">HOŞ GELDIŇIZ!</h1></div>
+<div class="hero">
+    <h1 id="hero-title">HOŞ GELDIŇIZ!</h1>
+    <p id="hero-sub">Aşgabat — Dünýäniň gapysy</p>
+</div>
 
-<div id="lk-modal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:white; padding:30px; border-radius:15px; width:320px;">
-        <h3 style="color:var(--green)">Giriş / Profil</h3>
-        <input type="text" id="u-fio" placeholder="F.I.O. (Batyr Batyrow)" style="width:100%; margin:10px 0; padding:10px;">
-        <input type="text" id="u-pass" placeholder="Pasport (A1904657)" style="width:100%; margin:10px 0; padding:10px;">
-        <button class="buy-btn" onclick="saveUser()" style="width:100%">Ýatda sakla</button>
-        <button onclick="toggleModal(false)" style="background:none; border:none; color:red; cursor:pointer; width:100%; margin-top:10px;">Ýap</button>
+<div class="search-container">
+    <div class="search-card">
+        <div class="field">
+            <label id="lbl-from">Nireden</label>
+            <input type="text" id="from" placeholder="ASB" maxlength="3">
+        </div>
+        <button onclick="swapCities()" style="background:none; border:none; color:var(--green); cursor:pointer; font-size:18px; margin-bottom:12px;"><i class="fas fa-exchange-alt"></i></button>
+        <div class="field">
+            <label id="lbl-to">Nirä</label>
+            <input type="text" id="to" placeholder="KZN" maxlength="3">
+        </div>
+        <div class="field">
+            <label id="lbl-date">Sene</label>
+            <input type="text" id="date">
+        </div>
+        <button class="btn-search" onclick="runSearch()" id="btn-search">GÖZLEG</button>
     </div>
 </div>
 
-<div id="results-list"></div>
+<div id="results-list" style="padding: 0 20px 50px;"></div>
+
+<div class="search-container" id="popular-section" style="margin-top: 20px; text-align: center;">
+    <h2 id="pop-title">Meşhur ugurlar</h2>
+    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+        <button class="btn-login" onclick="setQuickSearch('ASB', 'IST')">Aşgabat → Stambul</button>
+        <button class="btn-login" onclick="setQuickSearch('ASB', 'DME')">Aşgabat → Moskwa</button>
+        <button class="btn-login" onclick="setQuickSearch('ASB', 'DXB')">Aşgabat → Dubaý</button>
+    </div>
+</div>
+
+<div id="lk-modal" class="modal">
+    <div class="modal-content">
+        <h2 style="color: var(--green); margin-bottom: 20px;">Şahsy Profil</h2>
+        <div class="field" style="text-align: left;">
+            <label>F.I.O.</label>
+            <input type="text" id="u-fio" placeholder="Batyr Batyrow">
+        </div>
+        <div class="field" style="text-align: left;">
+            <label>Pasport (Seriýa/Belgi)</label>
+            <input type="text" id="u-pass" placeholder="A1904657">
+        </div>
+        <button class="btn-search" onclick="saveUser()" style="width: 100%; margin-top: 20px;">Ýatda sakla</button>
+        <button onclick="toggleModal(false)" style="background:none; border:none; color: #888; margin-top: 15px; cursor: pointer;">Yza dön</button>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="logic.js"></script>
+
 </body>
 </html>
