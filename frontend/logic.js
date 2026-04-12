@@ -2,12 +2,12 @@ const dict = {
     tk: {
         title: "HOŞ GELDIŇIZ!", sub: "Aşgabat — Dünýäniň gapysy", from: "Nireden", to: "Nirä", date: "Sene",
         search: "GÖZLEG", popular: "Meşhur ugurlar", cabinet: "Giriş", buy: "SATYN AL",
-        dep: "Uçuş", arr: "Geliş", loading: "Gözlenilýär...", direct: "Gönümel", flight: "Reýs", rules: "Tarif düzgünleri"
+        dep: "Uçuş", arr: "Geliş", loading: "Gözlenilýär...", direct: "Gönümel", flight: "Reýs", rules: "Tarif düzgünleri", time: "Ýolda"
     },
     ru: {
         title: "ДОБРО ПОЖАЛОВАТЬ!", sub: "Ашхабад — Врата мира", from: "Откуда", to: "Куда", date: "Дата",
         search: "ПОИСК", popular: "Популярные направления", cabinet: "Вход", buy: "КУПИТЬ",
-        dep: "Вылет", arr: "Прилет", loading: "Поиск билетов...", direct: "Прямой", flight: "Рейс", rules: "Правила тарифа"
+        dep: "Вылет", arr: "Прилет", loading: "Поиск билетов...", direct: "Прямой", flight: "Рейс", rules: "Правила тарифа", time: "В пути"
     }
 };
 
@@ -22,14 +22,9 @@ const cities = [
 let currentLang = 'tk';
 let lastTickets = [];
 
-// 1. Инициализация календаря
-flatpickr("#date", {
-    dateFormat: "d.m.Y",
-    minDate: "today",
-    disableMobile: "true"
-});
+// Инициализация календаря
+flatpickr("#date", { dateFormat: "d.m.Y", minDate: "today" });
 
-// 2. Смена языка
 function changeLang(lang) {
     currentLang = lang;
     document.getElementById('btn-tk').classList.toggle('active', lang === 'tk');
@@ -44,10 +39,10 @@ function changeLang(lang) {
     document.getElementById('pop-title').innerText = dict[lang].popular;
     document.getElementById('txt-cabinet').innerText = dict[lang].cabinet;
 
+    // Если билет уже на экране - переводим его
     if (lastTickets.length > 0) renderTickets(lastTickets);
 }
 
-// 3. Автозаполнение
 function setupSuggest(inputId, suggestId) {
     const input = document.getElementById(inputId);
     const box = document.getElementById(suggestId);
@@ -77,26 +72,23 @@ function setupSuggest(inputId, suggestId) {
 setupSuggest('from', 'suggest-from');
 setupSuggest('to', 'suggest-to');
 
-// 4. Поиск (имитация API)
 async function runSearch() {
     const from = document.getElementById('from').value;
     const to = document.getElementById('to').value;
     const date = document.getElementById('date').value;
     const resBox = document.getElementById('results-list');
 
-    if(!from || !to || !date) return alert("Error!");
+    if(!from || !to || !date) return alert(currentLang === 'tk' ? "Ähli meýdançalary dolduryň!" : "Заполните все поля!");
 
     document.getElementById('popular-section').style.display = 'none';
     resBox.innerHTML = `<center style="padding:50px;"><i class="fas fa-spinner fa-spin"></i> ${dict[currentLang].loading}</center>`;
 
-    // Здесь должен быть твой fetch('/api/search')
     setTimeout(() => {
         lastTickets = [{ origin: from, destination: to, price: 3200, link: "https://turkmenistanairlines.tm" }];
         renderTickets(lastTickets);
     }, 800);
 }
 
-// 5. Отрисовка билетов
 function renderTickets(tickets) {
     const resBox = document.getElementById('results-list');
     resBox.innerHTML = "";
@@ -110,8 +102,8 @@ function renderTickets(tickets) {
                 <div class="ticket-grid">
                     <div><div class="t-lbl">${lang.dep}</div><div class="t-val">17:30</div></div>
                     <div><div class="t-lbl">${lang.arr}</div><div class="t-val">22:50</div></div>
-                    <div><div class="t-lbl">${lang.direct}</div><div class="t-val" style="color:green">✔</div></div>
-                    <div><div class="t-lbl">Ýolda</div><div class="t-val">03:20</div></div>
+                    <div><div class="t-lbl">Status</div><div class="t-val" style="color:green">${lang.direct}</div></div>
+                    <div><div class="t-lbl">${lang.time}</div><div class="t-val">03:20</div></div>
                     <div><div class="t-lbl">${lang.flight}</div><div class="t-val">T5-442</div></div>
                 </div>
                 <div class="ticket-footer">
@@ -130,4 +122,5 @@ function swapCities() {
 function setQuickSearch(f, t) {
     document.getElementById('from').value = f;
     document.getElementById('to').value = t;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
