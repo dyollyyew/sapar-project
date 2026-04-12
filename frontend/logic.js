@@ -1,84 +1,97 @@
-const TOKEN = "23a9b11bc2672f0692432adc75cfc003";
-const MARKER = "716446";
+const TOKEN = "23a9b11bc2672f0692432adc75cfc003"; //
+const MARKER = "716446"; //
 
-// Авто-настройка календаря (только формат YYYY-MM-DD!)
+// Инициализация календаря в правильном формате YYYY-MM-DD
 flatpickr("#date", { dateFormat: "Y-m-d", minDate: "today" });
 
+function openModal() { document.getElementById('lk-modal').style.display = 'flex'; }
+function closeModal() { document.getElementById('lk-modal').style.display = 'none'; }
+
+// Сохранение ЛК (Паспортные данные)
+function saveLK() {
+    const user = {
+        fio: document.getElementById('u-fio').value.trim(),
+        passport: document.getElementById('u-pass').value.trim()
+    };
+    if (!user.fio || !user.passport) return alert("Please fill FIO and Passport!");
+    localStorage.setItem('sap_user', JSON.stringify(user));
+    document.getElementById('user-btn').innerText = user.fio.split(' ')[0];
+    closeModal();
+}
+
 async function startSearch() {
-    // 1. Принудительно делаем буквы БОЛЬШИМИ (чтобы не было Error API)
+    // Принудительный верхний регистр
     const from = document.getElementById('from').value.toUpperCase().trim();
     const to = document.getElementById('to').value.toUpperCase().trim();
     const date = document.getElementById('date').value;
     const resDiv = document.getElementById('results');
 
-    if (!from || !to || !date) {
-        alert("Ähli meýdançalary dolduryň!"); 
-        return;
-    }
+    if (!from || !to || !date) return alert("Fill all fields!");
 
-    resDiv.innerHTML = "<center style='padding:50px;'>Gözlenilýär (Идет поиск)...</center>";
+    resDiv.innerHTML = "<center>Searching with 5% markup calculation...</center>";
 
     try {
-        // 2. Используем прокси для обхода блокировок браузера (CORS)
+        // Использование прокси для обхода API Error (CORS)
         const apiUrl = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${date}&currency=rub&token=${TOKEN}`;
-        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(apiUrl);
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
         
         const response = await fetch(proxyUrl);
-        const wrapper = await response.json();
-        const json = JSON.parse(wrapper.contents); // Получаем чистые данные из прокси
+        const dataWrapper = await response.json();
+        const json = JSON.parse(dataWrapper.contents);
 
         if (!json.data || json.data.length === 0) {
-            resDiv.innerHTML = "<center style='padding:50px;'>Bilet tapylmady. Başga sene synanyşyň.</center>";
+            resDiv.innerHTML = "<center>No flights found for these dates.</center>";
             return;
         }
 
-        renderTickets(json.data, from, to);
+        render(json.data, from, to);
     } catch (err) {
-        console.error(err);
-        resDiv.innerHTML = "<center style='color:red; padding:50px;'>API baglanyşyk ýalňyşlygy. <br> Internetiňizi we Tokeniňizi barlaň.</center>";
+        resDiv.innerHTML = "<center style='color:red;'>API Connection Error. Check Token/Internet.</center>"; //
     }
 }
 
-function renderTickets(data, from, to) {
+function render(data, from, to) {
     const resDiv = document.getElementById('results');
     resDiv.innerHTML = "";
 
-    data.slice(0, 5).forEach((flight, i) => {
-        // 3. ДОБАВЛЯЕМ ТВОИ 5% СБОРА
-        const finalPrice = Math.round(flight.price * 1.05);
+    data.slice(0, 5).forEach((f, i) => {
+        // Наценка 5%
+        const finalPrice = Math.round(f.price * 1.05);
         
-        // Оформление как на твоем образце
-        let badge = "";
-        let bColor = "";
-        if (i === 0) { badge = "Самый дешевый"; bColor = "#008755"; }
-        else if (i === 1) { badge = "Оптимальный"; bColor = "#007bff"; }
-
         resDiv.innerHTML += `
-            <div style="background:#fff; border-radius:15px; padding:20px; margin:15px auto; max-width:800px; display:flex; justify-content:space-between; border:1px solid #ddd; position:relative;">
-                ${badge ? `<div style="position:absolute; top:-10px; left:20px; background:${bColor}; color:white; padding:2px 10px; border-radius:10px; font-size:12px; font-weight:bold;">${badge}</div>` : ''}
-                <div style="flex:1;">
-                    <img src="https://pics.avs.io/120/40/${flight.airline}.png">
-                    <div style="margin-top:10px;">
-                        <b style="font-size:18px;">${from} ✈ ${to}</b><br>
-                        <small style="color:gray;">Reýs: ${flight.flight_number}</small>
-                    </div>
+            <div class="ticket">
+                ${i === 0 ? '<div class="badge">Cheap Flight</div>' : ''}
+                <div>
+                    <img src="https://pics.avs.io/100/35/${f.airline}.png"><br>
+                    <b>${from} ✈ ${to}</b><br>
+                    <small>Flight: ${f.flight_number}</small>
                 </div>
-                <div style="text-align:right; border-left: 1px solid #eee; padding-left: 20px;">
-                    <div style="font-size:26px; font-weight:bold;">${finalPrice.toLocaleString()} ₽</div>
-                    <div style="font-size:11px; color:gray; margin-bottom:10px;">5% hyzmat tölegi bilen</div>
-                    <button onclick="pay('${flight.link}')" style="background:#008755; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">SATYN AL</button>
+                <div style="text-align:right;">
+                    <div class="price-text">${finalPrice.toLocaleString()} ₽</div>
+                    <div style="font-size:11px; color:gray;">Includes 5% fee</div>
+                    <button class="btn-main" onclick="goToPay('${f.link}')" style="margin-top:10px;">BUY NOW</button>
                 </div>
             </div>`;
     });
 }
 
-function pay(link) {
+function goToPay(link) {
     const user = localStorage.getItem('sap_user');
+    // Проверка ЛК перед оплатой
     if (!user) {
-        alert("Lütfan, profil maglumatlaryňyzy dolduryň (Сначала заполните ЛК)!");
-        openModal(); // Открываем твою модалку для паспорта
+        alert("Please create Profile and fill Passport (A1904657) first!");
+        openModal();
         return;
     }
-    // Открываем авиакомпанию с твоим маркером
+    // Редирект с партнерским маркером
     window.open(`https://www.aviasales.ru${link}&marker=${MARKER}`, '_blank');
 }
+
+// Проверка ЛК при загрузке страницы
+window.onload = () => {
+    const saved = localStorage.getItem('sap_user');
+    if (saved) {
+        const u = JSON.parse(saved);
+        document.getElementById('user-btn').innerText = u.fio.split(' ')[0];
+    }
+};

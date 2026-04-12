@@ -2,55 +2,54 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SAPARTM - Bronirleme</title>
+    <title>SAPARTM - Бронирование авиабилетов</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
-        :root { --green: #008755; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; }
+        :root { --green: #008755; --gray: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray); margin: 0; }
         header { background: #fff; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .logo { font-size: 24px; font-weight: bold; color: var(--green); text-decoration: none; }
-        .search-area { background: var(--green); padding: 50px 20px; text-align: center; }
-        .search-container { background: #fff; padding: 25px; border-radius: 15px; display: inline-flex; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .hero { background: var(--green); padding: 40px 20px; text-align: center; color: white; }
+        .search-container { background: #fff; padding: 25px; border-radius: 15px; display: inline-flex; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-top: -30px; position: relative; left: 50%; transform: translateX(-50%); }
+        .search-container input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; text-transform: uppercase; }
         .btn-main { background: var(--green); color: #fff; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        /* Карточка билета в стиле Aviasales */
-        .ticket { background: #fff; border-radius: 15px; padding: 20px; margin: 15px auto; max-width: 800px; display: flex; justify-content: space-between; position: relative; border: 1px solid #e0e0e0; }
-        .badge { position: absolute; top: -10px; left: 20px; padding: 4px 12px; border-radius: 20px; color: #fff; font-size: 12px; font-weight: bold; }
-        .price-val { font-size: 28px; font-weight: 900; color: #333; }
+        .ticket { background: #fff; border-radius: 15px; padding: 20px; margin: 20px auto; max-width: 800px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; position: relative; }
+        .badge { position: absolute; top: -10px; left: 20px; background: var(--green); color: white; padding: 3px 12px; border-radius: 20px; font-size: 12px; }
+        .price-text { font-size: 26px; font-weight: 900; color: #333; }
         
-        /* Модалка ЛК */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: #fff; padding: 30px; border-radius: 15px; width: 350px; }
-        .modal-content input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 15px; width: 350px; text-align: center; }
+        .modal-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; text-transform: none; }
     </style>
 </head>
 <body>
 
 <header>
     <a href="#" class="logo">SAPARTM</a>
-    <button class="btn-main" onclick="openModal()" id="user-btn">Создать ЛК</button>
+    <button class="btn-main" onclick="openModal()" id="user-btn">Profil / Giriş</button>
 </header>
 
-<div class="search-area">
-    <div class="search-container">
-        <input type="text" id="from" placeholder="KZN" style="width: 80px; text-transform: uppercase;">
-        <input type="text" id="to" placeholder="ASB" style="width: 80px; text-transform: uppercase;">
-        <input type="text" id="date" placeholder="Sene">
-        <button class="btn-main" onclick="startSearch()">GÖZLEG</button>
-    </div>
+<div class="hero"><h1>Bilet Gözlegi</h1></div>
+
+<div class="search-container">
+    <input type="text" id="from" placeholder="KZN" maxlength="3" style="width: 80px;">
+    <input type="text" id="to" placeholder="ASB" maxlength="3" style="width: 80px;">
+    <input type="text" id="date" placeholder="Sene">
+    <button class="btn-main" onclick="startSearch()">GÖZLEG</button>
 </div>
 
-<div id="results"></div>
+<div id="results" style="margin-top: 50px; padding: 0 20px;"></div>
 
 <div id="lk-modal" class="modal">
     <div class="modal-content">
-        <h3>Maglumatlar (ЛК)</h3>
-        <input type="text" id="u-fio" placeholder="F.I.O.">
+        <h3>Passenger Data (A1904657)</h3>
+        <input type="text" id="u-fio" placeholder="Full Name (Latin)">
         <input type="email" id="u-email" placeholder="Email">
-        <input type="text" id="u-phone" placeholder="Telefon">
-        <input type="text" id="u-pass" placeholder="Pasport (Meselem: A1904657)">
-        <button class="btn-main" style="width: 100%; margin-top: 10px;" onclick="saveLK()">Ýatda sakla</button>
-        <p onclick="closeModal()" style="color: red; cursor: pointer; text-align: center; margin-top: 15px;">Ýap</p>
+        <input type="text" id="u-phone" placeholder="Phone Number">
+        <input type="text" id="u-pass" placeholder="Passport Number">
+        <button class="btn-main" style="width: 100%;" onclick="saveLK()">Save Data</button>
+        <p onclick="closeModal()" style="color:red; cursor:pointer; margin-top:15px;">Close</p>
     </div>
 </div>
 
