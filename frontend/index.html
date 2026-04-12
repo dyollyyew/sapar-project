@@ -2,67 +2,55 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPARTM</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>SAPARTM - Bronirleme</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
-        :root { --green: #008755; --white: #ffffff; }
-        body { font-family: sans-serif; background: #f4f7f6; margin: 0; }
-        header { background: #fff; padding: 10px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        :root { --green: #008755; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; }
+        header { background: #fff; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .logo { font-size: 24px; font-weight: bold; color: var(--green); text-decoration: none; }
-        .lang-switcher span { cursor: pointer; padding: 5px; font-weight: bold; color: #888; }
-        .lang-switcher span.active { color: var(--green); border-bottom: 2px solid var(--green); }
-        .hero { background: var(--green); height: 100px; }
-        .search-box { max-width: 1000px; margin: -40px auto 20px; background: #fff; padding: 20px; border-radius: 15px; display: flex; gap: 10px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 150px; }
-        .btn-go { background: var(--green); color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .dest-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; max-width: 1000px; margin: 20px auto; }
-        .card { background: #fff; border-radius: 10px; overflow: hidden; cursor: pointer; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card img { width: 100%; height: 100px; object-fit: cover; }
-        .ticket { background: #fff; padding: 20px; margin: 10px auto; max-width: 800px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--green); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
+        .search-area { background: var(--green); padding: 50px 20px; text-align: center; }
+        .search-container { background: #fff; padding: 25px; border-radius: 15px; display: inline-flex; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .btn-main { background: var(--green); color: #fff; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        /* Карточка билета в стиле Aviasales */
+        .ticket { background: #fff; border-radius: 15px; padding: 20px; margin: 15px auto; max-width: 800px; display: flex; justify-content: space-between; position: relative; border: 1px solid #e0e0e0; }
+        .badge { position: absolute; top: -10px; left: 20px; padding: 4px 12px; border-radius: 20px; color: #fff; font-size: 12px; font-weight: bold; }
+        .price-val { font-size: 28px; font-weight: 900; color: #333; }
+        
+        /* Модалка ЛК */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 15px; width: 350px; }
+        .modal-content input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <header>
     <a href="#" class="logo">SAPARTM</a>
-    <div style="display:flex; gap:20px; align-items:center;">
-        <div class="lang-switcher">
-            <span id="btn-tk" class="active" onclick="changeLang('tk')">TKM</span> | 
-            <span id="btn-ru" onclick="changeLang('ru')">РУС</span>
-        </div>
-        <button onclick="openProfile()" style="border:none; background:#eee; padding:5px 15px; border-radius:15px; cursor:pointer;">
-            <i class="fas fa-user"></i> <span id="user-label">Giriş</span>
-        </button>
-    </div>
+    <button class="btn-main" onclick="openModal()" id="user-btn">Создать ЛК</button>
 </header>
 
-<div class="hero"></div>
-
-<div class="search-box">
-    <input type="text" id="from" placeholder="MOW" value="KZN">
-    <span style="cursor:pointer" onclick="swap()">⇄</span>
-    <input type="text" id="to" placeholder="ASB" value="ASB">
-    <input type="text" id="date" placeholder="Sene">
-    <button class="btn-go" id="search-text" onclick="findFlights()">GÖZLEG</button>
+<div class="search-area">
+    <div class="search-container">
+        <input type="text" id="from" placeholder="KZN" style="width: 80px; text-transform: uppercase;">
+        <input type="text" id="to" placeholder="ASB" style="width: 80px; text-transform: uppercase;">
+        <input type="text" id="date" placeholder="Sene">
+        <button class="btn-main" onclick="startSearch()">GÖZLEG</button>
+    </div>
 </div>
 
 <div id="results"></div>
 
-<div class="dest-grid" id="popular-box">
-    <div class="card" onclick="quickSearch('ASB','IST')"><img src="img/ist.jpg"><p>Stambul</p></div>
-    <div class="card" onclick="quickSearch('ASB','MOW')"><img src="img/mow.jpg"><p>Moskwa</p></div>
-    <div class="card" onclick="quickSearch('ASB','DXB')"><img src="img/dxb.jpg"><p>Dubaý</p></div>
-    <div class="card" onclick="quickSearch('ASB','KZN')"><img src="img/kzn.jpg"><p>Kazan</p></div>
-</div>
-
-<div id="modal-profile" class="modal">
-    <div style="background:#fff; padding:30px; border-radius:10px; width:250px; text-align:center;">
-        <h3 id="modal-h">Profil</h3>
-        <input type="text" id="user-input" placeholder="Adyňyz" style="width:90%; margin-bottom:10px;">
-        <button class="btn-go" onclick="saveUser()" style="width:100%">OK</button>
+<div id="lk-modal" class="modal">
+    <div class="modal-content">
+        <h3>Maglumatlar (ЛК)</h3>
+        <input type="text" id="u-fio" placeholder="F.I.O.">
+        <input type="email" id="u-email" placeholder="Email">
+        <input type="text" id="u-phone" placeholder="Telefon">
+        <input type="text" id="u-pass" placeholder="Pasport (Meselem: A1904657)">
+        <button class="btn-main" style="width: 100%; margin-top: 10px;" onclick="saveLK()">Ýatda sakla</button>
+        <p onclick="closeModal()" style="color: red; cursor: pointer; text-align: center; margin-top: 15px;">Ýap</p>
     </div>
 </div>
 
