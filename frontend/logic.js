@@ -108,6 +108,7 @@ function saveProfile() {
         name: document.getElementById('p-name').value,
         surname: document.getElementById('p-surname').value,
         email: document.getElementById('p-email').value
+        
     };
     if(!data.name || !data.surname) return alert("Dolduryň!");
     
