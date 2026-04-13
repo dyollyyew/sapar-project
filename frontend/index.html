@@ -10,232 +10,207 @@
     
     <style>
         :root { --main-green: #008755; --dark: #333; --light: #f4f4f4; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--light); }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); color: var(--dark); overflow-x: hidden; }
         
-        /* Header & Profile */
-        header { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .logo { font-size: 24px; font-weight: 800; color: var(--main-green); cursor: pointer; text-decoration: none; }
+        /* Header & Logo */
+        header { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; }
+        .logo-icon { background: var(--main-green); color: white; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 20px; }
+        .logo-text { font-size: 22px; font-weight: 800; color: var(--main-green); }
+
+        /* Языки и Профиль */
         .nav-right { display: flex; align-items: center; gap: 20px; }
+        .lang-switcher { font-weight: bold; font-size: 14px; }
+        .lang-switcher span { cursor: pointer; color: #888; padding: 2px 5px; transition: 0.3s; }
+        .lang-switcher span.active { color: var(--main-green); border-bottom: 2px solid var(--main-green); }
+        
         .profile-wrapper { position: relative; }
-        .btn-profile { background: none; border: 1px solid #ddd; padding: 8px 15px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 30px; height: 30px; background: var(--main-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        
-        /* Dropdown Menu */
-        .dropdown-card { position: absolute; right: 0; top: 45px; background: white; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); width: 220px; display: none; z-index: 1000; padding: 10px 0; }
-        .menu-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; color: var(--dark); }
-        .menu-item:hover { background: #f9f9f9; color: var(--main-green); }
-        .menu-item.admin-btn { color: #d32f2f; font-weight: bold; }
-        
-        /* Hero & Search */
-        .hero { background: var(--main-green); color: white; padding: 60px 5%; text-align: center; }
-        .search-container { margin-top: -40px; padding: 0 5%; }
-        .search-card { background: white; padding: 25px; border-radius: 15px; display: flex; flex-wrap: wrap; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); align-items: flex-end; }
-        .field { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
-        .field label { font-size: 12px; font-weight: bold; color: #888; text-transform: uppercase; }
-        .field input { padding: 12px; border: 1px solid #eee; border-radius: 8px; outline: none; font-size: 16px; }
-        .swap-btn { background: #f0f0f0; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; align-self: center; margin-top: 20px; transition: 0.3s; }
-        .btn-search { background: var(--main-green); color: white; border: none; padding: 15px 40px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; }
+        .btn-profile { background: white; border: 1px solid #ddd; padding: 6px 16px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 15px; }
+
+        /* Меню */
+        .dropdown-card { position: absolute; right: 0; top: 48px; background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); width: 250px; display: none; z-index: 1000; overflow: hidden; border: 1px solid #eee; }
+        .menu-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: var(--dark); transition: 0.2s; font-size: 14px; }
+        .menu-item:hover { background: #f8f8f8; color: var(--main-green); }
+        .menu-item i { width: 18px; text-align: center; color: #555; }
+        .admin-text { color: #d32f2f !important; font-weight: bold; }
+
+        /* Поиск */
+        .hero { background: var(--main-green); color: white; padding: 50px 5% 80px; text-align: center; }
+        .search-card { background: white; margin: -50px auto 30px; padding: 25px; border-radius: 20px; display: flex; gap: 15px; max-width: 1000px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); align-items: flex-end; flex-wrap: wrap; }
+        .field { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 6px; }
+        .field label { font-size: 11px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .field input { padding: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 15px; width: 100%; box-sizing: border-box; background: #fafafa; outline: none; transition: 0.3s; }
+        .field input:focus { border-color: var(--main-green); background: white; }
+        .swap-btn { background: #f0f0f0; border: none; width: 45px; height: 45px; border-radius: 10px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; color: var(--main-green); margin-bottom: 2px; }
+        .btn-search { background: var(--main-green); color: white; border: none; padding: 14px 40px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; box-shadow: 0 4px 15px rgba(0, 135, 85, 0.3); }
         .btn-search:hover { background: #006b44; transform: translateY(-2px); }
 
-        /* Sections */
-        .section-title { text-align: center; margin: 40px 0 20px; color: var(--dark); }
-        .popular-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 0 5% 50px; }
-        .dest-card { background: white; border-radius: 15px; overflow: hidden; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .dest-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        .dest-card img { width: 100%; height: 160px; object-fit: cover; }
-        .dest-card p { padding: 15px; margin: 0; font-weight: bold; text-align: center; }
+        /* Регистрация Модал */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        .modal-content { background: white; margin: 8% auto; padding: 30px; border-radius: 20px; width: 380px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: zoomIn 0.3s ease-out; }
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-content h3 { margin: 0 0 20px; color: var(--main-green); text-align: center; }
+        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 14px; outline: none; }
+        .modal-content input:focus { border-color: var(--main-green); }
 
-        /* Forms & Tickets */
-        .display-area { padding: 20px 5%; max-width: 900px; margin: 0 auto; }
-        .ticket-card { background: white; padding: 20px; border-radius: 12px; border-left: 5px solid var(--main-green); margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .docs-form { background: white; padding: 30px; border-radius: 15px; display: grid; gap: 15px; }
-        .docs-form input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        /* Красивое уведомление (Toast) вместо Alert */
+        #toast { position: fixed; bottom: 30px; right: 30px; background: #333; color: white; padding: 15px 25px; border-radius: 12px; display: flex; align-items: center; gap: 10px; transform: translateX(150%); transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-left: 5px solid var(--main-green); }
+        #toast.show { transform: translateX(0); }
+
+        /* Популярные */
+        .popular-section { padding: 40px 5%; max-width: 1100px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; }
+        .dest-card { background: white; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; }
+        .dest-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
+        .dest-card img { width: 100%; height: 160px; object-fit: cover; }
+        .dest-card p { padding: 15px; font-weight: bold; margin: 0; text-align: center; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="index.html" class="logo">SAPARTM</a>
+    <a href="index.html" class="logo-container">
+        <div class="logo-icon">S</div>
+        <div class="logo-text">SAPARTM</div>
+    </a>
     <div class="nav-right">
         <div class="lang-switcher">
-            <button onclick="changeLang('tk')" style="border:none; background:none; cursor:pointer;">TM</button> | 
-            <button onclick="changeLang('ru')" style="border:none; background:none; cursor:pointer;">RU</button>
+            <span id="l-tk" class="active" onclick="setLang('tk')">TM</span> | 
+            <span id="l-ru" onclick="setLang('ru')">RU</span>
         </div>
         <div class="profile-wrapper">
             <button class="btn-profile" onclick="toggleMenu()">
-                <div class="avatar" id="user-icon">?</div>
-                <span id="user-name-text">Profil</span>
+                <div style="background:var(--main-green); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">?</div>
+                <span id="prof-label">Profil</span>
             </button>
             <div class="dropdown-card" id="profile-menu">
-                <div class="menu-item" onclick="showSection('docs')"><i class="fas fa-id-card"></i> <span>Meniň resminamalarym</span></div>
-                <div class="menu-item" onclick="showSection('tickets')"><i class="fas fa-plane-departure"></i> <span>Meniň biletlerim</span></div>
-                <div class="menu-item admin-btn" onclick="adminLogin()"><i class="fas fa-user-shield"></i> <span>Admin Paneli</span></div>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
-                <div class="menu-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>Çykmak</span></div>
+                <div class="menu-item" onclick="openLoginModal()"><i class="fas fa-sign-in-alt"></i> <span id="m-login">Içeri gir (Вход)</span></div>
+                <div class="menu-item" onclick="showMsg('Bölüm ýakyn wagtda açylar')"><i class="fas fa-id-card"></i> <span id="m-docs">Meniň resminamalarym</span></div>
+                <div class="menu-item" onclick="showMsg('Biletleriňiz ýok')"><i class="fas fa-ticket-alt"></i> <span id="m-tickets">Meniň biletlerim</span></div>
+                <div class="menu-item admin-text" onclick="adminAuth()"><i class="fas fa-user-shield"></i> <span>Admin Paneli</span></div>
+                <hr style="border:0; border-top:1px solid #eee; margin:0;">
+                <div class="menu-item" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> <span id="m-exit">Çykmak</span></div>
             </div>
         </div>
     </div>
 </header>
 
 <div class="hero">
-    <h1 id="hero-title">HOŞ GELDIŇIZ!</h1>
-    <p>Aşgabat — Dünýäniň gapysy</p>
+    <h1 id="h-title">HOŞ GELDIŇIZ!</h1>
+    <p id="h-sub">Aşgabat — dünýäniň gapysy</p>
 </div>
 
-<div class="search-container">
-    <div class="search-card">
-        <div class="field">
-            <label>Nireden (Откуда)</label>
-            <input type="text" id="from" placeholder="Ashgabat (ASB)">
+<div class="search-card">
+    <div class="field">
+        <label id="lbl-from">Nireden</label>
+        <input type="text" id="from" placeholder="Ashgabat (ASB)">
+    </div>
+    <button class="swap-btn" onclick="swap()"><i class="fas fa-exchange-alt"></i></button>
+    <div class="field">
+        <label id="lbl-to">Nirä</label>
+        <input type="text" id="to" placeholder="Istanbul (IST)">
+    </div>
+    <div class="field">
+        <label id="lbl-date">Sene</label>
+        <input type="text" id="date-picker" placeholder="Saýlaň...">
+    </div>
+    <button class="btn-search" onclick="showMsg('Gözleg başlandy...')">GÖZLEG</button>
+</div>
+
+<div class="popular-section">
+    <h2 id="pop-title" style="text-align:center; margin-bottom:30px;">Meşhur ugurlar</h2>
+    <div class="grid">
+        <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Istanbul (IST)')">
+            <img src="IMG/ist.jpg"><p>Ashgabat — Istanbul (IST)</p>
         </div>
-        <button class="swap-btn" onclick="swapCities()" id="swap-icon"><i class="fas fa-exchange-alt"></i></button>
-        <div class="field">
-            <label>Nirä (Куда)</label>
-            <input type="text" id="to" placeholder="Istanbul (IST)">
+        <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Moscow (DME)')">
+            <img src="IMG/mow.jpg"><p>Ashgabat — Moscow (DME)</p>
         </div>
-        <div class="field">
-            <label>Sene (Дата)</label>
-            <input type="text" id="date-picker" placeholder="Saýlaň...">
+        <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Dubai (DXB)')">
+            <img src="IMG/dxb.jpg"><p>Ashgabat — Dubai (DXB)</p>
         </div>
-        <button class="btn-search" onclick="runSearch()">GÖZLEG</button>
+        <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Kazan (KZN)')">
+            <img src="IMG/kzn.jpg"><p>Ashgabat — Kazan (KZN)</p>
+        </div>
     </div>
 </div>
 
-<div id="content-display">
-    <h2 class="section-title" id="sec-title">Meşhur ugurlar</h2>
-    <div class="popular-grid" id="popular-grid">
-        </div>
-    <div class="display-area" id="display-area"></div>
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <h3>Içeri gir (Вход)</h3>
+        <input type="text" id="r-name" placeholder="Adyňyz (Имя)">
+        <input type="text" id="r-surname" placeholder="Familiýaňyz (Фамилия)">
+        <input type="email" id="r-mail" placeholder="E-mail">
+        <input type="tel" id="r-tel" placeholder="Telefon (+993...)">
+        <button class="btn-search" style="width:100%; margin-top:10px;" onclick="doLogin()">Girmek</button>
+        <button class="btn-search" style="width:100%; background:#888; margin-top:10px;" onclick="closeModal()">Ýapmak</button>
+    </div>
+</div>
+
+<div id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toast-text"></span>
+</div>
+<div id="results-container" style="padding: 20px 5%; display: none;">
+    <h2 id="results-title">Elinizdäki biletler:</h2>
+    <div id="flights-list"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    // --- ДАННЫЕ И КОНФИГУРАЦИЯ ---
-    const ADMIN_PASS = "sapar2024";
-    let tickets = JSON.parse(localStorage.getItem('myTickets')) || [];
-    let userDocs = JSON.parse(localStorage.getItem('userDocs')) || {fio:'', pass:'', tel:'', mail:''};
+    // Языковые данные
+    const langData = {
+        tk: { title: "HOŞ GELDIŇIZ!", sub: "Aşgabat — dünýäniň gapysy", from: "Nireden", to: "Nirä", date: "Sene", pop: "Meşhur ugurlar", login: "Içeri gir", docs: "Meniň resminamalarym", tickets: "Meniň biletlerim", exit: "Çykmak" },
+        ru: { title: "ДОБРО ПОЖАЛОВАТЬ!", sub: "Ашхабад — ворота мира", from: "Откуда", to: "Куда", date: "Дата", pop: "Популярные направления", login: "Вход", docs: "Мои документы", tickets: "Мои билеты", exit: "Выйти" }
+    };
 
-    // --- ИНИЦИАЛИЗАЦИЯ ---
-    document.addEventListener('DOMContentLoaded', () => {
-        flatpickr("#date-picker", { minDate: "today", dateFormat: "d.m.Y" });
-        renderPopular();
-        if(userDocs.fio) document.getElementById('user-name-text').innerText = userDocs.fio.split(' ')[0];
-    });
-
-    // --- ПОПУЛЯРНЫЕ НАПРАВЛЕНИЯ ---
-    function renderPopular() {
-        const dests = [
-            { f: "Ashgabat (ASB)", t: "Istanbul (IST)", img: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=400" },
-            { f: "Ashgabat (ASB)", t: "Moscow (DME)", img: "https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&w=400" },
-            { f: "Ashgabat (ASB)", t: "Dubai (DXB)", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=400" }
-        ];
-        document.getElementById('popular-grid').innerHTML = dests.map(d => `
-            <div class="dest-card" onclick="setQuickSearch('${d.f}', '${d.t}')">
-                <img src="${d.img}">
-                <p>${d.f} — ${d.t}</p>
-            </div>
-        `).join('');
+    function setLang(l) {
+        document.getElementById('h-title').innerText = langData[l].title;
+        document.getElementById('h-sub').innerText = langData[l].sub;
+        document.getElementById('lbl-from').innerText = langData[l].from;
+        document.getElementById('lbl-to').innerText = langData[l].to;
+        document.getElementById('lbl-date').innerText = langData[l].date;
+        document.getElementById('pop-title').innerText = langData[l].pop;
+        document.getElementById('m-login').innerText = langData[l].login;
+        document.getElementById('m-docs').innerText = langData[l].docs;
+        document.getElementById('m-tickets').innerText = langData[l].tickets;
+        document.getElementById('m-exit').innerText = langData[l].exit;
+        document.getElementById('l-tk').className = l === 'tk' ? 'active' : '';
+        document.getElementById('l-ru').className = l === 'ru' ? 'active' : '';
     }
 
-    function setQuickSearch(f, t) {
-        document.getElementById('from').value = f;
-        document.getElementById('to').value = t;
-        window.scrollTo({ top: 150, behavior: 'smooth' });
+    // Красивый Alert (Toast)
+    function showMsg(text) {
+        const t = document.getElementById('toast');
+        document.getElementById('toast-text').innerText = text;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // --- ПОИСК И ПОКУПКА ---
-    function runSearch() {
-        const f = document.getElementById('from').value;
-        const t = document.getElementById('to').value;
-        const d = document.getElementById('date-picker').value;
-        if(!f || !t) return alert("Şäherleri dolduryň!");
-
-        document.getElementById('popular-grid').style.display = 'none';
-        document.getElementById('sec-title').innerText = "Gözleg netijeleri";
-        
-        document.getElementById('display-area').innerHTML = `
-            <div class="ticket-card">
-                <div style="display:flex; justify-content:space-between; color:var(--main-green); font-weight:bold;">
-                    <span>Turkmenistan Airline</span>
-                    <span>TMT 3360</span>
-                </div>
-                <h3>${f} ➔ ${t}</h3>
-                <p>Sene: ${d || '26.04.2026'} | Reýs: 254</p>
-                <button class="btn-search" style="width:100%" onclick="buyTicket('${f}','${t}','${d || '26.04.2026'}')">SATYN AL (КУПИТЬ)</button>
-            </div>
-        `;
-    }
-
-    function buyTicket(f, t, d) {
-        tickets.push({ route: `${f} - ${t}`, date: d, price: '3360 TMT', id: Date.now() });
-        localStorage.setItem('myTickets', JSON.stringify(tickets));
-        alert("Bilet satyn alyndy!");
-        showSection('tickets');
-    }
-
-    // --- ЛИЧНЫЙ КАБИНЕТ ---
-    function showSection(type) {
-        document.getElementById('popular-grid').style.display = 'none';
-        const area = document.getElementById('display-area');
-        toggleMenu();
-
-        if(type === 'docs') {
-            document.getElementById('sec-title').innerText = "Resminamalarym";
-            area.innerHTML = `
-                <div class="docs-form">
-                    <input type="text" id="d-fio" placeholder="F.I.A." value="${userDocs.fio}">
-                    <input type="text" id="d-pass" placeholder="Pasport seriýa" value="${userDocs.pass}">
-                    <input type="text" id="d-tel" placeholder="Telefon" value="${userDocs.tel}">
-                    <input type="email" id="d-mail" placeholder="E-mail" value="${userDocs.mail}">
-                    <button class="btn-search" onclick="saveDocs()">ÝATDA SAKLA</button>
-                </div>
-            `;
+    // Модальное окно
+    function openLoginModal() { document.getElementById('loginModal').style.display = 'block'; toggleMenu(); }
+    function closeModal() { document.getElementById('loginModal').style.display = 'none'; }
+    
+    function doLogin() {
+        const n = document.getElementById('r-name').value;
+        const s = document.getElementById('r-surname').value;
+        if(n && s) {
+            document.getElementById('prof-label').innerText = n + " " + s.charAt(0) + ".";
+            showMsg("Siz ulgama girdiňiz!");
+            closeModal();
         } else {
-            document.getElementById('sec-title').innerText = "Meniň biletlerim";
-            area.innerHTML = tickets.length ? tickets.map(tk => `
-                <div class="ticket-card">
-                    <b>${tk.route}</b><br><small>${tk.date} | ${tk.price}</small>
-                </div>
-            `).join('') : "<p>Bilet ýok.</p>";
+            showMsg("Ähli ýerleri dolduryň!");
         }
     }
 
-    function saveDocs() {
-        userDocs = {
-            fio: document.getElementById('d-fio').value,
-            pass: document.getElementById('d-pass').value,
-            tel: document.getElementById('d-tel').value,
-            mail: document.getElementById('d-mail').value
-        };
-        localStorage.setItem('userDocs', JSON.stringify(userDocs));
-        alert("Üstünlikli saklandy!");
-        location.reload();
-    }
+    // Поиск и Инструменты
+    flatpickr("#date-picker", { minDate: "today", dateFormat: "d.m.Y" });
+    function toggleMenu() { const m = document.getElementById('profile-menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
+    function fill(f, t) { document.getElementById('from').value = f; document.getElementById('to').value = t; window.scrollTo({top:0, behavior:'smooth'}); }
+    function swap() { const f = document.getElementById('from'), t = document.getElementById('to'); [f.value, t.value] = [t.value, f.value]; }
+    function adminAuth() { if(prompt("Parol:") === "sapar2024") window.location.href="admin.html"; }
 
-    // --- УПРАВЛЕНИЕ ---
-    function toggleMenu() {
-        const m = document.getElementById('profile-menu');
-        m.style.display = m.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function adminLogin() {
-        const p = prompt("Admin parolyny giriziň:");
-        if(p === ADMIN_PASS) window.location.href = "admin.html";
-        else alert("Ýalňyş!");
-    }
-
-    function swapCities() {
-        const f = document.getElementById('from');
-        const t = document.getElementById('to');
-        const b = document.getElementById('swap-icon');
-        b.style.transform = b.style.transform === 'rotate(180deg)' ? 'rotate(0deg)' : 'rotate(180deg)';
-        [f.value, t.value] = [t.value, f.value];
-    }
-
-    function logout() {
-        localStorage.clear();
-        location.reload();
-    }
+    window.onclick = (e) => { if(e.target == document.getElementById('loginModal')) closeModal(); }
 </script>
 </body>
 </html>
