@@ -68,7 +68,7 @@ function setupSuggest(inputId, suggestId) {
         try {
             // Используем официальное API автокомплита Aviasales
             // Оно понимает: "Москва", "Moscow", "MOW", "Aşgabat"
-            const response = await fetch(`https://autocomplete.travelpayouts.com/jcity?locale=ru&types[]=city&term=${encodeURIComponent(val)}`);
+           const response = await fetch(`/api/autocomplete?term=${encodeURIComponent(val)}`);
             const data = await response.json();
 
             box.innerHTML = '';

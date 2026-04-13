@@ -64,7 +64,15 @@ app.post('/api/search-live', async (req, res) => {
 app.get('*', (req, res) => {
  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
-
+app.get('/api/autocomplete', async (req, res) => {
+  try {
+    const { term } = req.query;
+    const response = await axios.get(`https://autocomplete.travelpayouts.com/jcity?locale=ru&types[]=city&term=${encodeURIComponent(term)}`);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: "Ошибка автокомплита" });
+  }
+});
 // Запуск
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
