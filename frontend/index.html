@@ -1,185 +1,13 @@
-<!DOCTYPE html>
-<html lang="tk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPARTM — Onlaýn Biletler</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    
-    <style>
-        :root { --main-green: #008755; --dark: #333; --light: #f4f4f4; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); color: var(--dark); overflow-x: hidden; }
-        
-        /* Header & Logo */
-        header { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
-        .logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; }
-        .logo-icon { background: var(--main-green); color: white; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 20px; }
-        .logo-text { font-size: 22px; font-weight: 800; color: var(--main-green); }
-
-        /* Языки и Профиль */
-        .nav-right { display: flex; align-items: center; gap: 20px; }
-        .lang-switcher { font-weight: bold; font-size: 14px; }
-        .lang-switcher span { cursor: pointer; color: #888; padding: 2px 5px; transition: 0.3s; }
-        .lang-switcher span.active { color: var(--main-green); border-bottom: 2px solid var(--main-green); }
-        
-        .profile-wrapper { position: relative; }
-        .btn-profile { background: white; border: 1px solid #ddd; padding: 6px 16px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 15px; }
-
-        /* Меню */
-        .dropdown-card { position: absolute; right: 0; top: 48px; background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); width: 250px; display: none; z-index: 1000; overflow: hidden; border: 1px solid #eee; }
-        .menu-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: var(--dark); transition: 0.2s; font-size: 14px; }
-        .menu-item:hover { background: #f8f8f8; color: var(--main-green); }
-        .menu-item i { width: 18px; text-align: center; color: #555; }
-        .admin-text { color: #d32f2f !important; font-weight: bold; }
-
-        /* Поиск */
-        .hero { background: var(--main-green); color: white; padding: 50px 5% 80px; text-align: center; }
-        .search-card { background: white; margin: -50px auto 30px; padding: 25px; border-radius: 20px; display: flex; gap: 15px; max-width: 1000px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); align-items: flex-end; flex-wrap: wrap; }
-        .field { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 6px; }
-        .field label { font-size: 11px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
-        .field input { padding: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 15px; width: 100%; box-sizing: border-box; background: #fafafa; outline: none; transition: 0.3s; }
-        .field input:focus { border-color: var(--main-green); background: white; }
-        .swap-btn { background: #f0f0f0; border: none; width: 45px; height: 45px; border-radius: 10px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; color: var(--main-green); margin-bottom: 2px; }
-        .btn-search { background: var(--main-green); color: white; border: none; padding: 14px 40px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; box-shadow: 0 4px 15px rgba(0, 135, 85, 0.3); }
-        .btn-search:hover { background: #006b44; transform: translateY(-2px); }
-
-        /* Регистрация Модал */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-content { background: white; margin: 8% auto; padding: 30px; border-radius: 20px; width: 380px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: zoomIn 0.3s ease-out; }
-        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-content h3 { margin: 0 0 20px; color: var(--main-green); text-align: center; }
-        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 14px; outline: none; }
-        .modal-content input:focus { border-color: var(--main-green); }
-
-        /* Красивое уведомление (Toast) вместо Alert */
-        #toast { position: fixed; bottom: 30px; right: 30px; background: #333; color: white; padding: 15px 25px; border-radius: 12px; display: flex; align-items: center; gap: 10px; transform: translateX(150%); transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-left: 5px solid var(--main-green); }
-        #toast.show { transform: translateX(0); }
-
-        /* Популярные */
-        .popular-section { padding: 40px 5%; max-width: 1100px; margin: 0 auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; }
-        .dest-card { background: white; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; }
-        .dest-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
-        .dest-card img { width: 100%; height: 160px; object-fit: cover; }
-        .dest-card p { padding: 15px; font-weight: bold; margin: 0; text-align: center; }
-    </style>
-</head>
-<body>
-
-<header>
-    <a href="index.html" class="logo-container">
-        <div class="logo-icon">S</div>
-        <div class="logo-text">SAPARTM</div>
-    </a>
-    <div class="nav-right">
-        <div class="lang-switcher">
-            <span id="l-tk" class="active" onclick="setLang('tk')">TM</span> | 
-            <span id="l-ru" onclick="setLang('ru')">RU</span>
-        </div>
-        <div class="profile-wrapper">
-            <button class="btn-profile" onclick="toggleMenu()">
-                <div style="background:var(--main-green); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">?</div>
-                <span id="prof-label">Profil</span>
-            </button>
-            <div class="dropdown-card" id="profile-menu">
-                <div class="menu-item" onclick="openLoginModal()"><i class="fas fa-sign-in-alt"></i> <span id="m-login">Içeri gir (Вход)</span></div>
-                <div class="menu-item" onclick="showMsg('Bölüm ýakyn wagtda açylar')"><i class="fas fa-id-card"></i> <span id="m-docs">Meniň resminamalarym</span></div>
-                <div class="menu-item" onclick="showMsg('Biletleriňiz ýok')"><i class="fas fa-ticket-alt"></i> <span id="m-tickets">Meniň biletlerim</span></div>
-                <div class="menu-item admin-text" onclick="adminAuth()"><i class="fas fa-user-shield"></i> <span>Admin Paneli</span></div>
-                <hr style="border:0; border-top:1px solid #eee; margin:0;">
-                <div class="menu-item" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> <span id="m-exit">Çykmak</span></div>
-            </div>
-        </div>
-    </div>
-</header>
-
-<div class="hero">
-    <h1 id="h-title">HOŞ GELDIŇIZ!</h1>
-    <p id="h-sub">Aşgabat — dünýäniň gapysy</p>
-</div>
-
-<div class="search-card">
-    <div class="field">
-        <label id="lbl-from">Nireden</label>
-        <input type="text" id="from" placeholder="Ashgabat (ASB)">
-    </div>
-    <button class="swap-btn" onclick="swap()"><i class="fas fa-exchange-alt"></i></button>
-    <div class="field">
-        <label id="lbl-to">Nirä</label>
-        <input type="text" id="to" placeholder="Istanbul (IST)">
-    </div>
-    <div class="field">
-        <label id="lbl-date">Sene</label>
-        <input type="text" id="date-picker" placeholder="Saýlaň...">
-    </div>
-    <button class="btn-search" onclick="showMsg('Gözleg başlandy...')">GÖZLEG</button>
-</div>
-
-<div class="popular-section">
-    <h2 id="pop-title" style="text-align:center; margin-bottom:30px;">Meşhur ugurlar</h2>
-    <div class="grid">
-        <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Istanbul (IST)')">
-            <img src="IMG/ist.jpg"><p>Ashgabat — Istanbul (IST)</p>
-        </div>
-        <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Moscow (DME)')">
-            <img src="IMG/mow.jpg"><p>Ashgabat — Moscow (DME)</p>
-        </div>
-        <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Dubai (DXB)')">
-            <img src="IMG/dxb.jpg"><p>Ashgabat — Dubai (DXB)</p>
-        </div>
-        <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Kazan (KZN)')">
-            <img src="IMG/kzn.jpg"><p>Ashgabat — Kazan (KZN)</p>
-        </div>
-    </div>
-</div>
-
-<div id="loginModal" class="modal">
-    <div class="modal-content">
-        <h3>Içeri gir (Вход)</h3>
-        <input type="text" id="r-name" placeholder="Adyňyz (Имя)">
-        <input type="text" id="r-surname" placeholder="Familiýaňyz (Фамилия)">
-        <input type="email" id="r-mail" placeholder="E-mail">
-        <input type="tel" id="r-tel" placeholder="Telefon (+993...)">
-        <button class="btn-search" style="width:100%; margin-top:10px;" onclick="doLogin()">Girmek</button>
-        <button class="btn-search" style="width:100%; background:#888; margin-top:10px;" onclick="closeModal()">Ýapmak</button>
-    </div>
-</div>
-
-<div id="toast">
-    <i class="fas fa-check-circle"></i>
-    <span id="toast-text"></span>
-</div>
-<div id="results-container" style="padding: 20px 5%; display: none;">
-    <h2 id="results-title">Elinizdäki biletler:</h2>
-    <div id="flights-list"></div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    // Языковые данные
-    const langData = {
-        tk: { title: "HOŞ GELDIŇIZ!", sub: "Aşgabat — dünýäniň gapysy", from: "Nireden", to: "Nirä", date: "Sene", pop: "Meşhur ugurlar", login: "Içeri gir", docs: "Meniň resminamalarym", tickets: "Meniň biletlerim", exit: "Çykmak" },
-        ru: { title: "ДОБРО ПОЖАЛОВАТЬ!", sub: "Ашхабад — ворота мира", from: "Откуда", to: "Куда", date: "Дата", pop: "Популярные направления", login: "Вход", docs: "Мои документы", tickets: "Мои билеты", exit: "Выйти" }
-    };
-
-    function setLang(l) {
-        document.getElementById('h-title').innerText = langData[l].title;
-        document.getElementById('h-sub').innerText = langData[l].sub;
-        document.getElementById('lbl-from').innerText = langData[l].from;
-        document.getElementById('lbl-to').innerText = langData[l].to;
-        document.getElementById('lbl-date').innerText = langData[l].date;
-        document.getElementById('pop-title').innerText = langData[l].pop;
-        document.getElementById('m-login').innerText = langData[l].login;
-        document.getElementById('m-docs').innerText = langData[l].docs;
-        document.getElementById('m-tickets').innerText = langData[l].tickets;
-        document.getElementById('m-exit').innerText = langData[l].exit;
-        document.getElementById('l-tk').className = l === 'tk' ? 'active' : '';
-        document.getElementById('l-ru').className = l === 'ru' ? 'active' : '';
-    }
-
-    // Красивый Alert (Toast)
+    // 1. Инициализация календаря (Важно: формат Y-m-d для API)
+    flatpickr("#date-picker", { 
+        minDate: "today", 
+        dateFormat: "Y-m-d",
+        defaultDate: new Date()
+    });
+<button class="btn-search">GÖZLEG</button>
+    // 2. Красивое уведомление (Toast)
     function showMsg(text) {
         const t = document.getElementById('toast');
         document.getElementById('toast-text').innerText = text;
@@ -187,30 +15,92 @@
         setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // Модальное окно
-    function openLoginModal() { document.getElementById('loginModal').style.display = 'block'; toggleMenu(); }
-    function closeModal() { document.getElementById('loginModal').style.display = 'none'; }
-    
-    function doLogin() {
-        const n = document.getElementById('r-name').value;
-        const s = document.getElementById('r-surname').value;
-        if(n && s) {
-            document.getElementById('prof-label').innerText = n + " " + s.charAt(0) + ".";
-            showMsg("Siz ulgama girdiňiz!");
-            closeModal();
-        } else {
-            showMsg("Ähli ýerleri dolduryň!");
+    // 3. Главная функция поиска (Связь с твоим Бэкендом)
+    async function findTickets() {
+        // Извлекаем IATA код из строки (например "Ashgabat (ASB)" -> "ASB")
+        const fromRaw = document.getElementById('from').value;
+        const toRaw = document.getElementById('to').value;
+        const date = document.getElementById('date-picker').value;
+
+        const extractIATA = (str) => {
+            const match = str.match(/\((.*?)\)/);
+            return match ? match[1] : str;
+        };
+
+        const origin = extractIATA(fromRaw).toUpperCase();
+        const destination = extractIATA(toRaw).toUpperCase();
+
+        if (!origin || !destination || !date) {
+            showMsg("Maglumatlary dolduryň!");
+            return;
+        }
+
+        showMsg("Gözleg başlandy...");
+        
+        const resultsDiv = document.getElementById('results-container');
+        const listDiv = document.getElementById('flights-list');
+
+        try {
+            // Запрос к твоему Node.js серверу
+            const response = await fetch('/api/search-live', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ origin, destination, date })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.tickets.length > 0) {
+                resultsDiv.style.display = 'block';
+                listDiv.innerHTML = data.tickets.map(t => `
+                    <div style="background:white; padding:20px; border-radius:15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #008755;">
+                        <div>
+                            <strong style="font-size:18px;">${t.origin} ✈ ${t.destination}</strong><br>
+                            <span style="color:#666; font-size:13px;">Reýs: ${t.flight_number} | Kompaniýa: ${t.airline}</span><br>
+                            <small>Sene: ${new Date(t.departure_at).toLocaleString()}</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="color:#008755; font-weight:bold; font-size:22px;">${t.price} RUB</span><br>
+                            <button class="btn-search" style="padding:10px 20px; font-size:14px; margin-top:10px;" onclick="buyTicket('${t.origin}-${t.destination}', '${t.price} RUB')">SATYN AL</button>
+                        </div>
+                    </div>
+                `).join('');
+                resultsDiv.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                showMsg("Reýs tapylmady.");
+                resultsDiv.style.display = 'none';
+            }
+        } catch (err) {
+            console.error(err);
+            showMsg("Сервер недоступен");
         }
     }
 
-    // Поиск и Инструменты
-    flatpickr("#date-picker", { minDate: "today", dateFormat: "d.m.Y" });
-    function toggleMenu() { const m = document.getElementById('profile-menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
-    function fill(f, t) { document.getElementById('from').value = f; document.getElementById('to').value = t; window.scrollTo({top:0, behavior:'smooth'}); }
-    function swap() { const f = document.getElementById('from'), t = document.getElementById('to'); [f.value, t.value] = [t.value, f.value]; }
-    function adminAuth() { if(prompt("Parol:") === "sapar2024") window.location.href="admin.html"; }
+    // 4. Логика покупки (сохранение в LocalStorage)
+    function buyTicket(route, price) {
+        let tickets = JSON.parse(localStorage.getItem('myTickets') || '[]');
+        tickets.push({ route, price, date: new Date().toLocaleDateString(), id: Date.now() });
+        localStorage.setItem('myTickets', JSON.stringify(tickets));
+        showMsg("Bilet satyn alyndy!");
+    }
 
-    window.onclick = (e) => { if(e.target == document.getElementById('loginModal')) closeModal(); }
+    // 5. Вспомогательные функции
+    function swap() {
+        const f = document.getElementById('from'), t = document.getElementById('to');
+        [f.value, t.value] = [t.value, f.value];
+    }
+
+    function fill(f, t) {
+        document.getElementById('from').value = f;
+        document.getElementById('to').value = t;
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function toggleMenu() {
+        const m = document.getElementById('profile-menu');
+        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Привязываем функцию к кнопке в HTML
+    document.querySelector('.btn-search').onclick = findTickets;
 </script>
-</body>
-</html>
