@@ -1,30 +1,31 @@
 const express = require('express');
 const path = require('path');
 const axios = require('axios');
-const cors = require('cors');
+const cors = require('cors'); // Добавлено для работы запросов
 require('dotenv').config();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
 // Раздаем статику из папки frontend
 app.use(express.static(path.join(__dirname, 'frontend')));
 
-// 1. Автокомплит городов (через сервер, чтобы не было CORS Error)
+// 1. Маршрут для автокомплита (решает проблему CORS)
 app.get('/api/autocomplete', async (req, res) => {
     try {
         const { term } = req.query;
         const response = await axios.get(`https://autocomplete.travelpayouts.com/jcity`, {
             params: { locale: 'ru', types: ['city'], term: term }
         });
-        res.json(response.data);
+        res.json(data = response.data);
     } catch (error) {
-        res.status(500).json({ error: "Ошибка подсказок" });
+        res.status(500).json({ error: "Ошибка автокомплита" });
     }
 });
 
-// 2. Поиск билетов
+// 2. Маршрут для поиска билетов
 app.post('/api/search-live', async (req, res) => {
     const { origin, destination, date } = req.body;
     const TOKEN = process.env.TRAVELPAYOUTS_TOKEN || "23a9b11bc2672f0692432adc75cfc003";
@@ -38,19 +39,95 @@ app.post('/api/search-live', async (req, res) => {
                 unique: 'false',
                 sorting: 'price',
                 currency: 'rub',
+                limit: 30,
                 token: TOKEN
             }
         });
         res.json({ success: true, tickets: response.data.data || [] });
     } catch (error) {
-        res.status(500).json({ success: false, error: "Ошибка API" });
+        res.status(500).json({ success: false, error: "Ошибка поиска" });
     }
 });
 
-// SPA поддержка
+// Всегда отдаем index.html для любых путей
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
+app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));
+
+// Настройки
+app.use(cors()); // Разрешаем кросс-доменные запросы
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'frontend')));
+
+// API Маршрут
+app.post('/api/search-live', async (req, res) => {
+ const { origin, destination, date } = req.body;
+ 
+ // Используем токен из .env или системный
+ const TOKEN = process.env.TRAVELPAYOUTS_TOKEN || "23a9b11bc2672f0692432adc75cfc003";
+
+ // Проверка входных данных
+ if (!origin || !destination || !date) {
+ return res.status(400).json({ error: "Отсутствуют обязательные параметры (origin, destination, date)" });
+ }
+
+ try {
+ console.log(`🔎 Поиск: ${origin} -> ${destination} на ${date}`);
+
+ const response = await axios.get('https://api.travelpayouts.com/aviasales/v3/prices_for_dates', {
+ params: {
+ origin: origin.toUpperCase(),
+ destination: destination.toUpperCase(),
+ departure_at: date, // Ожидается формат YYYY-MM или YYYY-MM-DD
+ unique: 'false',
+ sorting: 'price',
+ direct: 'false',
+ currency: 'rub', // Можно сменить на 'usd' для стабильности
+ limit: 30,
+ token: TOKEN
+ },
+ timeout: 10000 // Ждем ответ не более 10 секунд
+ });
+
+ // Отправляем данные фронтенду
+ res.json({ 
+ success: true,
+ tickets: response.data.data || [] 
+ });
+
+
+ } catch (error) {
+ console.error("❌ Ошибка API Aviasales:", error.response?.data || error.message);
+ 
+// Отправляем понятную ошибку клиенту
+ res.status(500).json({ 
+ success: false,
+ error: "Не удалось получить данные от авиакомпаний",
+ details: error.response?.data?.message || error.message
+ });
+ }
+});
+
+// Для всех остальных запросов отдаем index.html (SPA поддержка)
+app.get('*', (req, res) => {
+ res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+});
+app.get('/api/autocomplete', async (req, res) => {
+  try {
+    const { term } = req.query;
+    const response = await axios.get(`https://autocomplete.travelpayouts.com/jcity?locale=ru&types[]=city&term=${encodeURIComponent(term)}`);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: "Ошибка автокомплита" });
+  }
+});
+// Запуск
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Сервер запущен на порту ${PORT}`));
+app.listen(PORT, () => {
+ console.log(`----------------------------------`);
+ console.log(`🚀 SAPAR Server running on port ${PORT}`);
+ console.log(`📂 Static files: ${path.join(__dirname, 'frontend')}`);
+ console.log(`----------------------------------`);
+});
