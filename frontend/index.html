@@ -1,47 +1,50 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script>
     // 1. Инициализация календаря (Важно: формат Y-m-d для API)
     flatpickr("#date-picker", { 
         minDate: "today", 
-        dateFormat: "Y-m-d",
-        defaultDate: new Date()
+        dateFormat: "Y-m-d", 
+        defaultDate: "2026-04-26" 
     });
-<button class="btn-search">GÖZLEG</button>
-    // 2. Красивое уведомление (Toast)
+
+    // 2. Уведомления (Toast)
     function showMsg(text) {
         const t = document.getElementById('toast');
-        document.getElementById('toast-text').innerText = text;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
+        const txt = document.getElementById('toast-text');
+        if (t && txt) {
+            txt.innerText = text;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        } else {
+            alert(text); // Резервный вариант, если тост не найден
+        }
     }
 
-    // 3. Главная функция поиска (Связь с твоим Бэкендом)
+    // 3. Главная функция поиска (Связь с Backend)
     async function findTickets() {
-        // Извлекаем IATA код из строки (например "Ashgabat (ASB)" -> "ASB")
-        const fromRaw = document.getElementById('from').value;
-        const toRaw = document.getElementById('to').value;
+        // Извлекаем только IATA коды (напр. "ASB") из полей
+        const fromInput = document.getElementById('from').value.trim();
+        const toInput = document.getElementById('to').value.trim();
         const date = document.getElementById('date-picker').value;
 
-        const extractIATA = (str) => {
+        // Функция для очистки текста, если там есть "(ASB)"
+        const getIata = (str) => {
             const match = str.match(/\((.*?)\)/);
-            return match ? match[1] : str;
+            return match ? match[1].toUpperCase() : str.toUpperCase();
         };
 
-        const origin = extractIATA(fromRaw).toUpperCase();
-        const destination = extractIATA(toRaw).toUpperCase();
+        const origin = getIata(fromInput);
+        const destination = getIata(toInput);
 
         if (!origin || !destination || !date) {
-            showMsg("Maglumatlary dolduryň!");
+            showMsg("Ähli maglumatlary dolduryň!");
             return;
         }
 
-        showMsg("Gözleg başlandy...");
-        
-        const resultsDiv = document.getElementById('results-container');
-        const listDiv = document.getElementById('flights-list');
+        showMsg("Gözleg başlandy..."); //
 
         try {
-            // Запрос к твоему Node.js серверу
             const response = await fetch('/api/search-live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -50,33 +53,38 @@
 
             const data = await response.json();
 
-            if (data.success && data.tickets.length > 0) {
-                resultsDiv.style.display = 'block';
-                listDiv.innerHTML = data.tickets.map(t => `
-                    <div style="background:white; padding:20px; border-radius:15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #008755;">
-                        <div>
-                            <strong style="font-size:18px;">${t.origin} ✈ ${t.destination}</strong><br>
-                            <span style="color:#666; font-size:13px;">Reýs: ${t.flight_number} | Kompaniýa: ${t.airline}</span><br>
-                            <small>Sene: ${new Date(t.departure_at).toLocaleString()}</small>
+            const resultsContainer = document.getElementById('results-container');
+            const list = document.getElementById('flights-list');
+
+            if (data.success && data.tickets && data.tickets.length > 0) {
+                resultsContainer.style.display = 'block';
+                list.innerHTML = data.tickets.map(t => `
+                    <div class="ticket-card" style="background:white; padding:20px; border-radius:15px; margin-bottom:10px; border-left:5px solid #008755; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                        <div style="display:flex; justify-content:space-between;">
+                            <b>${t.origin} ✈ ${t.destination}</b>
+                            <b style="color:#008755; font-size:18px;">${t.price} RUB</b>
                         </div>
-                        <div style="text-align:right;">
-                            <span style="color:#008755; font-weight:bold; font-size:22px;">${t.price} RUB</span><br>
-                            <button class="btn-search" style="padding:10px 20px; font-size:14px; margin-top:10px;" onclick="buyTicket('${t.origin}-${t.destination}', '${t.price} RUB')">SATYN AL</button>
+                        <div style="font-size:12px; color:#666; margin-top:5px;">
+                            Reýs: ${t.flight_number} | Sene: ${new Date(t.departure_at).toLocaleString()}
                         </div>
+                        <button class="btn-search" style="margin-top:10px; padding:8px 15px; font-size:14px;" 
+                                onclick="buyTicket('${t.origin}-${t.destination}', '${t.price} RUB')">
+                            Satyn al
+                        </button>
                     </div>
                 `).join('');
-                resultsDiv.scrollIntoView({ behavior: 'smooth' });
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
             } else {
                 showMsg("Reýs tapylmady.");
-                resultsDiv.style.display = 'none';
+                resultsContainer.style.display = 'none';
             }
-        } catch (err) {
-            console.error(err);
-            showMsg("Сервер недоступен");
+        } catch (error) {
+            showMsg("Сервер ýalňyşlygy");
+            console.error("Fetch error:", error);
         }
     }
 
-    // 4. Логика покупки (сохранение в LocalStorage)
+    // 4. Логика покупки
     function buyTicket(route, price) {
         let tickets = JSON.parse(localStorage.getItem('myTickets') || '[]');
         tickets.push({ route, price, date: new Date().toLocaleDateString(), id: Date.now() });
@@ -84,7 +92,7 @@
         showMsg("Bilet satyn alyndy!");
     }
 
-    // 5. Вспомогательные функции
+    // 5. Вспомогательные функции (Меню, Обмен городов)
     function swap() {
         const f = document.getElementById('from'), t = document.getElementById('to');
         [f.value, t.value] = [t.value, f.value];
@@ -97,10 +105,17 @@
     }
 
     function toggleMenu() {
-        const m = document.getElementById('profile-menu');
-        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+        const m = document.getElementById('profile-menu'); //
+        if (m) m.style.display = m.style.display === 'block' ? 'none' : 'block';
     }
 
-    // Привязываем функцию к кнопке в HTML
-    document.querySelector('.btn-search').onclick = findTickets;
+    function adminAuth() {
+        if(prompt("Parol:") === "sapar2024") window.location.href="admin.html";
+    }
+
+    // Привязка поиска к кнопке
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchBtn = document.querySelector('.btn-search');
+        if (searchBtn) searchBtn.onclick = findTickets;
+    });
 </script>

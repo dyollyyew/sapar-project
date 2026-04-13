@@ -17,7 +17,8 @@ function renderPopular() {
     const dests = [
         { f: "Ashgabat (ASB)", t: "Istanbul (IST)", img: "IMG/ist.jpg" },
         { f: "Ashgabat (ASB)", t: "Moscow (DME)", img: "IMG/mow.jpg" },
-        { f: "Ashgabat (ASB)", t: "Dubai (DXB)", img: "IMG/dxb.jpg" }
+        { f: "Ashgabat (ASB)", t: "Dubai (DXB)", img: "IMG/dxb.jpg" },
+        { f: "Ashgabat (ASB)", t: "Kazan (KZN)", img: "IMG/kzn.jpg" }
     ];
     const grid = document.getElementById('popular-grid');
     grid.innerHTML = dests.map(d => `
