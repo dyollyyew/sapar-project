@@ -51,38 +51,65 @@ function changeLang(lang) {
 }
 
 // 3. Подсказки городов
+// Улучшенная функция подсказок: понимает латиницу, кириллицу и любые города мира
 function setupSuggest(inputId, suggestId) {
     const input = document.getElementById(inputId);
     const box = document.getElementById(suggestId);
     
     input.oninput = async () => {
-    const val = input.value.toLowerCase().trim();
-    if (val.length < 2) { box.style.display = 'none'; return; }
-
-    try {
-        // Бесплатное API автокомплита Aviasales (не требует токена для подсказок)
-        const res = await fetch(`https://autocomplete.travelpayouts.com/jcity?locale=${currentLang}&types[]=city&term=${val}`);
-        const data = await res.json();
-
-        box.innerHTML = '';
-        if (data.length > 0) {
-            box.style.display = 'block';
-            data.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'suggest-item';
-                // item.name — название города, item.code — IATA код
-                div.innerHTML = `<strong>${item.name}</strong> <span style="color: #888;">${item.code}</span>`;
-                div.onclick = () => {
-                    input.value = `${item.name} (${item.code})`;
-                    box.style.display = 'none';
-                };
-                box.appendChild(div);
-            });
+        const val = input.value.trim();
+        
+        // Начинаем поиск, если введено хотя бы 2 символа
+        if (val.length < 2) { 
+            box.style.display = 'none'; 
+            return; 
         }
-    } catch (e) {
-        console.log("Ошибка автокомплита");
-    }
-};
+
+        try {
+            // Запрос к официальному API автокомплита (бесплатно, без токена)
+            // locale=ru подтянет названия на русском, но понимает ввод на любом языке
+            const response = await fetch(`https://autocomplete.travelpayouts.com/jcity?locale=ru&types[]=city&term=${encodeURIComponent(val)}`);
+            const data = await response.json();
+
+            box.innerHTML = '';
+            
+            if (data && data.length > 0) {
+                box.style.display = 'block';
+                
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'suggest-item';
+                    
+                    // Формируем красивую строку: "Москва (MOW)"
+                    // Используем item.name (название) и item.code (IATA код)
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>${item.name}</span>
+                            <span style="color: #008755; font-weight: bold; font-size: 12px; background: #e6f3ee; padding: 2px 6px; border-radius: 4px;">
+                                ${item.code}
+                            </span>
+                        </div>
+                    `;
+                    
+                    div.onclick = () => {
+                        // Подставляем в инпут формат, который твоя функция runSearch умеет читать: "Название (CODE)"
+                        input.value = `${item.name} (${item.code})`;
+                        box.style.display = 'none';
+                    };
+                    box.appendChild(div);
+                });
+            } else {
+                box.style.display = 'none';
+            }
+        } catch (error) {
+            console.error("Ошибка автокомплита:", error);
+        }
+    };
+
+    // Закрываем список при клике вне его
+    document.addEventListener('click', (e) => {
+        if (e.target !== input) box.style.display = 'none';
+    });
 }
 setupSuggest('from', 'suggest-from');
 setupSuggest('to', 'suggest-to');
