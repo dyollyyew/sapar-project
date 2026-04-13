@@ -59,15 +59,15 @@ function setupSuggest(inputId, suggestId) {
     input.oninput = async () => {
         const val = input.value.trim();
         
-        // Начинаем поиск, если введено хотя бы 2 символа
+        // Начинаем поиск от 2-х символов
         if (val.length < 2) { 
             box.style.display = 'none'; 
             return; 
         }
 
         try {
-            // Запрос к официальному API автокомплита (бесплатно, без токена)
-            // locale=ru подтянет названия на русском, но понимает ввод на любом языке
+            // Используем официальное API автокомплита Aviasales
+            // Оно понимает: "Москва", "Moscow", "MOW", "Aşgabat"
             const response = await fetch(`https://autocomplete.travelpayouts.com/jcity?locale=ru&types[]=city&term=${encodeURIComponent(val)}`);
             const data = await response.json();
 
@@ -80,11 +80,10 @@ function setupSuggest(inputId, suggestId) {
                     const div = document.createElement('div');
                     div.className = 'suggest-item';
                     
-                    // Формируем красивую строку: "Москва (MOW)"
-                    // Используем item.name (название) и item.code (IATA код)
+                    // item.name подстроится под язык ввода (кириллица/латиница)
                     div.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>${item.name}</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px;">
+                            <span style="font-weight:500;">${item.name}</span>
                             <span style="color: #008755; font-weight: bold; font-size: 12px; background: #e6f3ee; padding: 2px 6px; border-radius: 4px;">
                                 ${item.code}
                             </span>
@@ -92,7 +91,7 @@ function setupSuggest(inputId, suggestId) {
                     `;
                     
                     div.onclick = () => {
-                        // Подставляем в инпут формат, который твоя функция runSearch умеет читать: "Название (CODE)"
+                        // Важно: сохраняем формат "Город (КОД)", чтобы runSearch мог вырезать код
                         input.value = `${item.name} (${item.code})`;
                         box.style.display = 'none';
                     };
@@ -106,7 +105,7 @@ function setupSuggest(inputId, suggestId) {
         }
     };
 
-    // Закрываем список при клике вне его
+    // Закрываем подсказки при клике в любое другое место
     document.addEventListener('click', (e) => {
         if (e.target !== input) box.style.display = 'none';
     });
