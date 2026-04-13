@@ -127,10 +127,11 @@ async function runSearch() {
                         ${t.origin} <span style="color:#008755;">✈</span> ${t.destination}
                         <small style="font-weight:normal; font-size:14px; color:#666; margin-left:10px;">${new Date(t.departure_at).toLocaleDateString()}</small>
                     </div>
-                    <div style="display:flex; justify-content:flex-end; align-items:center; gap:20px;">
-                        <div style="font-size:24px; font-weight:bold; color:#008755;">${price} RUB</div>
-                        <button class="btn-search" style="height:40px; padding:0 20px;">${dict[currentLang].buy}</button>
-                    </div>
+                  <button onclick="buyTicket('${t.origin}', '${t.destination}', ${price})" 
+        class="btn-search" 
+        style="height:40px; padding:0 20px; text-transform:uppercase;">
+    ${dict[currentLang].buy}
+</button>
                 </div>`;
             });
         } else {
@@ -184,4 +185,15 @@ function showToast(msg) {
     document.getElementById('toast-msg').innerText = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
+}
+function buyTicket(origin, destination, price) {
+    // Имитация логики покупки
+    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+    const name = userData.name || "Yolagçy";
+
+    // Выводим красивое сообщение
+    alert(`Sargyt kabul edildi!\n\nYolagçy: ${name}\nUgur: ${origin} — ${destination}\nBahasy: ${price} RUB\n\nAdmin size tiz wagtda jaň eder!`);
+    
+    // Можно также показать тост
+    showToast(currentLang === 'tk' ? "Sargyt kabul edildi!" : "Заказ принят!");
 }
