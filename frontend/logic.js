@@ -52,64 +52,43 @@ function changeLang(lang) {
 
 // 3. Подсказки городов
 // Улучшенная функция подсказок: понимает латиницу, кириллицу и любые города мира
+
+
 function setupSuggest(inputId, suggestId) {
     const input = document.getElementById(inputId);
     const box = document.getElementById(suggestId);
     
     input.oninput = async () => {
         const val = input.value.trim();
-        
-        // Начинаем поиск от 2-х символов
-        if (val.length < 2) { 
-            box.style.display = 'none'; 
-            return; 
-        }
+        if (val.length < 2) { box.style.display = 'none'; return; }
 
         try {
-            // Используем официальное API автокомплита Aviasales
-            // Оно понимает: "Москва", "Moscow", "MOW", "Aşgabat"
-           const response = await fetch(`/api/autocomplete?term=${encodeURIComponent(val)}`);
+            // Запрос идет к ТВОЕМУ серверу
+            const response = await fetch(`/api/autocomplete?term=${encodeURIComponent(val)}`);
             const data = await response.json();
 
             box.innerHTML = '';
-            
             if (data && data.length > 0) {
                 box.style.display = 'block';
-                
                 data.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'suggest-item';
-                    
-                    // item.name подстроится под язык ввода (кириллица/латиница)
                     div.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px;">
-                            <span style="font-weight:500;">${item.name}</span>
-                            <span style="color: #008755; font-weight: bold; font-size: 12px; background: #e6f3ee; padding: 2px 6px; border-radius: 4px;">
-                                ${item.code}
-                            </span>
-                        </div>
-                    `;
-                    
+                        <div style="display:flex; justify-content:space-between; padding:10px;">
+                            <span>${item.name}</span>
+                            <span style="color:#008755; font-weight:bold;">${item.code}</span>
+                        </div>`;
                     div.onclick = () => {
-                        // Важно: сохраняем формат "Город (КОД)", чтобы runSearch мог вырезать код
                         input.value = `${item.name} (${item.code})`;
                         box.style.display = 'none';
                     };
                     box.appendChild(div);
                 });
-            } else {
-                box.style.display = 'none';
             }
-        } catch (error) {
-            console.error("Ошибка автокомплита:", error);
-        }
+        } catch (e) { console.error("Suggest error", e); }
     };
-
-    // Закрываем подсказки при клике в любое другое место
-    document.addEventListener('click', (e) => {
-        if (e.target !== input) box.style.display = 'none';
-    });
 }
+
 setupSuggest('from', 'suggest-from');
 setupSuggest('to', 'suggest-to');
 
