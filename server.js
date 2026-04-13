@@ -47,7 +47,6 @@ app.post('/api/search-live', async (req, res) => {
  tickets: response.data.data || [] 
  });
 
- console.log("tickets", tickets)
 
  } catch (error) {
  console.error("❌ Ошибка API Aviasales:", error.response?.data || error.message);

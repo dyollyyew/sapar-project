@@ -55,33 +55,34 @@ function setupSuggest(inputId, suggestId) {
     const input = document.getElementById(inputId);
     const box = document.getElementById(suggestId);
     
-    input.oninput = () => {
-        const val = input.value.toLowerCase();
-        box.innerHTML = '';
-        if(!val || val.length < 1) { box.style.display = 'none'; return; }
-        
-        const filtered = cities.filter(c => 
-            c.name.toLowerCase().includes(val) || 
-            c.ru.toLowerCase().includes(val) || 
-            c.code.toLowerCase().includes(val)
-        );
+    input.oninput = async () => {
+    const val = input.value.toLowerCase().trim();
+    if (val.length < 2) { box.style.display = 'none'; return; }
 
-        if(filtered.length > 0) {
+    try {
+        // Бесплатное API автокомплита Aviasales (не требует токена для подсказок)
+        const res = await fetch(`https://autocomplete.travelpayouts.com/jcity?locale=${currentLang}&types[]=city&term=${val}`);
+        const data = await res.json();
+
+        box.innerHTML = '';
+        if (data.length > 0) {
             box.style.display = 'block';
-            filtered.forEach(c => {
+            data.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'suggest-item';
-                const fullName = currentLang === 'tk' ? c.name : c.ru;
-                div.innerText = `${fullName} (${c.code})`;
+                // item.name — название города, item.code — IATA код
+                div.innerHTML = `<strong>${item.name}</strong> <span style="color: #888;">${item.code}</span>`;
                 div.onclick = () => {
-                    input.value = `${fullName} (${c.code})`;
+                    input.value = `${item.name} (${item.code})`;
                     box.style.display = 'none';
                 };
                 box.appendChild(div);
             });
         }
-    };
-    document.addEventListener('click', (e) => { if (e.target !== input) box.style.display = 'none'; });
+    } catch (e) {
+        console.log("Ошибка автокомплита");
+    }
+};
 }
 setupSuggest('from', 'suggest-from');
 setupSuggest('to', 'suggest-to');
