@@ -127,11 +127,11 @@ async function runSearch() {
                         ${t.origin} <span style="color:#008755;">✈</span> ${t.destination}
                         <small style="font-weight:normal; font-size:14px; color:#666; margin-left:10px;">${new Date(t.departure_at).toLocaleDateString()}</small>
                     </div>
-                  <button onclick="buyTicket('${t.origin}', '${t.destination}', ${price})" 
-        class="btn-search" 
-        style="height:40px; padding:0 20px; text-transform:uppercase;">
-    ${dict[currentLang].buy}
-</button>
+                 <button onclick="buyTicket('${t.origin}', '${t.destination}', '${date}')" 
+            class="btn-search" 
+            style="height:40px; padding:0 20px;">
+        ${dict[currentLang].buy}
+    </button>
                 </div>`;
             });
         } else {
@@ -186,14 +186,16 @@ function showToast(msg) {
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
 }
-function buyTicket(origin, destination, price) {
-    // Имитация логики покупки
-    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-    const name = userData.name || "Yolagçy";
-
-    // Выводим красивое сообщение
-    alert(`Sargyt kabul edildi!\n\nYolagçy: ${name}\nUgur: ${origin} — ${destination}\nBahasy: ${price} RUB\n\nAdmin size tiz wagtda jaň eder!`);
+function buyTicket(origin, destination, date) {
+    // Формируем ссылку для партнерской программы Aviasales
+    // Формат: aviasales.ru/search/MOW2604ASB1
     
-    // Можно также показать тост
-    showToast(currentLang === 'tk' ? "Sargyt kabul edildi!" : "Заказ принят!");
+    // Очищаем дату от дефисов (из 2026-04-26 делаем 2604)
+    const d = date.split('-'); 
+    const dateFormatted = d[2] + d[1]; // Получаем "2604"
+
+    const url = `https://www.aviasales.ru/search/${origin}${dateFormatted}${destination}1?marker=${MARKER}`;
+    
+    // Открываем в новой вкладке
+    window.open(url, '_blank');
 }
