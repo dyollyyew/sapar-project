@@ -63,10 +63,6 @@ app.post('/api/search-live', async (req, res) => {
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
-flatpickr("#date", { 
-    minDate: "today", 
-    dateFormat: "Y-m-d" // Обязательно для API
-});
 
 // Запуск
 const PORT = process.env.PORT || 3000;
