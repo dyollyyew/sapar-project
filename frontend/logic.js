@@ -1,118 +1,153 @@
-// База данных городов (можно расширять)
-const cities = [
-    { name: "Ашхабад", code: "ASB", country: "Туркменистан" },
-    { name: "Казань", code: "KZN", country: "Россия" },
-    { name: "Москва", code: "MOW", country: "Россия" },
-    { name: "Стамбул", code: "IST", country: "Турция" },
-    { name: "Дубай", code: "DXB", country: "ОАЭ" }
-];
+// Данные администратора
+const ADMIN_PASS = "sapar2024";
 
-// 1. Настройка красивого календаря
-flatpickr("#dateInput", {
-    "locale": "ru",
-    dateFormat: "d.m.Y",
-    minDate: "today",
-    disableMobile: true,
-    // Делаем выбор месяца и года выпадающим списком
-    monthSelectorType: "static", 
-    onReady: function(selectedDates, dateStr, instance) {
-        // Дополнительная настройка для красоты
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    // Чиним календарь
+    flatpickr("#date-picker", { 
+        minDate: "today", 
+        dateFormat: "d.m.Y",
+        defaultDate: "26.04.2026" 
+    });
+    renderPopular();
+    updateUI();
 });
 
-// 2. Функция автозаполнения (Autocomplete)
-function setupAutocomplete(inputId, listId) {
-    const input = document.getElementById(inputId);
-    const list = document.getElementById(listId);
+// 1. Популярные направления с ПОЛНЫМИ названиями
+function renderPopular() {
+    const dests = [
+        { f: "Ashgabat (ASB)", t: "Istanbul (IST)", img: "IMG/ist.jpg" },
+        { f: "Ashgabat (ASB)", t: "Moscow (DME)", img: "IMG/mow.jpg" },
+        { f: "Ashgabat (ASB)", t: "Dubai (DXB)", img: "IMG/dxb.jpg" }
+    ];
+    const grid = document.getElementById('popular-grid');
+    grid.innerHTML = dests.map(d => `
+        <div class="dest-card" onclick="setSearch('${d.f}', '${d.t}')" style="cursor:pointer; border:1px solid #eee; border-radius:10px; overflow:hidden; text-align:center; background:#fff;">
+            <img src="${d.img}" style="width:100%; height:150px; object-fit:cover;">
+            <p style="padding:10px; font-weight:bold;">${d.f} — ${d.t}</p>
+        </div>
+    `).join('');
+}
 
-    input.oninput = () => {
-        const val = input.value.toLowerCase();
-        list.innerHTML = "";
-        if (!val) { list.style.display = "none"; return; }
+function setSearch(f, t) {
+    document.getElementById('from').value = f;
+    document.getElementById('to').value = t;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-        const filtered = cities.filter(c => 
-            c.name.toLowerCase().includes(val) || c.code.toLowerCase().includes(val)
-        );
+// 2. Логика ПОИСКА и ПОКУПКИ
+function runSearch() {
+    const from = document.getElementById('from').value;
+    const to = document.getElementById('to').value;
+    const date = document.getElementById('date-picker').value;
 
-        if (filtered.length > 0) {
-            list.style.display = "block";
-            filtered.forEach(city => {
-                const item = document.createElement("div");
-                item.className = "city-item";
-                // Показываем польностью название и код
-                item.innerHTML = `<b>${city.name}</b> <span style="color:#888">(${city.code})</span>`;
-                item.onclick = () => {
-                    input.value = `${city.name} (${city.code})`; // Записываем полностью
-                    list.style.display = "none";
-                    input.dataset.code = city.code; // Сохраняем код для API
-                };
-                list.appendChild(item);
-            });
-        } else {
-            list.style.display = "none";
-        }
+    if (!from || !to) return alert("Şäherleri giriziň!");
+
+    document.getElementById('popular-section').style.display = 'none';
+    const area = document.getElementById('display-area');
+    
+    area.innerHTML = `
+        <div class="ticket-card">
+            <div style="display:flex; justify-content:space-between; color:#008755; font-weight:bold;">
+                <span>Turkmenistan Airline</span>
+                <span style="font-size:12px; cursor:pointer;">Nyrh kadalary</span>
+            </div>
+            <div style="margin:20px 0; font-size:18px; font-weight:bold;">
+                ${from} ✈ ${to} <span style="font-weight:normal; color:#888;">${date}</span>
+            </div>
+            <div style="display:flex; justify-content:flex-end; align-items:center; gap:20px;">
+                <div style="font-size:24px; font-weight:800; color:#008755;">3360 TMT</div>
+                <button onclick="buyTicket('${from}', '${to}', '${date}')" style="background:#008755; color:white; border:none; padding:12px 25px; border-radius:8px; cursor:pointer; font-weight:bold;">SATYN AL (КУПИТЬ)</button>
+            </div>
+        </div>
+    `;
+}
+
+function buyTicket(f, t, d) {
+    let tickets = JSON.parse(localStorage.getItem('myTickets') || '[]');
+    tickets.push({ route: `${f} - ${t}`, date: d, id: Date.now() });
+    localStorage.setItem('myTickets', JSON.stringify(tickets));
+    alert("Bilet satyn alyndy! 'Meniň biletlerim' bölüminden görüp bilersiňiz.");
+}
+
+// 3. Личный кабинет (Документы и Билеты)
+function showSection(type) {
+    const area = document.getElementById('display-area');
+    document.getElementById('popular-section').style.display = 'none';
+    
+    if (type === 'docs') {
+        const d = JSON.parse(localStorage.getItem('userDocs') || '{"fio":"","pass":"","tel":"","mail":""}');
+        area.innerHTML = `
+            <div class="docs-form" style="background:white; padding:20px; border-radius:15px; border:1px solid #ddd;">
+                <h3>Meniň resminamalarym</h3>
+                <input type="text" id="doc-fio" placeholder="F.I.A. (ФИО)" value="${d.fio}">
+                <input type="text" id="doc-pass" placeholder="Pasport maglumatlary" value="${d.pass}">
+                <input type="text" id="doc-tel" placeholder="Telefon" value="${d.tel}">
+                <input type="email" id="doc-mail" placeholder="E-mail" value="${d.mail}">
+                <button onclick="saveDocs()" style="background:#008755; color:white; border:none; padding:10px 20px; width:100%; border-radius:8px; cursor:pointer;">ÝATDA SAKLA</button>
+            </div>
+        `;
+    } else if (type === 'tickets') {
+        const tks = JSON.parse(localStorage.getItem('myTickets') || '[]');
+        area.innerHTML = '<h3>Meniň biletlerim</h3>' + (tks.length ? tks.map(t => `
+            <div style="background:white; padding:15px; border-bottom:1px solid #eee; margin-bottom:5px;">
+                <b>${t.route}</b> <br> <small>${t.date}</small>
+            </div>
+        `).join('') : '<p>Bilet ýok.</p>');
+    }
+}
+
+function saveDocs() {
+    const data = {
+        fio: document.getElementById('doc-fio').value,
+        pass: document.getElementById('doc-pass').value,
+        tel: document.getElementById('doc-tel').value,
+        mail: document.getElementById('doc-mail').value
     };
+    localStorage.setItem('userDocs', JSON.stringify(data));
+    alert("Maglumatlar ýatda saklandy!");
 }
 
-// Инициализируем подсказки для обоих полей
-setupAutocomplete("fromCity", "listFrom");
-setupAutocomplete("toCity", "listTo");
+// 4. Защита АДМИНКИ и ВХОД
+function handleLogin() {
+    const pass = prompt("Admin parolyňyzy giriziň:");
+    if (pass === ADMIN_PASS) {
+        localStorage.setItem('role', 'admin');
+        updateUI();
+        alert("Hoş geldiňiz, Admin!");
+    } else {
+        alert("Ýalňyş parol!");
+    }
+}
 
-// 3. Функция реверса (меняем города местами)
+function openAdminPanel() {
+    if (localStorage.getItem('role') === 'admin') {
+        window.location.href = 'admin.html'; //
+    } else {
+        alert("Giriş gadagan!");
+    }
+}
+
+function updateUI() {
+    const role = localStorage.getItem('role');
+    const adminMenu = document.getElementById('admin-menu-item');
+    if (role === 'admin') {
+        adminMenu.style.display = 'block';
+        document.getElementById('profile-text').innerText = "Admin";
+    }
+}
+
+function logout() {
+    localStorage.removeItem('role');
+    location.reload();
+}
+
+function toggleMenu() {
+    const m = document.getElementById('dropdown-menu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+
 function swapCities() {
-    const from = document.getElementById("fromCity");
-    const to = document.getElementById("toCity");
-    const temp = from.value;
-    from.value = to.value;
-    to.value = temp;
-}
-
-// 4. Поиск билетов
-async function findTickets() {
-    const results = document.getElementById("resultsArea");
-    const from = document.getElementById("fromCity").value;
-    const to = document.getElementById("toCity").value;
-    const date = document.getElementById("dateInput").value;
-
-    if (!from || !to || !date) {
-        alert("Пожалуйста, заполните все поля!");
-        return;
-    }
-
-    results.innerHTML = "<center style='margin-top:50px;'><i class='fas fa-spinner fa-spin fa-2x'></i><br>Ищем лучшие рейсы...</center>";
-
-    try {
-        // Имитация запроса к API (замени на свой fetch)
-        setTimeout(() => {
-            // Если города не Kazan или Ashgabat, выводим "не найдено"
-            if (!from.includes("ASB") && !from.includes("KZN")) {
-                results.innerHTML = "<div style='text-align:center; padding:50px; font-size:18px; color:#666;'>Petek tapylmady. (Билетов не найдено)</div>";
-                return;
-            }
-
-            // Иначе рисуем красивый билет по твоему образцу
-            results.innerHTML = `
-                <div class="ticket-card">
-                    <div class="ticket-header">
-                        <div>Turkmenistan Airline</div>
-                        <div style="font-size:12px; cursor:pointer">Правила тарифа и нормы багажа</div>
-                    </div>
-                    <div style="font-weight:bold; margin-bottom:15px; font-size:16px;">${from} ✈ ${to}</div>
-                    <div class="ticket-info">
-                        <div><div class="lbl">Вылет</div><div class="val">17:30</div></div>
-                        <div><div class="lbl">Прилет</div><div class="val">22:50</div></div>
-                        <div><div class="lbl">Пересадки</div><div class="val" style="color:green">Прямой</div></div>
-                        <div><div class="lbl">В пути</div><div class="val">03 ч 20 мин</div></div>
-                        <div><div class="lbl">Рейс</div><div class="val">740</div></div>
-                    </div>
-                    <div class="ticket-footer">
-                        <div class="price">31 988 ₽</div>
-                        <button class="btn-book">ЗАБРОНИРОВАТЬ</button>
-                    </div>
-                </div>
-            `;
-        }, 1000);
-    } catch (e) {
-        results.innerHTML = "Ошибка сервера.";
-    }
+    const f = document.getElementById('from');
+    const t = document.getElementById('to');
+    [f.value, t.value] = [t.value, f.value];
 }

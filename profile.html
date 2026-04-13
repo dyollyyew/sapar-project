@@ -1,0 +1,55 @@
+<div class="profile-card">
+    <div class="user-header">
+        <div class="avatar">Д</div>
+        <span>Профиль</span>
+    </div>
+    
+    <ul class="menu-list">
+        <li><i class="fas fa-cog"></i> Настройки</li>
+        <li><i class="fas fa-comment"></i> Уведомления</li>
+        <li><i class="fas fa-wallet"></i> Мои заказы</li>
+        <li class="active"><i class="fas fa-file-alt"></i> Документы</li>
+        <li><i class="fas fa-globe"></i> Статистика</li>
+    </ul>
+
+    <button class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Выйти
+    </button>
+</div>
+
+<style>
+.profile-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    font-family: sans-serif;
+}
+.menu-list {
+    list-style: none;
+    padding: 0;
+}
+.menu-list li {
+    padding: 12px 15px;
+    margin: 5px 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.menu-list li:hover { background: #f0f3f7; }
+.menu-list li.active { background: #f0f3f7; font-weight: bold; }
+.logout-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 15px;
+    border: none;
+    background: #f0f3f7;
+    margin-top: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+</style>
