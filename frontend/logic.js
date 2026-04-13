@@ -17,8 +17,7 @@ function renderPopular() {
     const dests = [
         { f: "Ashgabat (ASB)", t: "Istanbul (IST)", img: "IMG/ist.jpg" },
         { f: "Ashgabat (ASB)", t: "Moscow (DME)", img: "IMG/mow.jpg" },
-        { f: "Ashgabat (ASB)", t: "Dubai (DXB)", img: "IMG/dxb.jpg" },
-        { f: "Ashgabat (ASB)", t: "Kazan (KZN)", img: "IMG/kzn.jpg" }
+        { f: "Ashgabat (ASB)", t: "Dubai (DXB)", img: "IMG/dxb.jpg" }
     ];
     const grid = document.getElementById('popular-grid');
     grid.innerHTML = dests.map(d => `
@@ -151,87 +150,4 @@ function swapCities() {
     const f = document.getElementById('from');
     const t = document.getElementById('to');
     [f.value, t.value] = [t.value, f.value];
-}
-// Имитация базы данных рейсов
-const flightsData = [
-    { from: "Ashgabat (ASB)", to: "Istanbul (IST)", time: "10:00", price: "4500 TMT" },
-    { from: "Ashgabat (ASB)", to: "Moscow (DME)", time: "14:30", price: "3800 TMT" }
-];
-
-function startSearch() {
-    const fromVal = document.getElementById('from').value;
-    const toVal = document.getElementById('to').value;
-    const resultsDiv = document.getElementById('results-container');
-    const listDiv = document.getElementById('flights-list');
-
-    if (!fromVal || !toVal) {
-        showMsg("Dolduryň!"); //
-        return;
-    }
-
-    showMsg('Gözlenýär...'); //
-    
-    // Очищаем старые результаты
-    listDiv.innerHTML = '';
-    
-    // Фильтруем данные
-    const found = flightsData.filter(f => f.from === fromVal && f.to === toVal);
-
-    if (found.length > 0) {
-        resultsDiv.style.display = 'block';
-        found.forEach(flight => {
-            listDiv.innerHTML += `
-                <div style="background:white; padding:20px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <div>
-                        <strong style="font-size:18px;">${flight.from} ✈ ${flight.to}</strong><br>
-                        <span style="color:#666;">Wagt: ${flight.time}</span>
-                    </div>
-                    <div style="text-align:right;">
-                        <span style="color:var(--main-green); font-weight:bold; font-size:20px;">${flight.price}</span><br>
-                        <button class="btn-search" style="padding:8px 15px; font-size:14px; margin-top:5px;">Satyn al</button>
-                    </div>
-                </div>
-            `;
-        });
-    } else {
-        showMsg("Reýs tapylmady"); //
-        resultsDiv.style.display = 'none';
-    }
-}
-async function findTickets() {
-    const fromVal = document.getElementById('from').value.toUpperCase(); //
-    const toVal = document.getElementById('to').value.toUpperCase(); //
-    const list = document.getElementById('ticket-list');
-
-    showToast("Gözleg başlandy..."); //
-
-    try {
-        // Здесь указывается адрес твоего API
-        const response = await fetch(`https://api.sapar.tm/flights?from=${fromVal}&to=${toVal}`);
-        const found = await response.json();
-
-        list.innerHTML = "";
-        
-        if (found.length > 0) {
-            document.getElementById('results-container').style.display = 'block';
-            found.forEach(f => {
-                list.innerHTML += `
-                    <div class="ticket">
-                        <div>
-                            <strong>${f.from} ✈ ${f.to}</strong><br>
-                            <small>${f.company}</small>
-                        </div>
-                        <div style="text-align:right;">
-                            <div class="price">${f.price} TMT</div>
-                            <button class="btn-go">Satyn al</button>
-                        </div>
-                    </div>`;
-            });
-        } else {
-            showToast("Reýs tapylmady.");
-        }
-    } catch (error) {
-        console.error("API Error:", error);
-        showToast("Сервер недоступен"); //
-    }
 }
