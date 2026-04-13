@@ -1,155 +1,166 @@
 <!DOCTYPE html>
 <html lang="tm">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAPARTM — Biletiňizi Tapyň</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>SAPARTM — Biletiňizi Tapyň</title>
 
-    <style>
-        :root { --green: #008755; --bg: #f4f7f6; --white: #ffffff; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; overflow-x: hidden; color: #333; }
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-        /* Header & Lang */
-        header { background: #fff; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 24px; font-weight: 800; color: var(--green); text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .nav-right { display: flex; align-items: center; gap: 20px; }
-        
-        .lang-switcher { display: flex; background: #eee; padding: 4px; border-radius: 20px; }
-        .lang-switcher span { padding: 5px 15px; cursor: pointer; font-size: 12px; font-weight: bold; border-radius: 15px; transition: 0.3s; color: #666; }
-        .lang-switcher span.active { background: var(--green); color: #fff; }
+ <style>
+ :root { --green: #008755; --bg: #f4f7f6; --white: #ffffff; }
+ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; overflow-x: hidden; color: #333; }
 
-        .btn-profile { background: none; border: 1px solid #ddd; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .btn-profile:hover { border-color: var(--green); color: var(--green); }
+ /* Header & Lang */
+ header { background: #fff; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+ .logo { font-size: 24px; font-weight: 800; color: var(--green); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+ .nav-right { display: flex; align-items: center; gap: 20px; }
 
-        /* Hero */
-        .hero { background: var(--green); height: 180px; color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        .hero h1 { margin: 0; font-size: 32px; letter-spacing: 1px; }
-        .hero p { opacity: 0.9; margin-top: 5px; }
+.lang-switcher { display: flex; background: #eee; padding: 4px; border-radius: 20px; }
+ .lang-switcher span { padding: 5px 15px; cursor: pointer; font-size: 12px; font-weight: bold; border-radius: 15px; transition: 0.3s; color: #666; }
+ .lang-switcher span.active { background: var(--green); color: #fff; }
 
-        /* Search Form */
-        .search-container { max-width: 1100px; margin: -50px auto 40px; padding: 0 20px; }
-        .search-card { 
-            background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            display: grid; grid-template-columns: 1fr 40px 1fr 1fr auto; align-items: end; gap: 15px; 
-        }
-        .field { display: flex; flex-direction: column; gap: 5px; position: relative; }
-        .field label { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; margin-left: 5px; }
-        .field input { padding: 14px; border: 1px solid #eee; border-radius: 12px; outline: none; font-size: 15px; transition: 0.3s; font-weight: 600; }
-        .field input:focus { border-color: var(--green); background: #f9fffb; }
-        
-        /* Suggestions */
-        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #eee; z-index: 1000; display: none; border-radius: 0 0 12px 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow: hidden; }
-        .suggest-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f9f9f9; font-size: 14px; }
-        .suggest-item:hover { background: #f0f9f4; color: var(--green); }
+ .btn-profile { background: none; border: 1px solid #ddd; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+ .btn-profile:hover { border-color: var(--green); color: var(--green); }
 
-        .btn-search { background: var(--green); color: white; border: none; padding: 0 35px; border-radius: 12px; font-weight: bold; cursor: pointer; height: 50px; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,135,85,0.2); }
-        .btn-search:hover { background: #006b43; transform: translateY(-2px); }
+ /* Hero */
+ .hero { background: var(--green); height: 180px; color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+ .hero h1 { margin: 0; font-size: 32px; letter-spacing: 1px; }
+ .hero p { opacity: 0.9; margin-top: 5px; }
 
-        /* Popular Section */
-        .popular { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-        .dest-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; text-align: center; transition: 0.3s; }
-        .dest-card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .dest-card img { width: 100%; height: 140px; object-fit: cover; }
-        .dest-card p { padding: 12px; font-weight: bold; margin: 0; font-size: 14px; color: #444; }
+ /* Search Form */
+ .search-container { max-width: 1100px; margin: -50px auto 40px; padding: 0 20px; }
+ .search-card {
+ background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+ display: grid; grid-template-columns: 1fr 40px 1fr 1fr auto; align-items: end; gap: 15px;
+ }
+ .field { display: flex; flex-direction: column; gap: 5px; position: relative; }
+ .field label { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; margin-left: 5px; }
+ .field input { padding: 14px; border: 1px solid #eee; border-radius: 12px; outline: none; font-size: 15px; transition: 0.3s; font-weight: 600; }
+ .field input:focus { border-color: var(--green); background: #f9fffb; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #fff; padding: 35px; border-radius: 25px; width: 90%; max-width: 380px; position: relative; animation: slideUp 0.3s ease; text-align: center; }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .close-modal { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; color: #999; }
-        
-        /* Toast Notification */
-        .toast { position: fixed; top: 20px; right: -350px; background: #fff; padding: 18px 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 15px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 3000; border-left: 6px solid var(--green); }
-        .toast.show { right: 20px; }
-        .toast i { color: var(--green); font-size: 22px; }
+ /* Suggestions */
+ .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #eee; z-index: 1000; display: none; border-radius: 0 0 12px 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow: hidden; }
+ .suggest-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f9f9f9; font-size: 14px; }
+ .suggest-item:hover { background: #f0f9f4; color: var(--green); }
+ .btn-search { background: var(--green); color: white; border: none; padding: 0 35px; border-radius: 12px; font-weight: bold; cursor: pointer; height: 50px; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,135,85,0.2); }
+.btn-search:hover { background: #006b43; transform: translateY(-2px); }
 
-        @media (max-width: 900px) {
-            .search-card { grid-template-columns: 1fr; }
-            .grid { grid-template-columns: 1fr 1fr; }
-            header { padding: 15px 5%; }
-        }
-    </style>
+ /* Popular Section */
+ .popular { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+ .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+ .dest-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; text-align: center; transition: 0.3s; }
+ .dest-card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+ .dest-card img { width: 100%; height: 140px; object-fit: cover; }
+ .dest-card p { padding: 12px; font-weight: bold; margin: 0; font-size: 14px; color: #444; }
+ /* Modal */
+ .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+ .modal-content { background: #fff; padding: 35px; border-radius: 25px; width: 90%; max-width: 380px; position: relative; animation: slideUp 0.3s ease; text-align: center; }
+ @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+ .close-modal { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; color: #999; }
+
+ /* Toast Notification */
+.toast { position: fixed; top: 20px; right: -350px; background: #fff; padding: 18px 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 15px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 3000; border-left: 6px solid var(--green); }
+ .toast.show { right: 20px; }
+ .toast i { color: var(--green); font-size: 22px; }
+
+@media (max-width: 900px) {
+ .search-card { grid-template-columns: 1fr; }
+ .grid { grid-template-columns: 1fr 1fr; }
+ header { padding: 15px 5%; }
+}
+ </style>
 </head>
 <body>
 
 <header>
-    <a href="index.html" class="logo"><i class="fas fa-paper-plane"></i> SAPARTM</a>
-    <div class="nav-right">
-        <div class="lang-switcher">
-            <span id="btn-tk" class="active" onclick="changeLang('tk')">TKM</span>
-            <span id="btn-ru" onclick="changeLang('ru')">РУС</span>
-        </div>
-        <button class="btn-profile" onclick="openProfile()">
-            <i class="fas fa-user-circle"></i> <span id="txt-profile">Profil</span>
-        </button>
-    </div>
+ <a href="index.html" class="logo"><i class="fas fa-paper-plane"></i> SAPARTM</a>
+ <div class="nav-right">
+ <div class="lang-switcher">
+ <span id="btn-tk" class="active" onclick="changeLang('tk')">TKM</span>
+ <span id="btn-ru" onclick="changeLang('ru')">РУС</span>
+ </div>
+ <button class="btn-profile" onclick="openProfile()">
+ <i class="fas fa-user-circle"></i> <span id="txt-profile">Profil</span>
+ </button>
+ </div>
 </header>
 
 <div class="hero">
-    <h1 id="hero-title">HOŞ GELDIŇIZ!</h1>
-    <p id="hero-sub">Aşgabat — Dünýäniň gapysy</p>
+ <h1 id="hero-title">HOŞ GELDIŇIZ!</h1>
+ <p id="hero-sub">Aşgabat — Dünýäniň gapysy</p>
 </div>
 
 <div class="search-container">
-    <div class="search-card">
-        <div class="field">
-            <label id="lbl-from">Nireden</label>
-            <input type="text" id="from" placeholder="ASB" autocomplete="on">
-            <div id="suggest-from" class="suggestions"></div>
-        </div>
-        <button onclick="swapCities()" style="background:none; border:none; color:var(--green); cursor:pointer; font-size:20px; margin-bottom:12px;"><i class="fas fa-exchange-alt"></i></button>
-        <div class="field">
-            <label id="lbl-to">Nirä</label>
-            <input type="text" id="to" placeholder="KZN" autocomplete="on">
-            <div id="suggest-to" class="suggestions"></div>
-        </div>
-        <div class="field">
-            <label id="lbl-date">Sene</label>
-            <input type="text" id="date" placeholder="Saýlaň...">
-        </div>
-        <button class="btn-search" onclick="runSearch()" id="btn-search">GÖZLEG</button>
-    </div>
+ <div class="search-card">
+ <div class="field">
+ <label id="lbl-from">Nireden</label>
+ <input type="text" id="from" placeholder="ASB" autocomplete="on">
+ <div id="suggest-from" class="suggestions"></div>
+ </div>
+ <button onclick="swapCities()" style="background:none; border:none; color:var(--green); cursor:pointer; font-size:20px; margin-bottom:12px;"><i class="fas fa-exchange-alt"></i></button>
+ <div class="field">
+ <label id="lbl-to">Nirä</label>
+ <input type="text" id="to" placeholder="KZN" autocomplete="on">
+ <div id="suggest-to" class="suggestions"></div>
+ </div>
+ <div class="field">
+ <label id="lbl-date">Sene</label>
+ <input type="text" id="date" placeholder="Saýlaň...">
+</div>
+ <button class="btn-search">GÖZLEG</button>
+ </div>
 </div>
 
-<div class="popular" id="popular-section">
-    <h2 id="pop-title" style="text-align:center; margin-bottom:30px;">Meşhur ugurlar</h2>
-    <div class="grid">
-        <div class="dest-card" onclick="setQuickSearch('ASB', 'IST')"><img src="ist.jpg"><p>Aşgabat — Stambul</p></div>
-        <div class="dest-card" onclick="setQuickSearch('ASB', 'DME')"><img src="mow.jpg"><p>Aşgabat — Moskwa</p></div>
-        <div class="dest-card" onclick="setQuickSearch('ASB', 'DXB')"><img src="dxb.jpg"><p>Aşgabat — Dubaý</p></div>
-        <div class="dest-card" onclick="setQuickSearch('ASB', 'KZN')"><img src="kzn.jpg"><p>Aşgabat — Kazan</p></div>
-    </div>
+<div class="popular-section">
+ <h2 id="pop-title" style="text-align:center; margin-bottom:30px;">Meşhur ugurlar</h2>
+ <div class="grid" id="popular-grid">
+ <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Istanbul (IST)')">
+<img src="IMG/ist.jpg" alt="Istanbul">
+ <p>Ashgabat — Istanbul (IST)</p>
 </div>
 
+ <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Moscow (VKO)')">
+ <img src="IMG/mow.jpg" alt="Moscow">
+ <p>Ashgabat — Moscow (MOW)</p>
+ </div>
+
+ <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Dubai (DXB)')">
+ <img src="IMG/dxb.jpg" alt="Dubai">
+ <p>Ashgabat — Dubai (DXB)</p>
+ </div>
+ <div class="dest-card" onclick="fill('Ashgabat (ASB)', 'Kazan (KZN)')">
+ <img src="IMG/kzn.jpg" alt="Kazan">
+ <p>Ashgabat — Kazan (KZN)</p>
+ </div>
+ </div>
+</div>
 <div id="results-list" style="padding: 0 20px 50px;"></div>
 
 <div id="profile-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeProfile()">&times;</span>
-        <h3 id="modal-title">Yolagçy Profili</h3>
-        <div class="field" style="margin-bottom:15px; text-align: left;">
-            <label>Ady</label>
-            <input type="text" id="p-name" placeholder="Batyr">
-        </div>
-        <div class="field" style="margin-bottom:15px; text-align: left;">
-            <label>Familiýasy</label>
-            <input type="text" id="p-surname" placeholder="Batyrow">
-        </div>
-        <div class="field" style="margin-bottom:20px; text-align: left;">
-            <label>Email</label>
-            <input type="email" id="p-email" placeholder="example@mail.com">
-        </div>
-        <button class="btn-search" style="width:100%" onclick="saveProfile()">ÝATDA SAKLA</button>
-    </div>
+ <div class="modal-content">
+ <span class="close-modal" onclick="closeProfile()">&times;</span>
+ <h3 id="modal-title">Yolagçy Profili</h3>
+ <div class="field" style="margin-bottom:15px; text-align: left;">
+ <label>Ady</label>
+ <input type="text" id="p-name" placeholder="Batyr">
+ </div>
+ <div class="field" style="margin-bottom:15px; text-align: left;">
+ <label>Familiýasy</label>
+<input type="text" id="p-surname" placeholder="Batyrow">
+ </div>
+ <div class="field" style="margin-bottom:20px; text-align: left;">
+ <label>Email</label>
+ <input type="email" id="p-email" placeholder="example@mail.com">
+ </div>
+ <button class="btn-search" style="width:100%" onclick="saveProfile()">ÝATDA SAKLA</button>
+ </div>
 </div>
 
 <div id="toast" class="toast">
-    <i class="fas fa-check-circle"></i>
-    <span id="toast-msg">Üstünlikli ýazyldy!</span>
+ <i class="fas fa-check-circle"></i>
+ <span id="toast-msg">Üstünlikli ýazyldy!</span>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
